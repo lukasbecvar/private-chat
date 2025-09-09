@@ -1,0 +1,18 @@
+# env config files
+.env.prod
+
+# jwt key
+config/jwt
+
+# UI assets
+public/bundles/
+
+# composer packages
+vendor/
+composer.lock
+
+# symfony temp storage
+var/
+
+# php code sniffer cache
+.phpcs-cache

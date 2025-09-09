@@ -1,0 +1,7 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    trusted_hosts: '%env(TRUSTED_HOSTS)%'
+    session: false
+when@test:
+    framework:
+        test: true

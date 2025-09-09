@@ -1,0 +1,72 @@
+# docker compose configuration defines local development stack
+
+# docker network config
+networks:
+    main:
+        driver: bridge
+
+services:
+    # composer service for managing php dependencies
+    composer:
+        image: composer:latest
+        container_name: api_base_composer
+        working_dir: /app
+        mem_limit: 1g
+        volumes:
+            - ./backend:/app
+        command: composer install
+
+    # database container
+    mysql:
+        image: mysql:8.0.43
+        container_name: api_base_mysql
+        restart: always
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - ./backend/.docker/config/mysqld.conf:/etc/mysql/mysql.conf.d/mysqld.cnf
+            - ./services-data/mysql-database:/var/lib/mysql
+            - ./services-data/log:/var/log
+        mem_limit: 1g
+        ports:
+            - "3306:3306"
+        networks:
+            - main
+
+    # redis (cache) container
+    redis:
+        image: redis:8.2
+        container_name: api_base_redis
+        restart: always
+        mem_limit: 1g
+        ports:
+            - "6379:6379"
+        command: ["redis-server", "--requirepass", "redis_test_password"]
+        volumes:
+            - ./services-data/redis-data:/data
+        networks:
+            - main
+
+    # web server container
+    php:
+        build:
+            context: .
+            dockerfile: ./backend/.docker/Dockerfile.dev
+        container_name: api_base_website
+        restart: always
+        depends_on:
+            - mysql
+            - redis
+        environment:
+            - DATABASE_HOST=mysql
+            - REDIS_HOST=redis
+        volumes:
+            - ./backend/.docker/config/apache.conf:/etc/apache2/sites-available/000-default.conf
+            - ./backend/.docker/config/php.ini:/usr/local/etc/php/php.ini
+            - ./services-data/log:/var/log
+            - ./backend/:/var/www
+        mem_limit: 1g
+        ports:
+            - "1337:80"
+        networks:
+            - main

@@ -3,16 +3,16 @@
 # ROADMAP
 ## Version 1.0
 - [ ] Setup api-base and modify for private chat use    
-    - [ ] Clean unnecessary components
-    - [ ] User authentication
-    - [ ] Login and logout system
-    - [ ] JWT token blacklisting system
+    - [X] Clean unnecessary components
+    - [X] User authentication
+    - [X] Login and logout system
+    - [X] JWT token blacklisting system
+    - [X] User register command
+    - [X] User password reset command
+    - [X] Implement security middleware for (SSL check, XSS escape, CSRF, etc)
+    - [ ] Change user login main property to username auth (email is not required)
     - [ ] JWT refresh token system (?? maybe)
-    - [ ] User register command
-    - [ ] User password reset command
-    - [ ] Delete controller for user registration (allow registration only for admins in CLI for now)
     - [ ] Implement rate limiting for non-authenticated users
-    - [ ] Implement security middleware for (SSL check, XSS escape, CSRF, etc)
     - [ ] Implement user profile image to user entity (avatar in base64)
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)

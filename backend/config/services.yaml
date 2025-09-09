@@ -1,0 +1,68 @@
+services:
+    _defaults:
+        autowire: true      # automatically injects dependencies
+        autoconfigure: true # automatically register services
+
+    # define autowiring services for App namespace
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # register predis service (redis client)
+    Predis\Client:
+        arguments:
+            $parameters: '%env(resolve:REDIS_SCHEME)%://%env(resolve:REDIS_USER)%:%env(resolve:REDIS_PASSWORD)%@%env(resolve:REDIS_HOST)%:%env(resolve:REDIS_PORT)%'
+
+    # exception event subscriber (error handling functionality)
+    App\Event\Subscriber\ExceptionEventSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }
+
+    # login event subscriber (log login action)
+    App\Event\Subscriber\LoginEventSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
+    # request middlewares
+    # --------------------------------------------------------------------------------- #
+    # rate limiter middleware
+    App\Middleware\RateLimitMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 8 }
+
+    # escape request data (for security)
+    App\Middleware\EscapeRequestDataMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 7 }
+
+    # check if database is online
+    App\Middleware\DatabaseOnlineMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 6 }
+
+    # handle maintenance mode
+    App\Middleware\MaintenanceMiddleware:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 5 }
+
+    # check security rules
+    App\Middleware\SecurityCheckMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 4 }
+
+    # validate access token
+    App\Middleware\AccessTokenValidateMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 3 }
+
+    # validate auth token and check if token is blacklisted
+    App\Middleware\AuthTokenValidateMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 2 }
+
+    # check if user is active
+    App\Middleware\UserStatusCheckMiddleware:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 1 }

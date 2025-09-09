@@ -1,0 +1,87 @@
+when@dev:
+    nelmio_api_doc:
+        documentation:
+            info:
+                title: 'Private Chat API'
+                description: 'Private chat REST-API documentation'
+                version: '%env(APP_VERSION)%'
+
+            # api servers
+            servers:
+                # testing dev env
+                - url: 'http://localhost'
+                  description: 'Local development environment'
+                # live production system server url
+                - url: 'https://chat.becvar.xyz'
+                  description: 'Production server'
+
+            # security components
+            components:
+                securitySchemes:
+                    JWTSecurity:
+                        type: http
+                        scheme: bearer
+                        bearerFormat: JWT
+                        description: 'JWT token for user login'
+                        required: true
+                    XApiToken:
+                        type: apiKey
+                        in: header
+                        name: X-API-TOKEN
+                        description: 'API Access Token'
+                        required: true
+
+            # include security components
+            security:
+                - JWTSecurity: []   # JWT Security (user login)
+                - XApiToken: []     # API Access Token (validate request)
+
+            # static docs
+            paths:
+                # JWT login api endpoint documentation
+                /api/auth/login:
+                    post:
+                        tags: ['Auth']
+                        summary: User login action
+                        description: User login for get JWT auth token
+                        requestBody:
+                            required: true
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            email:
+                                                type: email
+                                                default: test@test.test
+                                            password:
+                                                type: string
+                                                default: test
+                        responses:
+                            200:
+                                description: Successful login (return token)
+                                content:
+                                    application/json:
+                                        examples:
+                                            success:
+                                                summary: Example of successful login
+                                                value:
+                                                    token: "eyJhbGciOiJIUzI1NiIsInR..."
+                            401:
+                                description: Invalid credentials
+                                content:
+                                    application/json:
+                                        examples:
+                                            unauthorized:
+                                                summary: Invalid credentials response
+                                                value:
+                                                    error: "Invalid credentials"
+                            400:
+                                description: Bad request body data
+                                content:
+                                    application/json:
+                                        examples:
+                                            bad_request:
+                                                summary: Example of bad request response
+                                                value:
+                                                    error: "Missing email or password"

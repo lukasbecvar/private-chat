@@ -1,0 +1,68 @@
+# run application tests with phpunit
+name: PHPUnit Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  phpunit:
+    name: Run PHPUnit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+        
+    services:
+      # mysql database service
+      mysql:
+        image: mysql:8.0.43
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      # redis cache service
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # setup php interpreter
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: intl, pdo_mysql, pdo
+
+      # composer install
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --no-suggest
+
+      # create test database
+      - name: Create database
+        run: php bin/console doctrine:database:create --if-not-exists --env=test
+
+      # migrate database to latest version
+      - name: Migrate database
+        run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+        
+      # load testing datafixtures
+      - name: Load db datafixtures
+        run: php bin/console doctrine:fixtures:load --no-interaction --env=test
+
+      # generate jwk key
+      - name: Generate JWT keys
+        run: php bin/console lexik:jwt:generate-keypair
+
+      # phpunit process
+      - name: Run PHPUnit
+        run: php ./bin/phpunit

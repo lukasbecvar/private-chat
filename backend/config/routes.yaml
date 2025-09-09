@@ -1,0 +1,32 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+# handle not found error (in prod env)
+when@prod:
+    catch_all:
+        path: /{any}
+        controller: App\Controller\ErrorController::handleNotFoundError
+        methods: GET
+        requirements:
+            any: .*
+
+# auth login route (handled by JWT bundle)
+api_login_check:
+    path: /api/auth/login
+    methods: POST
+
+# api doc routes
+when@dev:
+    # api doc in swagger ui
+    app.doc_swagger_ui:
+        path: /api/doc
+        methods: GET
+        defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+    # api doc in json format
+    app.doc_json:
+        path: /api/doc.json
+        methods: GET
+        defaults: { _controller: nelmio_api_doc.controller.swagger }

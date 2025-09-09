@@ -1,0 +1,27 @@
+# define base php-apache image for production environment
+FROM php:8.4-apache 
+
+# set container working directory
+WORKDIR /var/www
+
+# copy project file to image
+COPY . /var/www/
+COPY .docker/config/php.ini /usr/local/etc/php/php.ini
+COPY .docker/config/apache.conf /etc/apache2/sites-available/000-default.conf
+
+# install required packages
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    rpm
+    
+# install PHP extensions
+RUN docker-php-ext-install pdo_mysql pdo intl
+
+# install OPCache extension
+RUN docker-php-ext-install opcache
+
+# set global server name (domain)
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# enable rewrite module
+RUN a2enmod rewrite
