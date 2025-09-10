@@ -37,7 +37,7 @@ class UserUpdateRoleCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('user', null, InputOption::VALUE_REQUIRED, 'Email of the user to update')
+            ->addOption('user', null, InputOption::VALUE_REQUIRED, 'Username of the user to update')
             ->addOption('add', null, InputOption::VALUE_OPTIONAL, 'Role to add to the user')
             ->addOption('remove', null, InputOption::VALUE_OPTIONAL, 'Role to remove from the user')
             ->setHelp(<<<'HELP'
@@ -45,15 +45,15 @@ class UserUpdateRoleCommand extends Command
 
                 Examples:
                 - Add a role:
-                    <info>php bin/console %command.name% --user="test@test.test" --add="ROLE_ADMIN"</info>
+                    <info>php bin/console %command.name% --user="testing_user" --add="ROLE_ADMIN"</info>
                 
                 - Remove a role:
-                    <info>php bin/console %command.name% --user="test@test.test" --remove="ROLE_ADMIN"</info>
+                    <info>php bin/console %command.name% --user="testing_user" --remove="ROLE_ADMIN"</info>
 
                 - If no role action (--add or --remove) is provided, the command will display an error.
 
                 Options:
-                --user      (required) Email of the user to update
+                --user      (required) Username of the user to update
                 --add       (optional) Role to add
                 --remove    (optional) Role to remove
             HELP)
@@ -77,19 +77,19 @@ class UserUpdateRoleCommand extends Command
         $_SERVER['HTTP_USER_AGENT'] = 'CLI-COMMAND';
 
         // get command options
-        $email = $input->getOption('user');
+        $username = $input->getOption('user');
         $roleToAdd = $input->getOption('add');
         $roleToRemove = $input->getOption('remove');
 
-        // check if user email is provided
-        if (!$email) {
+        // check if user username is provided
+        if (!$username) {
             $io->error('The --user option is required.');
             return Command::INVALID;
         }
 
         // check if user exists
-        if (!$this->userManager->checkIfUserEmailAlreadyRegistered($email)) {
-            $io->error('User not found: ' . $email);
+        if (!$this->userManager->checkIfUserIsAlreadyRegistered($username)) {
+            $io->error('User not found: ' . $username);
             return Command::INVALID;
         }
 
@@ -99,20 +99,20 @@ class UserUpdateRoleCommand extends Command
             return Command::INVALID;
         }
 
-        // get user id by email
-        $id = $this->userManager->getUserIdByEmail($email);
+        // get user id by username
+        $id = $this->userManager->getUserIdByUsername($username);
 
         try {
             // add role to user
             if ($roleToAdd) {
                 $this->userManager->addRoleToUser($id, $roleToAdd);
-                $io->success('Role: ' . $roleToAdd . ' added to user: ' . $email . '.');
+                $io->success('Role: ' . $roleToAdd . ' added to user: ' . $username . '.');
             }
 
             // remove role from user
             if ($roleToRemove) {
                 $this->userManager->removeRoleFromUser($id, $roleToRemove);
-                $io->success('Role: ' . $roleToRemove . ' removed from user: ' . $email . '.');
+                $io->success('Role: ' . $roleToRemove . ' removed from user: ' . $username . '.');
             }
         } catch (Exception $e) {
             $io->error('Error updating user role: ' . $e->getMessage());

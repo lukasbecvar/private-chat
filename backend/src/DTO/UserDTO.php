@@ -13,9 +13,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class UserDTO
 {
-    #[Assert\NotBlank(message: "email value should not be blank.")]
-    #[Assert\Email(message: "email value is not a valid email address.")]
-    public string $email;
+    #[Assert\NotBlank(message: "username value should not be blank.")]
+    public string $username;
 
     #[Assert\NotBlank(message: "first-name value should not be blank.")]
     #[Assert\Length(

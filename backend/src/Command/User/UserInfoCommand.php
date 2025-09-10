@@ -38,7 +38,7 @@ class UserInfoCommand extends Command
      */
     protected function configure(): void
     {
-        $this->addArgument('email', InputArgument::REQUIRED, 'Email of the user');
+        $this->addArgument('username', InputArgument::REQUIRED, 'Username of the user');
     }
 
     /**
@@ -57,33 +57,29 @@ class UserInfoCommand extends Command
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['HTTP_USER_AGENT'] = 'CLI-COMMAND';
 
-        // get email argument
-        $email = $input->getArgument('email');
+        // get username argument
+        $username = $input->getArgument('username');
 
-        // validate email input
-        if ($email == null) {
-            $io->error('Email cannot be empty.');
-            return Command::INVALID;
-        }
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $io->error('Invalid email format.');
+        // validate username input
+        if ($username == null) {
+            $io->error('Username cannot be empty.');
             return Command::INVALID;
         }
 
         // check if user exists
-        if (!$this->userManager->checkIfUserEmailAlreadyRegistered($email)) {
-            $io->error('User not found: ' . $email);
+        if (!$this->userManager->checkIfUserIsAlreadyRegistered($username)) {
+            $io->error('User not found: ' . $username);
             return Command::INVALID;
         }
 
-        // get user id by email
-        $id = $this->userManager->getUserIdByEmail($email);
+        // get user id by username
+        $id = $this->userManager->getUserIdByUsername($username);
 
         // get user info
         $userInfo = $this->userManager->getUserInfo($id);
 
         // format user info
-        $email = $userInfo['email'];
+        $username = $userInfo['username'];
         $firstName = $userInfo['first-name'];
         $lastName = $userInfo['last-name'];
         $roles = $userInfo['roles'];
@@ -116,10 +112,10 @@ class UserInfoCommand extends Command
 
         // print user info
         $io->table(
-            headers: ['Email', 'First Name', 'Last Name', 'Roles', 'Register Time', 'Last Login Time', 'Ip Address', 'Browser', 'Status'],
+            headers: ['Username', 'First Name', 'Last Name', 'Roles', 'Register Time', 'Last Login Time', 'Ip Address', 'Browser', 'Status'],
             rows: [
                 [
-                    $email,
+                    $username,
                     $firstName,
                     $lastName,
                     $role,

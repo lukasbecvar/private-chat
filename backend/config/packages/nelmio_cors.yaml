@@ -1,7 +1,7 @@
 nelmio_cors:
     defaults:
         allow_origin: ['*']
-        allow_credentials: false
+        allow_credentials: true
         allow_headers: ['Content-Type', 'Accept', 'Authorization']
         allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS']
         expose_headers: []

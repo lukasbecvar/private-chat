@@ -142,8 +142,8 @@ class LogReaderCommandTest extends TestCase
         ];
 
         // mock user manager to return true for user check
-        $this->userManager->method('checkIfUserEmailAlreadyRegistered')->willReturn(true);
-        $this->userManager->method('getUserIdByEmail')->willReturn(123);
+        $this->userManager->method('checkIfUserIsAlreadyRegistered')->willReturn(true);
+        $this->userManager->method('getUserIdByUsername')->willReturn(123);
 
         // mock get log methods to return the mocked log data
         $this->logManager->method('getLogsWithUsername')->willReturn([$logData]);

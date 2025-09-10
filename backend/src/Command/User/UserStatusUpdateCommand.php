@@ -36,7 +36,7 @@ class UserStatusUpdateCommand extends Command
      */
     protected function configure(): void
     {
-        $this->addArgument('email', InputArgument::REQUIRED, 'Email of the user to delete');
+        $this->addArgument('username', InputArgument::REQUIRED, 'Username of the user to delete');
         $this->addArgument('status', InputArgument::REQUIRED, 'New status of the user');
     }
 
@@ -57,23 +57,23 @@ class UserStatusUpdateCommand extends Command
         $_SERVER['HTTP_USER_AGENT'] = 'CLI-COMMAND';
 
         // get command arguments
-        $email = $input->getArgument('email');
+        $username = $input->getArgument('username');
         $status = $input->getArgument('status');
 
-        // validate email input
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $io->error('Invalid email format.');
+        // check if username input is set
+        if ($username == null) {
+            $io->error('Username cannot be empty.');
             return Command::INVALID;
         }
 
         // check if user exists
-        if (!$this->userManager->checkIfUserEmailAlreadyRegistered($email)) {
+        if (!$this->userManager->checkIfUserIsAlreadyRegistered($username)) {
             $io->error('User not found.');
             return Command::INVALID;
         }
 
-        // get user id by email
-        $id = $this->userManager->getUserIdByEmail($email);
+        // get user id by username
+        $id = $this->userManager->getUserIdByUsername($username);
 
         // check if user status already associated with user
         if ($this->userManager->getUserStatus($id) === $status) {

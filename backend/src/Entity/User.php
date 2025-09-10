@@ -18,12 +18,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @package App\Entity
  */
 #[ORM\Table(name: 'users')]
-#[ORM\Index(name: 'users_email_idx', columns: ['email'])]
+#[ORM\Index(name: 'users_username_idx', columns: ['username'])]
 #[ORM\Index(name: 'users_status_idx', columns: ['status'])]
 #[ORM\Index(name: 'users_last_name_idx', columns: ['last_name'])]
 #[ORM\Index(name: 'users_first_name_idx', columns: ['first_name'])]
 #[ORM\Index(name: 'users_ip_address_idx', columns: ['ip_address'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]
-    private string $email;
+    private string $username;
 
     #[ORM\Column(length: 255)]
     private ?string $first_name = null;
@@ -68,14 +68,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getUsername(): ?string
     {
-        return $this->email;
+        return $this->username;
     }
 
-    public function setEmail(string $email): static
+    public function setUsername(string $username): static
     {
-        $this->email = $email;
+        $this->username = $username;
         return $this;
     }
 
@@ -201,11 +201,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Get identifier that represents this user
      *
-     * @return string The user email identifier
+     * @return string The username identifier
      */
     public function getUserIdentifier(): string
     {
-        return $this->email;
+        return $this->username;
     }
 
     #[Deprecated(message: 'eraseCredentials() is deprecated since Symfony 7.3 and maybe will be removed in future')]

@@ -49,7 +49,7 @@ class EscapeRequestDataMiddlewareTest extends TestCase
         // create a request with unescaped data
         $requestData = [
             'name' => '<script>alert("XSS Attack!");</script>',
-            'email' => 'user@example.com',
+            'username' => 'user@example.com',
             'message' => '<p>Hello, World!</p>'
         ];
 
@@ -68,7 +68,7 @@ class EscapeRequestDataMiddlewareTest extends TestCase
         $this->middleware->onKernelRequest($event);
 
         // assert response
-        $this->assertEquals('user@example.com', $request->get('email'));
+        $this->assertEquals('user@example.com', $request->get('username'));
         $this->assertEquals('&lt;p&gt;Hello, World!&lt;/p&gt;', $request->get('message'));
         $this->assertEquals('&lt;script&gt;alert(&quot;XSS Attack!&quot;);&lt;/script&gt;', $request->get('name'));
     }

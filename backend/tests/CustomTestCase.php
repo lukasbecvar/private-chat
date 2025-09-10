@@ -24,7 +24,7 @@ class CustomTestCase extends WebTestCase
     {
         // init test user (created with datafixtures)
         $fakeUser = new User();
-        $fakeUser->setEmail('test@test.test');
+        $fakeUser->setUsername('testing_user');
 
         /** @var JWTTokenManagerInterface $jwtManager */
         $jwtManager = self::getContainer()->get(JWTTokenManagerInterface::class);

@@ -48,14 +48,10 @@ class UserRegisterCommand extends Command
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['HTTP_USER_AGENT'] = 'CLI-COMMAND';
 
-        // get email from cli input
-        $email = $io->ask('Enter user email');
-        if ($email == null) {
-            $io->error('Email cannot be empty.');
-            return Command::INVALID;
-        }
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $io->error('Invalid email format.');
+        // get username from cli input
+        $username = $io->ask('Enter user username');
+        if ($username == null) {
+            $io->error('Username cannot be empty.');
             return Command::INVALID;
         }
 
@@ -82,7 +78,7 @@ class UserRegisterCommand extends Command
 
         // create user dto
         $userDTO = new UserDTO();
-        $userDTO->email = $email;
+        $userDTO->username = $username;
         $userDTO->firstName = $firstName;
         $userDTO->lastName = $lastName;
         $userDTO->password = $password;
@@ -97,20 +93,20 @@ class UserRegisterCommand extends Command
         }
 
         // check if user already exists
-        if ($this->userManager->checkIfUserEmailAlreadyRegistered($email)) {
-            $io->error('User already exists: ' . $email);
+        if ($this->userManager->checkIfUserIsAlreadyRegistered($username)) {
+            $io->error('User already exists: ' . $username);
             return Command::INVALID;
         }
 
         // register user
         try {
             $this->userManager->registerUser(
-                $userDTO->email,
+                $userDTO->username,
                 $userDTO->firstName,
                 $userDTO->lastName,
                 $userDTO->password
             );
-            $io->success("User registered: $email ($firstName $lastName)");
+            $io->success("User registered: $username ($firstName $lastName)");
         } catch (Exception $e) {
             $io->error('Error registering user: ' . $e->getMessage());
             return Command::FAILURE;

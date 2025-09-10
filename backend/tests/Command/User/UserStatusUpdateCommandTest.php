@@ -34,38 +34,20 @@ class UserStatusUpdateCommandTest extends TestCase
     }
 
     /**
-     * Test execute command with empty email input
+     * Test execute command with empty username input
      *
      * @return void
      */
-    public function testExecuteCommandEmptyEmailInput(): void
+    public function testExecuteCommandEmptyUsernameInput(): void
     {
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => '', 'status' => 'inactive']);
+        $exitCode = $this->commandTester->execute(['username' => '', 'status' => 'inactive']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('Invalid email format.', $output);
-        $this->assertEquals(Command::INVALID, $exitCode);
-    }
-
-    /**
-     * Test execute command with invalid email format
-     *
-     * @return void
-     */
-    public function testExecuteCommandInvalidEmail(): void
-    {
-        // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'invalid_email', 'status' => 'inactive']);
-
-        // get command output
-        $output = $this->commandTester->getDisplay();
-
-        // assert response
-        $this->assertStringContainsString('Invalid email format.', $output);
+        $this->assertStringContainsString('Username cannot be empty.', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -77,10 +59,10 @@ class UserStatusUpdateCommandTest extends TestCase
     public function testExecuteCommandUserNotFound(): void
     {
         // simulate user not found
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com', 'status' => 'inactive']);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => 'inactive']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -102,14 +84,14 @@ class UserStatusUpdateCommandTest extends TestCase
         $status = 'inactive';
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByEmail')->with('test@test.com')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
 
         // mock user manager to return the user status
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
         $this->userManager->expects($this->once())->method('getUserStatus')->with($id)->willReturn($status);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com', 'status' => $status]);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => $status]);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -131,14 +113,14 @@ class UserStatusUpdateCommandTest extends TestCase
         $status = 'inactive';
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByEmail')->with('test@test.com')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
 
-        // expect checkIfUserEmailAlreadyRegistered and updateUserStatus calls
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(true);
+        // expect checkIfUserIsAlreadyRegistered and updateUserStatus calls
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
         $this->userManager->expects($this->once())->method('updateUserStatus')->with($id, $status);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com', 'status' => $status]);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => $status]);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -160,14 +142,14 @@ class UserStatusUpdateCommandTest extends TestCase
         $status = 'inactive';
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByEmail')->with('test@test.com')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
 
         // mock exception during user status update
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
         $this->userManager->expects($this->once())->method('updateUserStatus')->with($id, $status)->willThrowException(new Exception('Database error'));
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com', 'status' => $status]);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => $status]);
 
         // get command output
         $output = $this->commandTester->getDisplay();

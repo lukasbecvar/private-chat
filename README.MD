@@ -10,7 +10,7 @@
     - [X] User register command
     - [X] User password reset command
     - [X] Implement security middleware for (SSL check, XSS escape, CSRF, etc)
-    - [ ] Change user login main property to username auth (email is not required)
+    - [X] Change user login main property to username auth (email is not required)
     - [ ] JWT refresh token system (?? maybe)
     - [ ] Implement rate limiting for non-authenticated users
     - [ ] Implement user profile image to user entity (avatar in base64)

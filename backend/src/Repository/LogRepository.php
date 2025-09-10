@@ -98,7 +98,7 @@ class LogRepository extends ServiceEntityRepository
     public function findLogsWithUsername(array $criteria, int $page, int $limit): array
     {
         $queryBuilder = $this->createQueryBuilder('l')
-            ->select('l.id, l.name, l.message, l.time, l.ip_address, u.email as username')
+            ->select('l.id, l.name, l.message, l.time, l.ip_address, u.username as username')
             ->leftJoin(User::class, 'u', 'WITH', 'l.user_id = u.id')
             ->orderBy('l.id', 'DESC')
             ->setFirstResult(($page - 1) * $limit)

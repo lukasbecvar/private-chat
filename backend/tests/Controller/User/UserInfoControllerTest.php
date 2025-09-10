@@ -115,7 +115,7 @@ class UserInfoControllerTest extends CustomTestCase
 
         // assert response
         $this->assertNotEmpty($responseData);
-        $this->assertArrayHasKey('email', $responseData['data']);
+        $this->assertArrayHasKey('username', $responseData['data']);
         $this->assertArrayHasKey('first-name', $responseData['data']);
         $this->assertArrayHasKey('last-name', $responseData['data']);
         $this->assertArrayHasKey('roles', $responseData['data']);

@@ -37,7 +37,7 @@ class UserFixtures extends Fixture
 
         // create test user
         $user = new User();
-        $user->setEmail('test@test.test')
+        $user->setUsername('testing_user')
             ->setFirstName('test')
             ->setLastName('User')
             ->setRoles(['ROLE_USER', 'ROLE_ADMIN'])
@@ -59,7 +59,7 @@ class UserFixtures extends Fixture
             $passwordHash = $this->userPasswordHasher->hashPassword($user, 'password');
 
             // set user properties
-            $user->setEmail("user$i@example.com")
+            $user->setUsername("testing_user_$i")
                 ->setFirstName($faker->firstName)
                 ->setLastName($faker->lastName)
                 ->setRoles(['ROLE_USER'])

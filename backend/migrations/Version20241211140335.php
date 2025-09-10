@@ -35,7 +35,7 @@ final class Version20241211140335 extends AbstractMigration
      */
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE users (id INT AUTO_INCREMENT NOT NULL, email VARCHAR(255) NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, register_time DATETIME NOT NULL, last_login_time DATETIME NOT NULL, ip_address VARCHAR(255) NOT NULL, user_agent VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL, INDEX users_email_idx (email), INDEX users_status_idx (status), INDEX users_last_name_idx (last_name), INDEX users_first_name_idx (first_name), INDEX users_ip_address_idx (ip_address), UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql('CREATE TABLE users (id INT AUTO_INCREMENT NOT NULL, username VARCHAR(255) NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, register_time DATETIME NOT NULL, last_login_time DATETIME NOT NULL, ip_address VARCHAR(255) NOT NULL, user_agent VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL, INDEX users_username_idx (username), INDEX users_status_idx (status), INDEX users_last_name_idx (last_name), INDEX users_first_name_idx (first_name), INDEX users_ip_address_idx (ip_address), UNIQUE INDEX UNIQ_IDENTIFIER_USERNAME (username), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4');
     }
 
     /**

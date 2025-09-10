@@ -4,11 +4,11 @@ namespace App\Tests\Manager;
 
 use DateTime;
 use App\Entity\User;
-use Monolog\Test\TestCase;
 use App\Manager\LogManager;
 use App\Manager\UserManager;
 use App\Util\VisitorInfoUtil;
 use App\Manager\ErrorManager;
+use PHPUnit\Framework\TestCase;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -53,13 +53,13 @@ class UserManagerTest extends TestCase
     }
 
     /**
-     * Test get user id by email
+     * Test get user id by username
      *
      * @return void
      */
-    public function testGetUserIdByEmail(): void
+    public function testGetUserIdByUsername(): void
     {
-        $email = 'test@test.com';
+        $username = 'testing_user';
         $userId = 1;
 
         // mock user entity
@@ -67,10 +67,10 @@ class UserManagerTest extends TestCase
         $user->expects($this->once())->method('getId')->willReturn($userId);
 
         // mock repository response
-        $this->userRepositoryMock->expects($this->once())->method('findByEmail')->with($email)->willReturn($user);
+        $this->userRepositoryMock->expects($this->once())->method('findByUsername')->with($username)->willReturn($user);
 
         // call tested method
-        $result = $this->userManager->getUserIdByEmail($email);
+        $result = $this->userManager->getUserIdByUsername($username);
 
         // assert result
         $this->assertSame($userId, $result);
@@ -81,13 +81,13 @@ class UserManagerTest extends TestCase
      *
      * @return void
      */
-    public function testcheckIfUserEmailAlreadyRegistered(): void
+    public function testcheckIfUserUserAlreadyRegistered(): void
     {
         // call tested method
-        $checkIfUserEmailAlreadyRegistered = $this->userManager->checkIfUserEmailAlreadyRegistered('test@test.test');
+        $checkIfUserIsAlreadyRegistered = $this->userManager->checkIfUserIsAlreadyRegistered('testing_user');
 
         // assert result
-        $this->assertIsBool($checkIfUserEmailAlreadyRegistered);
+        $this->assertIsBool($checkIfUserIsAlreadyRegistered);
     }
 
     /**
@@ -112,7 +112,7 @@ class UserManagerTest extends TestCase
     public function testRegisterUser(): void
     {
         // testing user data
-        $email = 'test@test.com';
+        $username = 'testing_user';
         $firstName = 'John';
         $lastName = 'Doe';
         $password = 'secure_password';
@@ -120,7 +120,7 @@ class UserManagerTest extends TestCase
         $userAgent = 'TestAgent';
 
         // mock repository to simulate no existing user
-        $this->userRepositoryMock->expects($this->once())->method('findByEmail')->with($email)->willReturn(null);
+        $this->userRepositoryMock->expects($this->once())->method('findByUsername')->with($username)->willReturn(null);
 
         // mock get visitor info
         $this->visitorInfoUtilMock->expects($this->once())->method('getIP')->willReturn($ipAddress);
@@ -136,12 +136,12 @@ class UserManagerTest extends TestCase
         // expect save log call
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'New user registered: ' . $email,
+            'New user registered: ' . $username,
             LogManager::LEVEL_NOTICE
         );
 
         // call tested method
-        $this->userManager->registerUser($email, $firstName, $lastName, $password);
+        $this->userManager->registerUser($username, $firstName, $lastName, $password);
     }
 
     /**
@@ -153,7 +153,7 @@ class UserManagerTest extends TestCase
     {
         // testing user data
         $id = 1;
-        $email = 'test@test.com';
+        $username = 'testing_user';
         $firstName = 'John';
         $lastName = 'Doe';
         $roles = ['ROLE_ADMIN'];
@@ -165,7 +165,7 @@ class UserManagerTest extends TestCase
 
         // mock user entity
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
         $user->expects($this->once())->method('getFirstName')->willReturn($firstName);
         $user->expects($this->once())->method('getLastName')->willReturn($lastName);
         $user->expects($this->once())->method('getRoles')->willReturn($roles);
@@ -183,7 +183,7 @@ class UserManagerTest extends TestCase
 
         // assert result
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('email', $result);
+        $this->assertArrayHasKey('username', $result);
         $this->assertArrayHasKey('first-name', $result);
         $this->assertArrayHasKey('last-name', $result);
         $this->assertArrayHasKey('roles', $result);
@@ -192,7 +192,7 @@ class UserManagerTest extends TestCase
         $this->assertArrayHasKey('ip-address', $result);
         $this->assertArrayHasKey('user-agent', $result);
         $this->assertArrayHasKey('status', $result);
-        $this->assertSame($email, $result['email']);
+        $this->assertSame($username, $result['username']);
         $this->assertSame($firstName, $result['first-name']);
         $this->assertSame($lastName, $result['last-name']);
         $this->assertSame($roles, $result['roles']);
@@ -211,12 +211,12 @@ class UserManagerTest extends TestCase
     public function testUpdateUserPassword(): void
     {
         $id = 1;
-        $email = 'test@test.com';
+        $username = 'testing_user';
         $newPassword = 'newPassword';
 
         // mock user
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
 
         // mock repository to return user
         $this->userRepositoryMock->expects($this->any())->method('find')->with($id)->willReturn($user);
@@ -227,7 +227,7 @@ class UserManagerTest extends TestCase
         // expect save log call
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'User: ' . $email . ' password changed',
+            'User: ' . $username . ' password changed',
             LogManager::LEVEL_INFO
         );
 
@@ -242,11 +242,11 @@ class UserManagerTest extends TestCase
      */
     public function testUpdateUserDataOnLogin(): void
     {
-        // testing user email
-        $identifier = 'test@test.com';
+        // testing user username
+        $identifier = 'testing_user';
 
         // mock user repository
-        $this->userRepositoryMock->expects($this->once())->method('findOneBy')->with(['email' => $identifier])->willReturn(new User());
+        $this->userRepositoryMock->expects($this->once())->method('findOneBy')->with(['username' => $identifier])->willReturn(new User());
 
         // mock visitor info util
         $this->visitorInfoUtilMock->expects($this->once())->method('getIP')->willReturn('127.0.0.1');
@@ -267,11 +267,11 @@ class UserManagerTest extends TestCase
     public function testDeleteUser(): void
     {
         $userId = 1;
-        $email = 'test@test.com';
+        $username = 'testing_user';
 
         // mock user entity
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
 
         // mock repository to return the user
         $this->userRepositoryMock->expects($this->any())->method('find')->with($userId)->willReturn($user);
@@ -283,7 +283,7 @@ class UserManagerTest extends TestCase
         // expect log manager to save the log
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'User deleted: ' . $email,
+            'User deleted: ' . $username,
             LogManager::LEVEL_NOTICE
         );
 
@@ -299,13 +299,13 @@ class UserManagerTest extends TestCase
     public function testUpdateUserStatus(): void
     {
         $userId = 1;
-        $email = 'test@test.test';
+        $username = 'testing_user';
         $oldStatus = 'active';
         $newStatus = 'inactive';
 
         // mock user retrieval
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
         $user->expects($this->once())->method('getStatus')->willReturn($oldStatus);
 
         // expect set status call
@@ -320,7 +320,7 @@ class UserManagerTest extends TestCase
         // expect save log call
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'User: ' . $email . ' updated status to: ' . $newStatus . ' old status was: ' . $oldStatus,
+            'User: ' . $username . ' updated status to: ' . $newStatus . ' old status was: ' . $oldStatus,
             LogManager::LEVEL_NOTICE
         );
 
@@ -358,11 +358,11 @@ class UserManagerTest extends TestCase
     {
         // testing user data
         $id = 1;
-        $email = 'test@test.com';
+        $username = 'testing_user';
 
         // mock existing user
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
 
         // mock repository to return the user twice
         $this->userRepositoryMock->expects($this->any())->method('find')->with($id)->willReturn($user);
@@ -373,7 +373,7 @@ class UserManagerTest extends TestCase
         // expect save log call
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'User password reset: ' . $email,
+            'User password reset: ' . $username,
             LogManager::LEVEL_INFO
         );
 
@@ -413,12 +413,12 @@ class UserManagerTest extends TestCase
     public function testAddRoleToUser(): void
     {
         $id = 1;
-        $email = 'test@test.com';
+        $username = 'testing_user';
         $role = 'ROLE_ADMIN';
 
         // mock existing user
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
         $user->expects($this->once())->method('getRoles')->willReturn([]);
         $user->expects($this->once())->method('addRole')->with($role);
 
@@ -431,7 +431,7 @@ class UserManagerTest extends TestCase
         // expect save log call
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'User role added: ' . $email . ' - ' . $role,
+            'User role added: ' . $username . ' - ' . $role,
             LogManager::LEVEL_WARNING
         );
 
@@ -447,12 +447,12 @@ class UserManagerTest extends TestCase
     public function testRemoveRoleFromUser(): void
     {
         $id = 1;
-        $email = 'test@test.com';
+        $username = 'testing_user';
         $role = 'ROLE_ADMIN';
 
         // mock existing user
         $user = $this->createMock(User::class);
-        $user->expects($this->once())->method('getEmail')->willReturn($email);
+        $user->expects($this->once())->method('getUsername')->willReturn($username);
         $user->expects($this->once())->method('getRoles')->willReturn([$role]);
         $user->expects($this->once())->method('removeRole')->with($role);
 
@@ -465,7 +465,7 @@ class UserManagerTest extends TestCase
         // expect save log call
         $this->logManagerMock->expects($this->once())->method('saveLog')->with(
             'user-manager',
-            'User role removed: ' . $email . ' - ' . $role,
+            'User role removed: ' . $username . ' - ' . $role,
             LogManager::LEVEL_WARNING
         );
 

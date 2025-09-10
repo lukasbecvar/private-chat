@@ -115,7 +115,7 @@ class LogoutControllerTest extends CustomTestCase
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'email' => 'test@test.test',
+            'username' => 'testing_user',
             'password' => 'test'
         ]) ?: null);
 

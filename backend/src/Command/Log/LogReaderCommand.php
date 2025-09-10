@@ -41,13 +41,13 @@ class LogReaderCommand extends Command
     {
         $this
             ->addOption('status', null, InputOption::VALUE_OPTIONAL, 'Filter by status')
-            ->addOption('user', null, InputOption::VALUE_OPTIONAL, 'Filter by user email')
+            ->addOption('user', null, InputOption::VALUE_OPTIONAL, 'Filter by user username')
             ->addOption('ip', null, InputOption::VALUE_OPTIONAL, 'Filter by IP address')
             ->setHelp(<<<'HELP'
                 Usage: 
 
                 <fg=green>app:log:reader --status=<status></>  Filter by status (READED, UNREADED)
-                <fg=green>app:log:reader --user=<user></>      Filter by user (email)
+                <fg=green>app:log:reader --user=<user></>      Filter by user (username)
                 <fg=green>app:log:reader --ip=<ip></>          Filter by IP address (192.168.1.1)
 
                 <comment>Note:</comment> Only one of these parameters can be used at a time.
@@ -114,13 +114,13 @@ class LogReaderCommand extends Command
         // get logs by user
         } elseif ($user !== null) {
             // check if user found in database
-            if (!$this->userManager->checkIfUserEmailAlreadyRegistered($user)) {
+            if (!$this->userManager->checkIfUserIsAlreadyRegistered($user)) {
                 $io->error('User not found in database.');
                 return Command::INVALID;
             }
 
-            // get user id by email
-            $userId = $this->userManager->getUserIdByEmail($user);
+            // get user id by username
+            $userId = $this->userManager->getUserIdByUsername($user);
             $criteria = ['user_id' => $userId];
 
         // get logs by ip address

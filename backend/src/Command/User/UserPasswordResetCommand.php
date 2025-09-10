@@ -36,7 +36,7 @@ class UserPasswordResetCommand extends Command
      */
     protected function configure(): void
     {
-        $this->addArgument('email', InputArgument::REQUIRED, 'Email of the user');
+        $this->addArgument('username', InputArgument::REQUIRED, 'Username of the user');
     }
 
     /**
@@ -55,32 +55,28 @@ class UserPasswordResetCommand extends Command
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['HTTP_USER_AGENT'] = 'CLI-COMMAND';
 
-        // get email argument
-        $email = $input->getArgument('email');
+        // get username argument
+        $username = $input->getArgument('username');
 
-        // validate email input
-        if ($email == null) {
-            $io->error('Email cannot be empty.');
-            return Command::INVALID;
-        }
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $io->error('Invalid email format.');
+        // validate username input
+        if ($username == null) {
+            $io->error('Username cannot be empty.');
             return Command::INVALID;
         }
 
         // check if user exists
-        if (!$this->userManager->checkIfUserEmailAlreadyRegistered($email)) {
-            $io->error('User not found: ' . $email);
+        if (!$this->userManager->checkIfUserIsAlreadyRegistered($username)) {
+            $io->error('User not found: ' . $username);
             return Command::INVALID;
         }
 
-        // get user id by email
-        $id = $this->userManager->getUserIdByEmail($email);
+        // get user id by username
+        $id = $this->userManager->getUserIdByUsername($username);
 
         try {
             // reset and get new password
             $newPassword = $this->userManager->resetUserPassword($id);
-            $io->success('User password reset: ' . $email . ' the new password is: ' . $newPassword);
+            $io->success('User password reset: ' . $username . ' the new password is: ' . $newPassword);
         } catch (Exception $e) {
             $io->error('Error resetting user password: ' . $e->getMessage());
             return Command::FAILURE;

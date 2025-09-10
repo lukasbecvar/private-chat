@@ -26,23 +26,23 @@ class UserRepositoryTest extends KernelTestCase
     }
 
     /**
-     * Test find user by email
+     * Test find user by username
      *
      * @return void
      */
-    public function testFindByEmail(): void
+    public function testFindByUsername(): void
     {
-        // testing user email
-        $email = 'test@test.test';
+        // testing user username
+        $username = 'testing_user';
 
         /** @var \App\Repository\UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);
 
         // call tested method
-        $user = $userRepository->findByEmail($email);
+        $user = $userRepository->findByUsername($username);
 
         // assert result
         $this->assertNotNull($user, 'User should not be null');
-        $this->assertEquals($email, $user->getEmail(), 'The user email should match the filter');
+        $this->assertEquals($username, $user->getUsername(), 'The user username should match the filter');
     }
 }

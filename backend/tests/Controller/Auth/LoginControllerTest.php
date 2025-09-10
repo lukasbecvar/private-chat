@@ -42,17 +42,17 @@ class LoginControllerTest extends WebTestCase
     }
 
     /**
-     * Test user login when email is blank
+     * Test user login when username is blank
      *
      * @return void
      */
-    public function testUserLoginWhenEmailIsBlank(): void
+    public function testUserLoginWhenUsernameIsBlank(): void
     {
         $this->client->request('POST', '/api/auth/login', [], [], [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'email' => '',
+            'username' => '',
             'password' => 'test'
         ]) ?: null);
 
@@ -61,7 +61,7 @@ class LoginControllerTest extends WebTestCase
 
         // assert response
         $this->assertSame('error', $responseData['status']);
-        $this->assertEquals('The key "email" must be a non-empty string.', $responseData['message']);
+        $this->assertEquals('The key "username" must be a non-empty string.', $responseData['message']);
         $this->assertResponseStatusCodeSame(JsonResponse::HTTP_BAD_REQUEST);
     }
 
@@ -76,7 +76,7 @@ class LoginControllerTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'email' => 'test@test.test',
+            'username' => 'testing_user',
             'password' => ''
         ]) ?: null);
 
@@ -100,7 +100,7 @@ class LoginControllerTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'email' => 'fugazi@fufu.xyz',
+            'username' => 'fugazi@fufu.xyz',
             'password' => 'invalid-password'
         ]) ?: null);
 
@@ -123,7 +123,7 @@ class LoginControllerTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'email' => 'test@test.test',
+            'username' => 'testing_user',
             'password' => 'test'
         ]) ?: null);
 

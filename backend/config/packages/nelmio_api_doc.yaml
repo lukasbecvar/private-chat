@@ -9,7 +9,7 @@ when@dev:
             # api servers
             servers:
                 # testing dev env
-                - url: 'http://localhost'
+                - url: 'http://localhost:1337'
                   description: 'Local development environment'
                 # live production system server url
                 - url: 'https://chat.becvar.xyz'
@@ -51,9 +51,9 @@ when@dev:
                                     schema:
                                         type: object
                                         properties:
-                                            email:
-                                                type: email
-                                                default: test@test.test
+                                            username:
+                                                type: username
+                                                default: testing_user
                                             password:
                                                 type: string
                                                 default: test
@@ -84,4 +84,4 @@ when@dev:
                                             bad_request:
                                                 summary: Example of bad request response
                                                 value:
-                                                    error: "Missing email or password"
+                                                    error: "Missing username or password"

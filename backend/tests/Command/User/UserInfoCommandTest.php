@@ -36,38 +36,20 @@ class UserInfoCommandTest extends TestCase
     }
 
     /**
-     * Test execute command without email input
+     * Test execute command without username input
      *
      * @return void
      */
-    public function testExecuteCommandWithoutEmailInput(): void
+    public function testExecuteCommandWithoutUsernameInput(): void
     {
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => '']);
+        $exitCode = $this->commandTester->execute(['username' => '']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('Email cannot be empty.', $output);
-        $this->assertEquals(Command::INVALID, $exitCode);
-    }
-
-    /**
-     * Test execute command with invalid email format
-     *
-     * @return void
-     */
-    public function testExecuteCommandWithInvalidEmail(): void
-    {
-        // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'invalid-email']);
-
-        // get command output
-        $output = $this->commandTester->getDisplay();
-
-        // assert response
-        $this->assertStringContainsString('Invalid email format.', $output);
+        $this->assertStringContainsString('Username cannot be empty.', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -79,16 +61,16 @@ class UserInfoCommandTest extends TestCase
     public function testExecuteCommandWithUserNotFound(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com']);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User not found: test@test.com', $output);
+        $this->assertStringContainsString('User not found: testing_user', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -100,14 +82,14 @@ class UserInfoCommandTest extends TestCase
     public function testExecuteCommandWithSuccessfulInfoRetrieval(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
 
         // mock user id get
-        $this->userManager->expects($this->once())->method('getUserIdByEmail')->with('test@test.com')->willReturn(1);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn(1);
 
         // mock user info get
         $this->userManager->expects($this->once())->method('getUserInfo')->with(1)->willReturn([
-            'email' => 'test@test.com',
+            'username' => 'testing_user',
             'first-name' => 'John',
             'last-name' => 'Doe',
             'roles' => ['ROLE_USER'],
@@ -122,13 +104,13 @@ class UserInfoCommandTest extends TestCase
         $this->visitorInfoUtil->expects($this->once())->method('getBrowserShortify')->with('Mozilla/5.0')->willReturn('Chrome');
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com']);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('test@test.com', $output);
+        $this->assertStringContainsString('testing_user', $output);
         $this->assertStringContainsString('John', $output);
         $this->assertStringContainsString('Doe', $output);
         $this->assertStringContainsString('Chrome', $output);
@@ -147,14 +129,14 @@ class UserInfoCommandTest extends TestCase
     public function testExecuteCommandWithMissingUserAgent(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserEmailAlreadyRegistered')->with('test@test.com')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
 
         // mock user id get
-        $this->userManager->expects($this->once())->method('getUserIdByEmail')->with('test@test.com')->willReturn(1);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn(1);
 
         // mock user info get
         $this->userManager->expects($this->once())->method('getUserInfo')->with(1)->willReturn([
-            'email' => 'test@test.com',
+            'username' => 'testing_user',
             'first-name' => 'John',
             'last-name' => 'Doe',
             'roles' => ['ROLE_USER'],
@@ -166,7 +148,7 @@ class UserInfoCommandTest extends TestCase
         ]);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['email' => 'test@test.com']);
+        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
 
         // get command output
         $output = $this->commandTester->getDisplay();

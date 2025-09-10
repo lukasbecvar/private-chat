@@ -67,28 +67,28 @@ class UserManager
     }
 
     /**
-     * Check if user email already registered in database
+     * Check if user username already registered in database
      *
-     * @param string $email The email address of the user
+     * @param string $username The username of the user
      *
      * @return bool True if user exists, false otherwise
      */
-    public function checkIfUserEmailAlreadyRegistered(string $email): bool
+    public function checkIfUserIsAlreadyRegistered(string $username): bool
     {
-        return $this->userRepository->findByEmail($email) !== null;
+        return $this->userRepository->findByUsername($username) !== null;
     }
 
     /**
-     * Get user id by email
+     * Get user id by username
      *
-     * @param string $email The email address of the user
+     * @param string $username The username address of the user
      *
      * @return int The user id or null if user does not exist
      */
-    public function getUserIdByEmail(string $email): int
+    public function getUserIdByUsername(string $username): int
     {
         // get user object
-        $user = $this->userRepository->findByEmail($email);
+        $user = $this->userRepository->findByUsername($username);
 
         // get user id
         $id = $user !== null ? $user->getId() : null;
@@ -96,7 +96,7 @@ class UserManager
         // check if user id found
         if ($id === null) {
             $this->errorManager->handleError(
-                message: 'Error retrieving user id by email: ' . $email,
+                message: 'Error retrieving user id by username: ' . $username,
                 code: JsonResponse::HTTP_NOT_FOUND
             );
         }
@@ -105,29 +105,29 @@ class UserManager
     }
 
     /**
-     * Get user email by id
+     * Get user username by id
      *
      * @param int $id The user id
      *
-     * @return string The user email or null if user not found
+     * @return string The user username or null if user not found
      */
-    public function getUserEmailById(int $id): string
+    public function getUserUsernameById(int $id): string
     {
         // get user object
         $user = $this->userRepository->find($id);
 
-        // get user email
-        $email = $user !== null ? $user->getEmail() : null;
+        // get user username
+        $username = $user !== null ? $user->getUsername() : null;
 
-        // check if user email found
-        if ($email === null) {
+        // check if user username found
+        if ($username === null) {
             $this->errorManager->handleError(
-                message: 'Error retrieving user email by id: ' . $id,
+                message: 'Error retrieving user username by id: ' . $id,
                 code: JsonResponse::HTTP_NOT_FOUND
             );
         }
 
-        return $email;
+        return $username;
     }
 
     /**
@@ -157,7 +157,7 @@ class UserManager
 
             $list[] = [
                 'id' => $user->getId(),
-                'email' => $user->getEmail(),
+                'username' => $user->getUsername(),
                 'first-name' => $user->getFirstName(),
                 'last-name' => $user->getLastName(),
                 'roles' => $user->getRoles(),
@@ -175,19 +175,19 @@ class UserManager
     /**
      * Register new user to database
      *
-     * @param string $email The email address of the user
+     * @param string $username The username of the user
      * @param string $firstName The first name of the user
      * @param string $lastName The last name of the user
      * @param string $password The password of the user
      *
      * @return void
      */
-    public function registerUser(string $email, string $firstName, string $lastName, string $password): void
+    public function registerUser(string $username, string $firstName, string $lastName, string $password): void
     {
-        // check if user email is already registered
-        if ($this->checkIfUserEmailAlreadyRegistered($email)) {
+        // check if user is already registered
+        if ($this->checkIfUserIsAlreadyRegistered($username)) {
             $this->errorManager->handleError(
-                message: 'User: ' . $email . ' already exists',
+                message: 'User: ' . $username . ' already exists',
                 code: JsonResponse::HTTP_CONFLICT
             );
         }
@@ -211,7 +211,7 @@ class UserManager
         $passwordHash = $this->passwordHasher->hashPassword($user, $password);
 
         // set user properties
-        $user->setEmail($email)
+        $user->setUsername($username)
             ->setFirstName($firstName)
             ->setLastName($lastName)
             ->setRoles(['ROLE_USER'])
@@ -237,7 +237,7 @@ class UserManager
         // log action to database
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'New user registered: ' . $email,
+            message: 'New user registered: ' . $username,
             level: LogManager::LEVEL_NOTICE
         );
     }
@@ -263,7 +263,7 @@ class UserManager
         }
 
         // get user info
-        $email = $user->getEmail();
+        $username = $user->getUsername();
         $firstName = $user->getFirstName();
         $lastName = $user->getLastName();
         $roles = $user->getRoles();
@@ -275,7 +275,7 @@ class UserManager
 
         // check if user info found
         if (
-            $email === null || $firstName === null || $lastName === null || $roles === null
+            $username === null || $firstName === null || $lastName === null || $roles === null
             || $registerTime === null || $lastLoginTime === null || $ipAddress === null
             || $userAgent === null || $status === null
         ) {
@@ -287,7 +287,7 @@ class UserManager
 
         // return user status
         return [
-            'email' => $email,
+            'username' => $username,
             'first-name' => $firstName,
             'last-name' => $lastName,
             'roles' => $roles,
@@ -337,13 +337,13 @@ class UserManager
             );
         }
 
-        // get email by user id
-        $email = $this->getUserEmailById($id);
+        // get username by user id
+        $username = $this->getUserUsernameById($id);
 
         // log event
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'User: ' . $email . ' password changed',
+            message: 'User: ' . $username . ' password changed',
             level: LogManager::LEVEL_INFO
         );
     }
@@ -358,7 +358,7 @@ class UserManager
     public function updateUserDataOnLogin(string $identifier): void
     {
         // get user by identifier
-        $user = $this->userRepository->findOneBy(['email' => $identifier]);
+        $user = $this->userRepository->findOneBy(['username' => $identifier]);
 
         // check if user exists
         if ($user === null) {
@@ -390,7 +390,7 @@ class UserManager
     }
 
     /**
-     * Delete user by email
+     * Delete user by id
      *
      * @param int $id The user id
      *
@@ -401,13 +401,13 @@ class UserManager
         // get user
         $user = $this->userRepository->find($id);
 
-        // get user email by id
-        $email = $this->getUserEmailById($id);
+        // get user username by id
+        $username = $this->getUserUsernameById($id);
 
         // check if user exists
         if ($user === null) {
             $this->errorManager->handleError(
-                message: 'User not found: ' . $email,
+                message: 'User not found: ' . $username,
                 code: JsonResponse::HTTP_NOT_FOUND
             );
         }
@@ -418,7 +418,7 @@ class UserManager
             $this->entityManager->flush();
         } catch (Exception $e) {
             $this->errorManager->handleError(
-                message: 'Error to delete user: ' . $email,
+                message: 'Error to delete user: ' . $username,
                 code: JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
                 exceptionMessage: $e->getMessage()
             );
@@ -427,7 +427,7 @@ class UserManager
         // log action to database
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'User deleted: ' . $email,
+            message: 'User deleted: ' . $username,
             level: LogManager::LEVEL_NOTICE
         );
     }
@@ -470,13 +470,13 @@ class UserManager
             );
         }
 
-        // get user email by id
-        $email = $this->getUserEmailById($id);
+        // get user username by id
+        $username = $this->getUserUsernameById($id);
 
         // log action
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'User: ' . $email . ' updated status to: ' . $status . ' old status was: ' . $oldStatus,
+            message: 'User: ' . $username . ' updated status to: ' . $status . ' old status was: ' . $oldStatus,
             level: LogManager::LEVEL_NOTICE
         );
     }
@@ -555,13 +555,13 @@ class UserManager
             );
         }
 
-        // get user email by id
-        $email = $this->getUserEmailById($id);
+        // get user username by id
+        $username = $this->getUserUsernameById($id);
 
         // log action to database
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'User password reset: ' . $email,
+            message: 'User password reset: ' . $username,
             level: LogManager::LEVEL_INFO
         );
 
@@ -649,13 +649,13 @@ class UserManager
             );
         }
 
-        // get user email by id
-        $email = $this->getUserEmailById($id);
+        // get user username by id
+        $username = $this->getUserUsernameById($id);
 
         // log action to database
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'User role added: ' . $email . ' - ' . $role,
+            message: 'User role added: ' . $username . ' - ' . $role,
             level: LogManager::LEVEL_WARNING
         );
     }
@@ -709,13 +709,13 @@ class UserManager
             );
         }
 
-        // get user email by id
-        $email = $this->getUserEmailById($id);
+        // get user username by id
+        $username = $this->getUserUsernameById($id);
 
         // log action to database
         $this->logManager->saveLog(
             name: 'user-manager',
-            message: 'User role removed: ' . $email . ' - ' . $role,
+            message: 'User role removed: ' . $username . ' - ' . $role,
             level: LogManager::LEVEL_WARNING
         );
     }
