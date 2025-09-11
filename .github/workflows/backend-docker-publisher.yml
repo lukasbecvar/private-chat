@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-publish:
-    name: Docker image builder
+    name: Backend docker image builder
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -42,5 +42,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/api-base:${{ github.event.release.tag_name }}
-            ghcr.io/${{ github.repository_owner }}/api-base:latest
+            ghcr.io/${{ github.repository_owner }}/private-chat-backend:${{ github.event.release.tag_name }}
+            ghcr.io/${{ github.repository_owner }}/private-chat-backend:latest

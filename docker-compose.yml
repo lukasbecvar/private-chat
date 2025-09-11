@@ -9,7 +9,7 @@ services:
     # composer service for managing php dependencies
     composer:
         image: composer:latest
-        container_name: api_base_composer
+        container_name: private_chat_composer
         working_dir: /app
         mem_limit: 1g
         volumes:
@@ -19,7 +19,7 @@ services:
     # database container
     mysql:
         image: mysql:8.0.43
-        container_name: api_base_mysql
+        container_name: private_chat_mysql
         restart: always
         environment:
             - MYSQL_ROOT_PASSWORD=root
@@ -36,7 +36,7 @@ services:
     # redis (cache) container
     redis:
         image: redis:8.2
-        container_name: api_base_redis
+        container_name: private_chat_redis
         restart: always
         mem_limit: 1g
         ports:
@@ -47,12 +47,12 @@ services:
         networks:
             - main
 
-    # web server container
+    # backend server container
     php:
         build:
             context: .
             dockerfile: ./backend/.docker/Dockerfile.dev
-        container_name: api_base_website
+        container_name: private_chat_website
         restart: always
         depends_on:
             - mysql
@@ -70,3 +70,22 @@ services:
             - "1337:80"
         networks:
             - main
+
+    # frontend server container
+    node:
+        image: node:22
+        restart: always
+        container_name: private_chat_frontend
+        working_dir: /app
+        depends_on:
+            - mysql
+            - redis
+            - php
+        volumes:
+            - ./frontend:/app
+        mem_limit: 1g
+        ports:
+            - "80:80"
+        networks:
+            - main
+        command: npm run dev

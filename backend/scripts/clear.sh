@@ -25,7 +25,6 @@ remove_item() {
     fi
 }
 
-remove_item "composer.lock"
 remove_item "vendor/"
 remove_item "config/jwt"
 remove_item "public/bundles"

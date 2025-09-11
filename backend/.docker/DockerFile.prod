@@ -1,4 +1,4 @@
-# define base php-apache image for production environment
+# define base php-apache image for (production image)
 FROM php:8.4-apache 
 
 # set container working directory

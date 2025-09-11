@@ -9,7 +9,6 @@ public/bundles/
 
 # composer packages
 vendor/
-composer.lock
 
 # symfony temp storage
 var/

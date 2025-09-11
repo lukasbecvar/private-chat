@@ -2,6 +2,8 @@
 
 # ROADMAP
 ## Version 1.0
+
+## Setup
 - [X] Setup api-base and modify for private chat use    
     - [X] Clean unnecessary components
     - [X] User authentication
@@ -13,10 +15,18 @@
     - [X] Change user login main property to username auth (email is not required)
     - [X] Implement rate limiting for non-authenticated users
     - [X] Implement user profile image to user entity (avatar in base64)
-- [ ] Setup react-app-base and modify for private chat use
+- [X] Setup react-app-base and modify for private chat use
+- [ ] Modify react-app-base for private chat use
+    - [ ] Implement config system for frontend somthing like .env
+        - [ ] Configurable api url
+    - [ ] Implement api status check (check if api is running)
 - [ ] Implement user authentication to frontend
     - [ ] Implement login system
     - [ ] Implement logout system
+- [ ] Try docker images building + create tesing docker-compose for production use
+- [ ] Base refactoring
+
+## Chat system
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)
     - [ ] API for send chat message (POST METHOD)
