@@ -63,6 +63,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $status = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $profile_pic = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -243,6 +246,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 fn($r) => $r !== $role
             )
         );
+
+        return $this;
+    }
+
+    public function getProfilePic(): ?string
+    {
+        return $this->profile_pic;
+    }
+
+    public function setProfilePic(string $profile_pic): static
+    {
+        $this->profile_pic = $profile_pic;
 
         return $this;
     }

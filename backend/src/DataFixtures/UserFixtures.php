@@ -46,7 +46,8 @@ class UserFixtures extends Fixture
             ->setLastLoginTime($faker->dateTimeBetween('-6 months', 'now'))
             ->setIpAddress($faker->ipv4)
             ->setUserAgent($faker->userAgent)
-            ->setStatus('active');
+            ->setStatus('active')
+            ->setProfilePic('nonset-default');
 
         // persist test user
         $manager->persist($user);
@@ -68,7 +69,8 @@ class UserFixtures extends Fixture
                 ->setLastLoginTime($faker->dateTimeBetween('-6 months', 'now'))
                 ->setIpAddress($faker->ipv4)
                 ->setUserAgent($faker->userAgent)
-                ->setStatus('active');
+                ->setStatus('active')
+                ->setProfilePic('nonset-default');
 
             // persist user entity
             $manager->persist($user);

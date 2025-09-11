@@ -220,7 +220,8 @@ class UserManager
             ->setLastLoginTime(new DateTime())
             ->setIpAddress($ipAddress)
             ->setUserAgent($userAgent)
-            ->setStatus('active');
+            ->setStatus('active')
+            ->setProfilePic('nonset-default');
 
         // save user to database
         try {
