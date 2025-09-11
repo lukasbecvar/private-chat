@@ -5,8 +5,9 @@ namespace App\Middleware;
 use App\Util\AppUtil;
 use App\Manager\CacheManager;
 use App\Manager\ErrorManager;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
  * Class RateLimitMiddleware
@@ -18,12 +19,14 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class RateLimitMiddleware
 {
     private AppUtil $appUtil;
+    private Security $security;
     private CacheManager $cacheManager;
     private ErrorManager $errorManager;
 
-    public function __construct(AppUtil $appUtil, CacheManager $cacheManager, ErrorManager $errorManager)
+    public function __construct(AppUtil $appUtil, Security $security, CacheManager $cacheManager, ErrorManager $errorManager)
     {
         $this->appUtil = $appUtil;
+        $this->security = $security;
         $this->cacheManager = $cacheManager;
         $this->errorManager = $errorManager;
     }
@@ -31,12 +34,19 @@ class RateLimitMiddleware
     /**
      * Handle rate limiting
      *
-     * @param RequestEvent $event
+     * @param ControllerEvent $event The controller event object
+     * 
+     * @return void
      */
-    public function onKernelRequest(RequestEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         // check if rate limit is enabled
         if ($this->appUtil->getEnvValue('RATE_LIMIT_ENABLED') == 'false') {
+            return;
+        }
+
+        // disable rate limiting for authenticated users
+        if ($this->security->getUser() !== null) {
             return;
         }
 

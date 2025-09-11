@@ -7,9 +7,11 @@ use App\Manager\ErrorManager;
 use App\Manager\CacheManager;
 use PHPUnit\Framework\TestCase;
 use App\Middleware\RateLimitMiddleware;
+use Symfony\Bundle\SecurityBundle\Security;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
  * Class RateLimitMiddlewareTest
@@ -21,28 +23,33 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class RateLimitMiddlewareTest extends TestCase
 {
     private RateLimitMiddleware $middleware;
+    private ControllerEvent $controllerEvent;
     private AppUtil & MockObject $appUtilMock;
+    private Security & MockObject $securityMock;
     private CacheManager & MockObject $cacheManagerMock;
     private ErrorManager & MockObject $errorManagerMock;
-    private RequestEvent & MockObject $requestEventMock;
 
     protected function setUp(): void
     {
         // mock dependencies
         $this->appUtilMock = $this->createMock(AppUtil::class);
+        $this->securityMock = $this->createMock(Security::class);
         $this->cacheManagerMock = $this->createMock(CacheManager::class);
         $this->errorManagerMock = $this->createMock(ErrorManager::class);
-        $this->requestEventMock = $this->createMock(RequestEvent::class);
 
         // instantiate tested middleware
         $this->middleware = new RateLimitMiddleware(
             $this->appUtilMock,
+            $this->securityMock,
             $this->cacheManagerMock,
             $this->errorManagerMock
         );
 
+        // create testing event
         $request = new Request();
-        $this->requestEventMock->method('getRequest')->willReturn($request);
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $controller = fn() => 'dummy';
+        $this->controllerEvent = new ControllerEvent($kernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     /**
@@ -59,7 +66,7 @@ class RateLimitMiddlewareTest extends TestCase
         $this->cacheManagerMock->expects($this->never())->method('getCacheValue');
 
         // call tested middleware
-        $this->middleware->onKernelRequest($this->requestEventMock);
+        $this->middleware->onKernelController($this->controllerEvent);
     }
 
     /**
@@ -83,7 +90,7 @@ class RateLimitMiddlewareTest extends TestCase
         $this->cacheManagerMock->expects($this->once())->method('saveCacheValue')->with($this->stringContains('rate_limit:'), '1', 60);
 
         // call tested middleware
-        $this->middleware->onKernelRequest($this->requestEventMock);
+        $this->middleware->onKernelController($this->controllerEvent);
     }
 
     /**
@@ -107,7 +114,7 @@ class RateLimitMiddlewareTest extends TestCase
         $this->cacheManagerMock->expects($this->once())->method('saveCacheValue')->with($this->stringContains('rate_limit:'), '51', 60);
 
         // call tested middleware
-        $this->middleware->onKernelRequest($this->requestEventMock);
+        $this->middleware->onKernelController($this->controllerEvent);
     }
 
     /**
@@ -131,6 +138,6 @@ class RateLimitMiddlewareTest extends TestCase
         $this->errorManagerMock->expects($this->once())->method('handleError');
 
         // call tested middleware
-        $this->middleware->onKernelRequest($this->requestEventMock);
+        $this->middleware->onKernelController($this->controllerEvent);
     }
 }

@@ -11,8 +11,7 @@
     - [X] User password reset command
     - [X] Implement security middleware for (SSL check, XSS escape, CSRF, etc)
     - [X] Change user login main property to username auth (email is not required)
-    - [ ] JWT refresh token system (?? maybe)
-    - [ ] Implement rate limiting for non-authenticated users
+    - [X] Implement rate limiting for non-authenticated users
     - [ ] Implement user profile image to user entity (avatar in base64)
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)
