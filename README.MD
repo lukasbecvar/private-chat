@@ -13,20 +13,18 @@
     - [X] Change user login main property to username auth (email is not required)
     - [X] Implement rate limiting for non-authenticated users
     - [X] Implement user profile image to user entity (avatar in base64)
+- [ ] Setup react-app-base and modify for private chat use
+- [ ] Implement user authentication to frontend
+    - [ ] Implement login system
+    - [ ] Implement logout system
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)
     - [ ] API for send chat message (POST METHOD)
     - [ ] API FOR GET CHAT MESSAGES (only last 50 messages) (GET METHOD)
         - [ ] Implement get more messages for load older messages (scroll message history)
     - [ ] For chat operations over API (send/get message) implement chat type=global (in furure will be implemented for type=private)
-- [ ] Setup react-app-base and modify for private chat use
-    - [ ] Implement system for configuration api url (for electron app)
-        - [ ] file config for app (if api-url is not set, use api url config component and save to local storage)
-- [ ] Implement user authentication to frontend
-    - [ ] Implement login system
-    - [ ] Implement logout system
 - [ ] Chat select system (hard coded for global chat for now)
-- [ ] Chat system
+- [ ] Chat system (frontend)
     - [ ] Form for send message
     - [ ] Implement chat polling system (for get new messages)
     - [ ] Implement chat history scroll system
