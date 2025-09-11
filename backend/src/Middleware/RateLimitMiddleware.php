@@ -35,7 +35,7 @@ class RateLimitMiddleware
      * Handle rate limiting
      *
      * @param ControllerEvent $event The controller event object
-     * 
+     *
      * @return void
      */
     public function onKernelController(ControllerEvent $event): void
