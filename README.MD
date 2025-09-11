@@ -1,9 +1,8 @@
 # Private Chat
 
-# ROADMAP
-## Version 1.0
-
-## Setup
+## ROADMAP
+### Version 1.0
+### Setup
 - [X] Setup api-base and modify for private chat use    
     - [X] Clean unnecessary components
     - [X] User authentication
@@ -25,8 +24,7 @@
     - [ ] Implement logout system
 - [ ] Try docker images building + create tesing docker-compose for production use
 - [ ] Base refactoring
-
-## Chat system
+### Chat system
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)
     - [ ] API for send chat message (POST METHOD)
