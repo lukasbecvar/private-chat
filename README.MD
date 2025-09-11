@@ -2,7 +2,7 @@
 
 # ROADMAP
 ## Version 1.0
-- [ ] Setup api-base and modify for private chat use    
+- [X] Setup api-base and modify for private chat use    
     - [X] Clean unnecessary components
     - [X] User authentication
     - [X] Login and logout system
@@ -12,7 +12,7 @@
     - [X] Implement security middleware for (SSL check, XSS escape, CSRF, etc)
     - [X] Change user login main property to username auth (email is not required)
     - [X] Implement rate limiting for non-authenticated users
-    - [ ] Implement user profile image to user entity (avatar in base64)
+    - [X] Implement user profile image to user entity (avatar in base64)
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)
     - [ ] API for send chat message (POST METHOD)
