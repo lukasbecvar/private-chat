@@ -76,7 +76,7 @@ class LoginControllerTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'username' => 'testing_user',
+            'username' => 'test',
             'password' => ''
         ]) ?: null);
 
@@ -123,17 +123,27 @@ class LoginControllerTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'username' => 'testing_user',
+            'username' => 'test',
             'password' => 'test'
         ]) ?: null);
 
-        /** @var array<mixed> $responseData */
-        $responseData = json_decode(($this->client->getResponse()->getContent() ?: '{}'), true);
+        $response = $this->client->getResponse();
 
-        // assert response
-        $this->assertNotEmpty($responseData);
-        $this->assertArrayHasKey('token', $responseData);
-        $this->assertNotEmpty($responseData['token']);
-        $this->assertResponseStatusCodeSame(JsonResponse::HTTP_OK);
+        // assert status
+        $this->assertResponseStatusCodeSame(JsonResponse::HTTP_NO_CONTENT);
+
+        // get jwt token from cookie
+        $cookies = $response->headers->getCookies();
+        $bearerCookie = null;
+        foreach ($cookies as $cookie) {
+            if ($cookie->getName() === 'BEARER') {
+                $bearerCookie = $cookie;
+                break;
+            }
+        }
+
+        // assert cookie is set
+        $this->assertNotNull($bearerCookie, 'BEARER cookie not set in response');
+        $this->assertNotEmpty($bearerCookie->getValue(), 'BEARER cookie value is empty');
     }
 }

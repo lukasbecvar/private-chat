@@ -59,10 +59,10 @@ class UserUpdateRoleCommandTest extends TestCase
     public function testExecuteMissingRoleAction(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['--user' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['--user' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -80,16 +80,16 @@ class UserUpdateRoleCommandTest extends TestCase
     public function testExecuteCommandWithUserNotFound(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['--user' => 'testing_user', '--add' => 'ROLE_ADMIN']);
+        $exitCode = $this->commandTester->execute(['--user' => 'test', '--add' => 'ROLE_ADMIN']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User not found: testing_user', $output);
+        $this->assertStringContainsString('User not found: test', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -101,22 +101,22 @@ class UserUpdateRoleCommandTest extends TestCase
     public function testExecuteCommandWithSuccessfulRoleAddition(): void
     {
         // mock get user id by username
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn(1);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn(1);
 
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // expect add role to user call
         $this->userManager->expects($this->once())->method('addRoleToUser')->with(1, 'ROLE_ADMIN');
 
         // execute command
-        $exitCode = $this->commandTester->execute(['--user' => 'testing_user', '--add' => 'ROLE_ADMIN']);
+        $exitCode = $this->commandTester->execute(['--user' => 'test', '--add' => 'ROLE_ADMIN']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString("Role: ROLE_ADMIN added to user: testing_user.", $output);
+        $this->assertStringContainsString('Role: ROLE_ADMIN added to user: test.', $output);
         $this->assertEquals(Command::SUCCESS, $exitCode);
     }
 
@@ -128,22 +128,22 @@ class UserUpdateRoleCommandTest extends TestCase
     public function testExecuteCommandWithSuccessfulRoleRemoval(): void
     {
         // mock get user id by username
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn(1);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn(1);
 
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // expect remove role from user call
         $this->userManager->expects($this->once())->method('removeRoleFromUser')->with(1, 'ROLE_ADMIN');
 
         // execute command
-        $exitCode = $this->commandTester->execute(['--user' => 'testing_user', '--remove' => 'ROLE_ADMIN']);
+        $exitCode = $this->commandTester->execute(['--user' => 'test', '--remove' => 'ROLE_ADMIN']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString("Role: ROLE_ADMIN removed from user: testing_user.", $output);
+        $this->assertStringContainsString('Role: ROLE_ADMIN removed from user: test.', $output);
         $this->assertEquals(Command::SUCCESS, $exitCode);
     }
 
@@ -155,13 +155,13 @@ class UserUpdateRoleCommandTest extends TestCase
     public function testExecuteCommandWithExceptionResponse(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // mock add role to user method to throw exception
         $this->userManager->expects($this->once())->method('addRoleToUser')->willThrowException(new Exception('Database error'));
 
         // execute command
-        $exitCode = $this->commandTester->execute(['--user' => 'testing_user', '--add' => 'ROLE_ADMIN']);
+        $exitCode = $this->commandTester->execute(['--user' => 'test', '--add' => 'ROLE_ADMIN']);
 
         // get command output
         $output = $this->commandTester->getDisplay();

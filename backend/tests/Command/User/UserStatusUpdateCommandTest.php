@@ -59,10 +59,10 @@ class UserStatusUpdateCommandTest extends TestCase
     public function testExecuteCommandUserNotFound(): void
     {
         // simulate user not found
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => 'inactive']);
+        $exitCode = $this->commandTester->execute(['username' => 'test', 'status' => 'inactive']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -84,14 +84,14 @@ class UserStatusUpdateCommandTest extends TestCase
         $status = 'inactive';
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // mock user manager to return the user status
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
         $this->userManager->expects($this->once())->method('getUserStatus')->with($id)->willReturn($status);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => $status]);
+        $exitCode = $this->commandTester->execute(['username' => 'test', 'status' => $status]);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -113,14 +113,14 @@ class UserStatusUpdateCommandTest extends TestCase
         $status = 'inactive';
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // expect checkIfUserIsAlreadyRegistered and updateUserStatus calls
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
         $this->userManager->expects($this->once())->method('updateUserStatus')->with($id, $status);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => $status]);
+        $exitCode = $this->commandTester->execute(['username' => 'test', 'status' => $status]);
 
         // get command output
         $output = $this->commandTester->getDisplay();
@@ -142,14 +142,14 @@ class UserStatusUpdateCommandTest extends TestCase
         $status = 'inactive';
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // mock exception during user status update
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
         $this->userManager->expects($this->once())->method('updateUserStatus')->with($id, $status)->willThrowException(new Exception('Database error'));
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user', 'status' => $status]);
+        $exitCode = $this->commandTester->execute(['username' => 'test', 'status' => $status]);
 
         // get command output
         $output = $this->commandTester->getDisplay();

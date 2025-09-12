@@ -45,10 +45,10 @@ class UserUpdateRoleCommand extends Command
 
                 Examples:
                 - Add a role:
-                    <info>php bin/console %command.name% --user="testing_user" --add="ROLE_ADMIN"</info>
+                    <info>php bin/console %command.name% --user="test" --add="ROLE_ADMIN"</info>
                 
                 - Remove a role:
-                    <info>php bin/console %command.name% --user="testing_user" --remove="ROLE_ADMIN"</info>
+                    <info>php bin/console %command.name% --user="test" --remove="ROLE_ADMIN"</info>
 
                 - If no role action (--add or --remove) is provided, the command will display an error.
 

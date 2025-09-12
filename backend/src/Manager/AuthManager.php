@@ -34,15 +34,30 @@ class AuthManager
     }
 
     /**
-     * Get auth token from request
+     * Get auth token from request or cookie
      *
      * @param Request $request The request object
      *
-     * @return string The auth token
+     * @return string|null The auth token or null if not set
      */
     public function getAuthTokenFromRequest(Request $request): ?string
     {
-        return $request->headers->get('Authorization');
+        // try to get token from authorization header
+        $authHeader = $request->headers->get('Authorization');
+        if ($authHeader) {
+            if (str_starts_with($authHeader, 'Bearer ')) {
+                return substr($authHeader, 7);
+            }
+            return $authHeader;
+        }
+
+        // try to get token from cookie
+        $cookieToken = $request->cookies->get('BEARER');
+        if ($cookieToken) {
+            return $cookieToken;
+        }
+
+        return null;
     }
 
     /**

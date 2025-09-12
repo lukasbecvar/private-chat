@@ -1,5 +1,6 @@
 {
     "DEV_MODE": true,
     "API_TIMEOUT_SEC": 5,
+    "API_TOKEN": "1234",
     "API_URL": "http://localhost:1337"
 }

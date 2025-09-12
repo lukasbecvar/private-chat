@@ -61,16 +61,16 @@ class UserInfoCommandTest extends TestCase
     public function testExecuteCommandWithUserNotFound(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User not found: testing_user', $output);
+        $this->assertStringContainsString('User not found: test', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -82,14 +82,14 @@ class UserInfoCommandTest extends TestCase
     public function testExecuteCommandWithSuccessfulInfoRetrieval(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // mock user id get
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn(1);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn(1);
 
         // mock user info get
         $this->userManager->expects($this->once())->method('getUserInfo')->with(1)->willReturn([
-            'username' => 'testing_user',
+            'username' => 'test',
             'first-name' => 'John',
             'last-name' => 'Doe',
             'roles' => ['ROLE_USER'],
@@ -104,13 +104,13 @@ class UserInfoCommandTest extends TestCase
         $this->visitorInfoUtil->expects($this->once())->method('getBrowserShortify')->with('Mozilla/5.0')->willReturn('Chrome');
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('testing_user', $output);
+        $this->assertStringContainsString('test', $output);
         $this->assertStringContainsString('John', $output);
         $this->assertStringContainsString('Doe', $output);
         $this->assertStringContainsString('Chrome', $output);
@@ -129,14 +129,14 @@ class UserInfoCommandTest extends TestCase
     public function testExecuteCommandWithMissingUserAgent(): void
     {
         // mock user existence check
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // mock user id get
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn(1);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn(1);
 
         // mock user info get
         $this->userManager->expects($this->once())->method('getUserInfo')->with(1)->willReturn([
-            'username' => 'testing_user',
+            'username' => 'test',
             'first-name' => 'John',
             'last-name' => 'Doe',
             'roles' => ['ROLE_USER'],
@@ -148,7 +148,7 @@ class UserInfoCommandTest extends TestCase
         ]);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();

@@ -18,12 +18,6 @@ when@dev:
             # security components
             components:
                 securitySchemes:
-                    JWTSecurity:
-                        type: http
-                        scheme: bearer
-                        bearerFormat: JWT
-                        description: 'JWT token for user login'
-                        required: true
                     XApiToken:
                         type: apiKey
                         in: header
@@ -33,7 +27,6 @@ when@dev:
 
             # include security components
             security:
-                - JWTSecurity: []   # JWT Security (user login)
                 - XApiToken: []     # API Access Token (validate request)
 
             # static docs
@@ -53,20 +46,19 @@ when@dev:
                                         properties:
                                             username:
                                                 type: username
-                                                default: testing_user
+                                                default: test
                                             password:
                                                 type: string
                                                 default: test
                         responses:
-                            200:
+                            204:
                                 description: Successful login (return token)
-                                content:
-                                    application/json:
-                                        examples:
-                                            success:
-                                                summary: Example of successful login
-                                                value:
-                                                    token: "eyJhbGciOiJIUzI1NiIsInR..."
+                                headers:
+                                    Set-Cookie:
+                                        description: "HttpOnly cookie `BEARER` containing JWT token"
+                                        schema:
+                                            type: string
+                                            example: "BEARER=eyJhbGciOi...; Path=/; HttpOnly; Secure; SameSite=Lax"
                             401:
                                 description: Invalid credentials
                                 content:

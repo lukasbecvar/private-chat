@@ -70,7 +70,7 @@ class UserStatusCheckMiddlewareTest extends TestCase
         // expect error handler call
         $this->errorManager->expects($this->once())->method('handleError')->with(
             'Your account is not active, your current status is: inactive',
-            JsonResponse::HTTP_UNAUTHORIZED
+            JsonResponse::HTTP_FORBIDDEN
         );
 
         // create testing request

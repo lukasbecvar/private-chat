@@ -33,7 +33,7 @@ class UserRepositoryTest extends KernelTestCase
     public function testFindByUsername(): void
     {
         // testing user username
-        $username = 'testing_user';
+        $username = 'test';
 
         /** @var \App\Repository\UserRepository $userRepository */
         $userRepository = $this->entityManager->getRepository(User::class);

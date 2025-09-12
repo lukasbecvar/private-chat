@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client'
 import { ConfigProvider } from './ConfigProvider.jsx'
+import JWTCheck from './components/JWTCheck.jsx'
 import ApiStatusCheck from './components/ApiStatusCheck.jsx'
 
 // import styles
@@ -8,10 +9,7 @@ import './assets/css/index.scss'
 export default function App() {
     return (
         <ApiStatusCheck>
-            <div className="app">
-                <h1>Private Chat</h1>
-                <p>API is running</p>
-            </div>
+            <JWTCheck/>
         </ApiStatusCheck>
     )
 }

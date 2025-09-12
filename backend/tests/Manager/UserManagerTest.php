@@ -59,7 +59,7 @@ class UserManagerTest extends TestCase
      */
     public function testGetUserIdByUsername(): void
     {
-        $username = 'testing_user';
+        $username = 'test';
         $userId = 1;
 
         // mock user entity
@@ -84,7 +84,7 @@ class UserManagerTest extends TestCase
     public function testcheckIfUserUserAlreadyRegistered(): void
     {
         // call tested method
-        $checkIfUserIsAlreadyRegistered = $this->userManager->checkIfUserIsAlreadyRegistered('testing_user');
+        $checkIfUserIsAlreadyRegistered = $this->userManager->checkIfUserIsAlreadyRegistered('test');
 
         // assert result
         $this->assertIsBool($checkIfUserIsAlreadyRegistered);
@@ -112,7 +112,7 @@ class UserManagerTest extends TestCase
     public function testRegisterUser(): void
     {
         // testing user data
-        $username = 'testing_user';
+        $username = 'test';
         $firstName = 'John';
         $lastName = 'Doe';
         $password = 'secure_password';
@@ -153,7 +153,7 @@ class UserManagerTest extends TestCase
     {
         // testing user data
         $id = 1;
-        $username = 'testing_user';
+        $username = 'test';
         $firstName = 'John';
         $lastName = 'Doe';
         $roles = ['ROLE_ADMIN'];
@@ -211,7 +211,7 @@ class UserManagerTest extends TestCase
     public function testUpdateUserPassword(): void
     {
         $id = 1;
-        $username = 'testing_user';
+        $username = 'test';
         $newPassword = 'newPassword';
 
         // mock user
@@ -243,7 +243,7 @@ class UserManagerTest extends TestCase
     public function testUpdateUserDataOnLogin(): void
     {
         // testing user username
-        $identifier = 'testing_user';
+        $identifier = 'test';
 
         // mock user repository
         $this->userRepositoryMock->expects($this->once())->method('findOneBy')->with(['username' => $identifier])->willReturn(new User());
@@ -267,7 +267,7 @@ class UserManagerTest extends TestCase
     public function testDeleteUser(): void
     {
         $userId = 1;
-        $username = 'testing_user';
+        $username = 'test';
 
         // mock user entity
         $user = $this->createMock(User::class);
@@ -299,7 +299,7 @@ class UserManagerTest extends TestCase
     public function testUpdateUserStatus(): void
     {
         $userId = 1;
-        $username = 'testing_user';
+        $username = 'test';
         $oldStatus = 'active';
         $newStatus = 'inactive';
 
@@ -358,7 +358,7 @@ class UserManagerTest extends TestCase
     {
         // testing user data
         $id = 1;
-        $username = 'testing_user';
+        $username = 'test';
 
         // mock existing user
         $user = $this->createMock(User::class);
@@ -413,7 +413,7 @@ class UserManagerTest extends TestCase
     public function testAddRoleToUser(): void
     {
         $id = 1;
-        $username = 'testing_user';
+        $username = 'test';
         $role = 'ROLE_ADMIN';
 
         // mock existing user
@@ -447,7 +447,7 @@ class UserManagerTest extends TestCase
     public function testRemoveRoleFromUser(): void
     {
         $id = 1;
-        $username = 'testing_user';
+        $username = 'test';
         $role = 'ROLE_ADMIN';
 
         // mock existing user

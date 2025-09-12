@@ -8,7 +8,7 @@ import ErrorScreen from './sub-components/ErrorScreen.jsx'
 export default function ApiStatusCheck({ children }) {
     // init config provider
     const { getConfigValue } = useConfig()
-    
+
     // init states
     const [loading, setLoading] = useState(true)
     const [errorMessage, setErrorMessage] = useState(null)
@@ -54,7 +54,10 @@ export default function ApiStatusCheck({ children }) {
         checkApi()
     }, [getConfigValue])
 
+    // show loading screen
     if (loading) return <Loading/>
+    
+    // show error screen
     if (errorMessage) return <ErrorScreen errorMessage={errorMessage}/>
 
     return <>{children}</>

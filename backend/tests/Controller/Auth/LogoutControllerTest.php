@@ -110,26 +110,32 @@ class LogoutControllerTest extends CustomTestCase
      */
     public function testLogoutWhenTokenIsValid(): void
     {
-        // make request to login endpoint (to get auth token)
+        // login request
         $this->client->request('POST', '/api/auth/login', [], [], [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN']
         ], json_encode([
-            'username' => 'testing_user',
+            'username' => 'test',
             'password' => 'test'
         ]) ?: null);
 
-        /** @var array<mixed> $loginResponseData */
-        $loginResponseData = json_decode(($this->client->getResponse()->getContent() ?: '{}'), true);
+        // get jwt token from cookie
+        $loginResponse = $this->client->getResponse();
+        $cookies = $loginResponse->headers->getCookies();
+        $bearerCookie = null;
+        foreach ($cookies as $cookie) {
+            if ($cookie->getName() === 'BEARER') {
+                $bearerCookie = $cookie;
+                break;
+            }
+        }
+        $this->assertNotNull($bearerCookie, 'BEARER cookie was not set on login');
 
-        // get auth token
-        $authToken = $loginResponseData['token'];
-
-        // make request to logout endpoint
+        // logout request with BEARER cookie
         $this->client->request('POST', '/api/auth/logout', [], [], [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN'],
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $authToken
+            'HTTP_COOKIE' => 'BEARER=' . $bearerCookie->getValue(),
         ]);
 
         /** @var array<mixed> $responseData */

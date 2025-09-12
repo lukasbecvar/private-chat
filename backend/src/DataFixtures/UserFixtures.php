@@ -37,7 +37,7 @@ class UserFixtures extends Fixture
 
         // create test user
         $user = new User();
-        $user->setUsername('testing_user')
+        $user->setUsername('test')
             ->setFirstName('test')
             ->setLastName('User')
             ->setRoles(['ROLE_USER', 'ROLE_ADMIN'])

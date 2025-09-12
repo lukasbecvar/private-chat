@@ -59,16 +59,16 @@ class UserDeleteCommandTest extends TestCase
     public function testExecuteCommandUserNotFound(): void
     {
         // simulate user not found
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User not found: testing_user', $output);
+        $this->assertStringContainsString('User not found: test', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -83,20 +83,20 @@ class UserDeleteCommandTest extends TestCase
         $id = 1;
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // expect delete user call
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
         $this->userManager->expects($this->once())->method('deleteUser')->with($id);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString("User testing_user deleted.", $output);
+        $this->assertStringContainsString('User test deleted.', $output);
         $this->assertEquals(Command::SUCCESS, $exitCode);
     }
 
@@ -111,14 +111,14 @@ class UserDeleteCommandTest extends TestCase
         $id = 1;
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // mock exception during user deletion throw exception
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
         $this->userManager->expects($this->once())->method('deleteUser')->with($id)->willThrowException(new Exception('Database error'));
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();

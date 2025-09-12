@@ -59,16 +59,16 @@ class UserPasswordResetCommandTest extends TestCase
     public function testExecuteCommandUserNotFound(): void
     {
         // simulate user not found
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(false);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User not found: testing_user', $output);
+        $this->assertStringContainsString('User not found: test', $output);
         $this->assertEquals(Command::INVALID, $exitCode);
     }
 
@@ -83,22 +83,22 @@ class UserPasswordResetCommandTest extends TestCase
         $newPassword = 'new-password';
 
         // simulate user found
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // expect reset user password call
         $this->userManager->expects($this->once())->method('resetUserPassword')->with($id)->willReturn($newPassword);
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User password reset: testing_user the new password is: ' . $newPassword, $output);
+        $this->assertStringContainsString('User password reset: test the new password is: ' . $newPassword, $output);
         $this->assertEquals(Command::SUCCESS, $exitCode);
     }
 
@@ -112,16 +112,16 @@ class UserPasswordResetCommandTest extends TestCase
         $id = 1;
 
         // simulate user found
-        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('testing_user')->willReturn(true);
+        $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
 
         // mock user manager to return the user id
-        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('testing_user')->willReturn($id);
+        $this->userManager->expects($this->once())->method('getUserIdByUsername')->with('test')->willReturn($id);
 
         // simulate exception during user password reset
         $this->userManager->expects($this->once())->method('resetUserPassword')->with($id)->willThrowException(new Exception('Reset error'));
 
         // execute command
-        $exitCode = $this->commandTester->execute(['username' => 'testing_user']);
+        $exitCode = $this->commandTester->execute(['username' => 'test']);
 
         // get command output
         $output = $this->commandTester->getDisplay();

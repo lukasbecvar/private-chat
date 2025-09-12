@@ -72,7 +72,7 @@ class UserStatusCheckMiddleware
             if ($userStatus !== 'active') {
                 $this->errorManager->handleError(
                     message: 'Your account is not active, your current status is: ' . $userStatus,
-                    code: JsonResponse::HTTP_UNAUTHORIZED
+                    code: JsonResponse::HTTP_FORBIDDEN
                 );
             }
         }

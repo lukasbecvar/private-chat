@@ -19,9 +19,11 @@
     - [X] Implement config system for frontend somthing like .env
     - [X] Implement api status check (check if api is running)
     - [X] Implement api status check for handle maintenance mode, security stop, etc
-- [ ] Implement user authentication to frontend
-    - [ ] Implement login system
-    - [ ] Implement logout system
+- [X] Implement user authentication to frontend
+    - [X] Implement login system
+    - [X] Implement logout system
+- [ ] Remove first name and last name from user entity
+- [ ] Basic frontend styling
 - [ ] Try docker images building + create tesing docker-compose for production use
 - [ ] Base refactoring
 ### Chat system

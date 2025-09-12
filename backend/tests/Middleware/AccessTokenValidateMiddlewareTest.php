@@ -42,7 +42,7 @@ class AccessTokenValidateMiddlewareTest extends TestCase
     public function testRequestWhenTokenIsInvalid(): void
     {
         // testing request
-        $request = new Request([], [], [], [], [], [], '{"username": "testing_user", "password": "test"}');
+        $request = new Request([], [], [], [], [], [], '{"username": "test", "password": "test"}');
         $request->setMethod('POST');
         $request->headers->set('X-API-TOKEN', 'invalid_token');
         $request->headers->set('Content-Type', 'application/json');
@@ -73,7 +73,7 @@ class AccessTokenValidateMiddlewareTest extends TestCase
     public function testRequestWhenTokenIsValid(): void
     {
         // testing request
-        $request = new Request([], [], [], [], [], [], '{"username": "testing_user", "password": "test"}');
+        $request = new Request([], [], [], [], [], [], '{"username": "test", "password": "test"}');
         $request->setMethod('POST');
         $request->headers->set('X-API-TOKEN', 'valid_token');
         $request->headers->set('Content-Type', 'application/json');

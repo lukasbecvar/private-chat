@@ -48,11 +48,11 @@ class AuthManagerTest extends TestCase
     }
 
     /**
-     * Test get auth token from request
+     * Test get auth token from request (authorization header)
      *
      * @return void
      */
-    public function testGetAuthTokenFromRequest(): void
+    public function testGetAuthTokenFromRequestFromHeader(): void
     {
         // creating mock request and setting authorization header
         $request = new Request([], [], [], [], [], ['HTTP_Authorization' => 'Bearer mock_token']);
@@ -60,8 +60,25 @@ class AuthManagerTest extends TestCase
         // call tested method
         $token = $this->authManager->getAuthTokenFromRequest($request);
 
+        // assert result (prefix "Bearer " is stripped)
+        $this->assertEquals('mock_token', $token);
+    }
+
+    /**
+     * Test get auth token from request (cookie)
+     *
+     * @return void
+     */
+    public function testGetAuthTokenFromRequestFromCookie(): void
+    {
+        // creating mock request with cookie
+        $request = new Request([], [], [], ['BEARER' => 'cookie_token']);
+
+        // call tested method
+        $token = $this->authManager->getAuthTokenFromRequest($request);
+
         // assert result
-        $this->assertEquals('Bearer mock_token', $token);
+        $this->assertEquals('cookie_token', $token);
     }
 
     /**

@@ -52,7 +52,7 @@ class UserInfoController extends AbstractController
                     property: 'data',
                     type: 'object',
                     properties: [
-                        new Property(property: 'username', type: 'string', example: 'testing_user'),
+                        new Property(property: 'username', type: 'string', example: 'test'),
                         new Property(property: 'first-name', type: 'string', example: 'Lukas'),
                         new Property(property: 'last-name', type: 'string', example: 'Becvar'),
                         new Property(property: 'roles', type: 'array', items: new Items(type: 'string'), example: ["ROLE_USER"]),
