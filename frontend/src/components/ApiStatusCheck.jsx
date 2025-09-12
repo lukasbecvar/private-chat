@@ -52,7 +52,7 @@ export default function ApiStatusCheck({ children }) {
             setLoading(false)
         }
         checkApi()
-    }, [getConfigValue])
+    })
 
     // show loading screen
     if (loading) return <Loading/>

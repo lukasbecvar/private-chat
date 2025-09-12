@@ -58,7 +58,7 @@ export default function JWTCheck() {
         }
 
         verifyUserStatus()
-    }, [API_URL, API_TOKEN, DEV_MODE])
+    })
 
 
     // show loading screen
