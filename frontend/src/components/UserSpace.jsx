@@ -5,7 +5,6 @@ import ErrorScreen from './sub-components/ErrorScreen.jsx'
 import LogoutComponent from './LogoutComponent.jsx'
 
 export default function UserSpace() {
-    let test = null    
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
