@@ -15,10 +15,10 @@
     - [X] Implement rate limiting for non-authenticated users
     - [X] Implement user profile image to user entity (avatar in base64)
 - [X] Setup react-app-base and modify for private chat use
-- [ ] Modify react-app-base for private chat use
-    - [ ] Implement config system for frontend somthing like .env
-        - [ ] Configurable api url
-    - [ ] Implement api status check (check if api is running)
+- [X] Modify react-app-base for private chat use
+    - [X] Implement config system for frontend somthing like .env
+    - [X] Implement api status check (check if api is running)
+    - [X] Implement api status check for handle maintenance mode, security stop, etc
 - [ ] Implement user authentication to frontend
     - [ ] Implement login system
     - [ ] Implement logout system

@@ -1,33 +1,17 @@
 {
-    "name": "private-chat",
     "author": "Lukáš Bečvář",
+    "name": "private-chat",
+    "version": "1.0",
+    "type": "module",
     "license": "MIT",
     "private": false,
-    "version": "1.0",
-    "main": "electron/main.js",
-    "build": {
-        "files": [
-            "dist/**/*",
-            "electron/**/*",
-            "package.json"
-        ],
-        "linux": {
-            "target": [
-                "AppImage",
-                "snap"
-            ],
-            "icon": "electron/app-icon.png"
-        }
-    },
     "scripts": {
         "dev": "vite",
         "lint": "eslint .",
         "build": "vite build",
-        "preview": "vite preview",
-        "electron-dist": "npm run build && electron-builder"
+        "preview": "vite preview"
     },
     "dependencies": {
-        "@tsparticles/react": "^3.0.0",
         "@tsparticles/slim": "^3.0.0",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
@@ -39,8 +23,6 @@
         "@types/react-dom": "^19.1.6",
         "@vitejs/plugin-react": "^4.7.0",
         "autoprefixer": "^10.4.21",
-        "electron": "^37.2.4",
-        "electron-builder": "^26.0.12",
         "eslint": "^9.30.1",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.20",

@@ -1,0 +1,5 @@
+{
+    "DEV_MODE": true,
+    "API_TIMEOUT_SEC": 5,
+    "API_URL": "http://localhost:1337"
+}

@@ -1,5 +1,5 @@
 # run application tests with phpunit
-name: PHPUnit Tests
+name: PHPUnit
 
 on:
   push:
