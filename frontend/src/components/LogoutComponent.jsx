@@ -41,19 +41,17 @@ export default function LogoutComponent() {
         } catch (err) {
             setError('Error logging out: ' + err.message)
         } finally {
-            setLoading(false)
             window.location.reload()
         }
     }
-
-    // show loading screen
-    if (loading) return <Loading/>
 
     // show error screen
     if (error) return <ErrorScreen errorMessage={error}/>
 
     return (
-        <button onClick={handleLogout} disabled={loading}>
+        <button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold text-base py-1.5 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={handleLogout} disabled={loading}>
             {loading ? 'Logging out...' : 'Logout'}
         </button>
     )
