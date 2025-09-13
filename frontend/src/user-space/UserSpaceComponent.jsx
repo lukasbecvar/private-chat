@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useConfig } from '../hooks/UseConfig.jsx'
-import Loading from './sub-components/Loading.jsx'
-import ErrorScreen from './sub-components/ErrorScreen.jsx'
-import LogoutComponent from './LogoutComponent.jsx'
+import { useConfig } from '../hooks/useConfig.jsx'
+import Loading from '../sub-components/LoadingComponent.jsx'
+import ErrorScreenComponent from '../sub-components/ErrorScreenComponent.jsx'
+import LogoutComponent from '../auth/LogoutComponent.jsx'
 
-export default function UserSpace() {
+export default function UserSpaceComponent() {
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
@@ -52,7 +52,7 @@ export default function UserSpace() {
     if (loading) return <Loading/>
 
     // show error screen
-    if (error) return <ErrorScreen errorMessage={error}/>
+    if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     return (
         <div>

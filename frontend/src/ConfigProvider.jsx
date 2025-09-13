@@ -1,8 +1,8 @@
 import { createContext, useEffect, useState } from 'react'
 
 // import sub-components
-import Loading from './components/sub-components/Loading'
-import ErrorScreen from './components/sub-components/ErrorScreen'
+import Loading from './sub-components/LoadingComponent'
+import ErrorScreenComponent from './sub-components/ErrorScreenComponent'
 
 // create config context
 const ConfigContext = createContext({})
@@ -28,7 +28,7 @@ export const ConfigProvider = ({ children }) => {
 
     // show error screen if config load failed
     if (error) {
-        return <ErrorScreen errorMessage={'Configuration file load error: ' + error.message}/>
+        return <ErrorScreenComponent errorMessage={'Configuration file load error: ' + error.message}/>
     }
 
     // show loading component if config is still loading

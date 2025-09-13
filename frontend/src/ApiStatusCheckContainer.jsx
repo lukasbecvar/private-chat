@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useConfig } from '../hooks/UseConfig.jsx'
+import { useConfig } from './hooks/useConfig.jsx'
 
 // import sub-components
-import Loading from './sub-components/Loading.jsx'
-import ErrorScreen from './sub-components/ErrorScreen.jsx'
+import Loading from './sub-components/LoadingComponent.jsx'
+import ErrorScreenComponent from './sub-components/ErrorScreenComponent.jsx'
 
-export default function ApiStatusCheck({ children }) {
+export default function ApiStatusCheckContainer({ children }) {
     // init config provider
     const { getConfigValue } = useConfig()
 
@@ -58,7 +58,7 @@ export default function ApiStatusCheck({ children }) {
     if (loading) return <Loading/>
     
     // show error screen
-    if (errorMessage) return <ErrorScreen errorMessage={errorMessage}/>
+    if (errorMessage) return <ErrorScreenComponent errorMessage={errorMessage}/>
 
     return <>{children}</>
 }

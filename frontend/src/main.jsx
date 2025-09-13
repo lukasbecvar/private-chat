@@ -1,16 +1,16 @@
 import ReactDOM from 'react-dom/client'
 import { ConfigProvider } from './ConfigProvider.jsx'
-import JWTCheck from './components/JWTCheck.jsx'
-import ApiStatusCheck from './components/ApiStatusCheck.jsx'
+import TokenCheckContainer from './auth/TokenCheckContainer.jsx'
+import ApiStatusCheckContainer from './ApiStatusCheckContainer.jsx'
 
 // import styles
 import './assets/css/index.scss'
 
 export default function App() {
     return (
-        <ApiStatusCheck>
-            <JWTCheck/>
-        </ApiStatusCheck>
+        <ApiStatusCheckContainer>
+            <TokenCheckContainer/>
+        </ApiStatusCheckContainer>
     )
 }
 

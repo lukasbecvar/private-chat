@@ -1,12 +1,12 @@
-// src/components/JWTCheck.jsx
+// src/components/TokenCheckContainer.jsx
 import { useEffect, useState } from 'react'
-import { useConfig } from '../hooks/UseConfig.jsx'
-import UserSpace from './UserSpace.jsx'
-import AuthComponent from './AuthComponent.jsx'
-import Loading from './sub-components/Loading.jsx'
-import ErrorScreen from './sub-components/ErrorScreen.jsx'
+import { useConfig } from '../hooks/useConfig.jsx'
+import UserSpaceComponent from '../user-space/UserSpaceComponent.jsx'
+import LoginComponent from './LoginComponent.jsx'
+import Loading from '../sub-components/LoadingComponent.jsx'
+import ErrorScreenComponent from '../sub-components/ErrorScreenComponent.jsx'
 
-export default function JWTCheck() {
+export default function TokenCheckContainer() {
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
@@ -67,7 +67,7 @@ export default function JWTCheck() {
     // show auth component
     if (status === 'unauthenticated') {
         return (
-            <AuthComponent
+            <LoginComponent
                 onLoginSuccess={() => {
                     setStatus('authenticated')
                 }}
@@ -76,12 +76,12 @@ export default function JWTCheck() {
     }
 
     // show error screen
-    if (status === 'error') return <ErrorScreen errorMessage={message}/>
+    if (status === 'error') return <ErrorScreenComponent errorMessage={message}/>
 
     // show user space
     if (status === 'authenticated') {
         return (
-            <UserSpace/>
+            <UserSpaceComponent/>
         )
     }
 

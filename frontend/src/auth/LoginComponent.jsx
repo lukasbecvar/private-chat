@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useConfig } from '../hooks/UseConfig.jsx'
-import Loading from './sub-components/Loading.jsx'
+import { useConfig } from '../hooks/useConfig.jsx'
+import Loading from '../sub-components/LoadingComponent.jsx'
 
-export default function AuthComponent({ onLoginSuccess }) {
+export default function LoginComponent({ onLoginSuccess }) {
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')

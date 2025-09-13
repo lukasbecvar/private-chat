@@ -1,4 +1,4 @@
-export default function ErrorScreen({ errorMessage }) {
+export default function ErrorScreenComponent({ errorMessage }) {
     const handleReload = () => {
         window.location.reload();
     };
