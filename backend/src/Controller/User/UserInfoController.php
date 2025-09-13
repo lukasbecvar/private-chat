@@ -53,8 +53,6 @@ class UserInfoController extends AbstractController
                     type: 'object',
                     properties: [
                         new Property(property: 'username', type: 'string', example: 'test'),
-                        new Property(property: 'first-name', type: 'string', example: 'Lukas'),
-                        new Property(property: 'last-name', type: 'string', example: 'Becvar'),
                         new Property(property: 'roles', type: 'array', items: new Items(type: 'string'), example: ["ROLE_USER"]),
                         new Property(property: 'register-time', type: 'string', format: 'date-time', example: '2024-11-17 07:31:27'),
                         new Property(property: 'last-login-time', type: 'string', format: 'date-time', example: '2025-01-31 10:50:29'),

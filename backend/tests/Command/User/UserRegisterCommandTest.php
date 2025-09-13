@@ -44,7 +44,7 @@ class UserRegisterCommandTest extends TestCase
     public function testExecuteCommandEmptyUsernameInput(): void
     {
         // simulate empty input
-        $this->commandTester->setInputs(['', 'John', 'Doe', 'password']);
+        $this->commandTester->setInputs(['', 'password']);
 
         // execute command
         $exitCode = $this->commandTester->execute([]);
@@ -65,7 +65,7 @@ class UserRegisterCommandTest extends TestCase
     public function testExecuteCommandUserExists(): void
     {
         // simulate user input
-        $this->commandTester->setInputs(['test', 'John', 'Doe', 'password']);
+        $this->commandTester->setInputs(['test', 'password']);
 
         // mock user existence check
         $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(true);
@@ -89,11 +89,11 @@ class UserRegisterCommandTest extends TestCase
     public function testExecuteCommandSuccess(): void
     {
         // simulate user input
-        $this->commandTester->setInputs(['test', 'John', 'Doe', 'password']);
+        $this->commandTester->setInputs(['test', 'password']);
 
         // mock successful registration
         $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);
-        $this->userManager->expects($this->once())->method('registerUser')->with('test', 'John', 'Doe', 'password');
+        $this->userManager->expects($this->once())->method('registerUser')->with('test', 'password');
 
         // execute command
         $exitCode = $this->commandTester->execute([]);
@@ -102,7 +102,7 @@ class UserRegisterCommandTest extends TestCase
         $output = $this->commandTester->getDisplay();
 
         // assert response
-        $this->assertStringContainsString('User registered: test (John Doe)', $output);
+        $this->assertStringContainsString('User registered: test', $output);
         $this->assertEquals(Command::SUCCESS, $exitCode);
     }
 
@@ -114,7 +114,7 @@ class UserRegisterCommandTest extends TestCase
     public function testExecuteCommandFailure(): void
     {
         // simulate user input
-        $this->commandTester->setInputs(['test', 'John', 'Doe', 'password']);
+        $this->commandTester->setInputs(['test', 'password']);
 
         // mock exception during registration
         $this->userManager->expects($this->once())->method('checkIfUserIsAlreadyRegistered')->with('test')->willReturn(false);

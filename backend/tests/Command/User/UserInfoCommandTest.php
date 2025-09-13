@@ -90,8 +90,6 @@ class UserInfoCommandTest extends TestCase
         // mock user info get
         $this->userManager->expects($this->once())->method('getUserInfo')->with(1)->willReturn([
             'username' => 'test',
-            'first-name' => 'John',
-            'last-name' => 'Doe',
             'roles' => ['ROLE_USER'],
             'register-time' => '2022-01-01 12:00:00',
             'last-login-time' => '2023-01-01 12:00:00',
@@ -111,8 +109,6 @@ class UserInfoCommandTest extends TestCase
 
         // assert response
         $this->assertStringContainsString('test', $output);
-        $this->assertStringContainsString('John', $output);
-        $this->assertStringContainsString('Doe', $output);
         $this->assertStringContainsString('Chrome', $output);
         $this->assertStringContainsString('active', $output);
         $this->assertStringContainsString('2022-01-01 12:00:00', $output);
@@ -137,8 +133,6 @@ class UserInfoCommandTest extends TestCase
         // mock user info get
         $this->userManager->expects($this->once())->method('getUserInfo')->with(1)->willReturn([
             'username' => 'test',
-            'first-name' => 'John',
-            'last-name' => 'Doe',
             'roles' => ['ROLE_USER'],
             'register-time' => '2022-01-01 12:00:00',
             'last-login-time' => '2023-01-01 12:00:00',

@@ -113,8 +113,6 @@ class UserManagerTest extends TestCase
     {
         // testing user data
         $username = 'test';
-        $firstName = 'John';
-        $lastName = 'Doe';
         $password = 'secure_password';
         $ipAddress = '127.0.0.1';
         $userAgent = 'TestAgent';
@@ -141,7 +139,7 @@ class UserManagerTest extends TestCase
         );
 
         // call tested method
-        $this->userManager->registerUser($username, $firstName, $lastName, $password);
+        $this->userManager->registerUser($username, $password);
     }
 
     /**
@@ -154,8 +152,6 @@ class UserManagerTest extends TestCase
         // testing user data
         $id = 1;
         $username = 'test';
-        $firstName = 'John';
-        $lastName = 'Doe';
         $roles = ['ROLE_ADMIN'];
         $registerTime = new DateTime();
         $lastLoginTime = new DateTime();
@@ -166,8 +162,6 @@ class UserManagerTest extends TestCase
         // mock user entity
         $user = $this->createMock(User::class);
         $user->expects($this->once())->method('getUsername')->willReturn($username);
-        $user->expects($this->once())->method('getFirstName')->willReturn($firstName);
-        $user->expects($this->once())->method('getLastName')->willReturn($lastName);
         $user->expects($this->once())->method('getRoles')->willReturn($roles);
         $user->expects($this->once())->method('getRegisterTime')->willReturn($registerTime);
         $user->expects($this->once())->method('getLastLoginTime')->willReturn($lastLoginTime);
@@ -184,8 +178,6 @@ class UserManagerTest extends TestCase
         // assert result
         $this->assertIsArray($result);
         $this->assertArrayHasKey('username', $result);
-        $this->assertArrayHasKey('first-name', $result);
-        $this->assertArrayHasKey('last-name', $result);
         $this->assertArrayHasKey('roles', $result);
         $this->assertArrayHasKey('register-time', $result);
         $this->assertArrayHasKey('last-login-time', $result);
@@ -193,8 +185,6 @@ class UserManagerTest extends TestCase
         $this->assertArrayHasKey('user-agent', $result);
         $this->assertArrayHasKey('status', $result);
         $this->assertSame($username, $result['username']);
-        $this->assertSame($firstName, $result['first-name']);
-        $this->assertSame($lastName, $result['last-name']);
         $this->assertSame($roles, $result['roles']);
         $this->assertSame($registerTime->format('Y-m-d H:i:s'), $result['register-time']);
         $this->assertSame($lastLoginTime->format('Y-m-d H:i:s'), $result['last-login-time']);

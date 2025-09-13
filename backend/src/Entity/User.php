@@ -20,8 +20,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Table(name: 'users')]
 #[ORM\Index(name: 'users_username_idx', columns: ['username'])]
 #[ORM\Index(name: 'users_status_idx', columns: ['status'])]
-#[ORM\Index(name: 'users_last_name_idx', columns: ['last_name'])]
-#[ORM\Index(name: 'users_first_name_idx', columns: ['first_name'])]
 #[ORM\Index(name: 'users_ip_address_idx', columns: ['ip_address'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -34,12 +32,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]
     private string $username;
-
-    #[ORM\Column(length: 255)]
-    private ?string $first_name = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $last_name = null;
 
     /** @var array<string> The user roles (json) */
     #[ORM\Column]
@@ -79,30 +71,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): static
     {
         $this->username = $username;
-        return $this;
-    }
-
-    public function getFirstName(): ?string
-    {
-        return $this->first_name;
-    }
-
-    public function setFirstName(string $first_name): static
-    {
-        $this->first_name = $first_name;
-
-        return $this;
-    }
-
-    public function getLastName(): ?string
-    {
-        return $this->last_name;
-    }
-
-    public function setLastName(string $last_name): static
-    {
-        $this->last_name = $last_name;
-
         return $this;
     }
 

@@ -46,7 +46,7 @@ export default function UserSpace() {
         }
 
         fetchUserData()
-    })
+    }, [DEV_MODE, API_TOKEN, API_URL])
 
     // show loading screen
     if (loading) return <Loading/>

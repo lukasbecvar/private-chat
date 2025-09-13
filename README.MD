@@ -22,7 +22,7 @@
 - [X] Implement user authentication to frontend
     - [X] Implement login system
     - [X] Implement logout system
-- [ ] Remove first name and last name from user entity
+- [X] Remove first name and last name from user entity
 - [ ] Basic frontend styling
 - [ ] Try docker images building + create tesing docker-compose for production use
 - [ ] Base refactoring

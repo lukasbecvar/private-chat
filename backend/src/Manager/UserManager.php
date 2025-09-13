@@ -158,8 +158,6 @@ class UserManager
             $list[] = [
                 'id' => $user->getId(),
                 'username' => $user->getUsername(),
-                'first-name' => $user->getFirstName(),
-                'last-name' => $user->getLastName(),
                 'roles' => $user->getRoles(),
                 'register-time' => $registerTime ?? 'Never',
                 'last-login-time' => $lastLoginTime ?? 'Never',
@@ -176,13 +174,11 @@ class UserManager
      * Register new user to database
      *
      * @param string $username The username of the user
-     * @param string $firstName The first name of the user
-     * @param string $lastName The last name of the user
      * @param string $password The password of the user
      *
      * @return void
      */
-    public function registerUser(string $username, string $firstName, string $lastName, string $password): void
+    public function registerUser(string $username, string $password): void
     {
         // check if user is already registered
         if ($this->checkIfUserIsAlreadyRegistered($username)) {
@@ -212,8 +208,6 @@ class UserManager
 
         // set user properties
         $user->setUsername($username)
-            ->setFirstName($firstName)
-            ->setLastName($lastName)
             ->setRoles(['ROLE_USER'])
             ->setPassword($passwordHash)
             ->setRegisterTime(new DateTime())
@@ -265,8 +259,6 @@ class UserManager
 
         // get user info
         $username = $user->getUsername();
-        $firstName = $user->getFirstName();
-        $lastName = $user->getLastName();
         $roles = $user->getRoles();
         $registerTime = $user->getRegisterTime();
         $lastLoginTime = $user->getLastLoginTime();
@@ -276,7 +268,7 @@ class UserManager
 
         // check if user info found
         if (
-            $username === null || $firstName === null || $lastName === null || $roles === null
+            $username === null || $roles === null
             || $registerTime === null || $lastLoginTime === null || $ipAddress === null
             || $userAgent === null || $status === null
         ) {
@@ -289,8 +281,6 @@ class UserManager
         // return user status
         return [
             'username' => $username,
-            'first-name' => $firstName,
-            'last-name' => $lastName,
             'roles' => $roles,
             'register-time' => $registerTime->format('Y-m-d H:i:s'),
             'last-login-time' => $lastLoginTime->format('Y-m-d H:i:s'),

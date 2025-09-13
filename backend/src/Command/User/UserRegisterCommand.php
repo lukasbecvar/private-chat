@@ -55,20 +55,6 @@ class UserRegisterCommand extends Command
             return Command::INVALID;
         }
 
-        // get first name from cli input
-        $firstName = $io->ask('Enter first name');
-        if ($firstName == null) {
-            $io->error('First name cannot be empty.');
-            return Command::INVALID;
-        }
-
-        // get last name from cli input
-        $lastName = $io->ask('Enter last name');
-        if ($lastName == null) {
-            $io->error('Last name cannot be empty.');
-            return Command::INVALID;
-        }
-
         // get password from cli input
         $password = $io->askHidden('Enter password (hidden input)');
         if ($password == null) {
@@ -79,8 +65,6 @@ class UserRegisterCommand extends Command
         // create user dto
         $userDTO = new UserDTO();
         $userDTO->username = $username;
-        $userDTO->firstName = $firstName;
-        $userDTO->lastName = $lastName;
         $userDTO->password = $password;
 
         // validate input data
@@ -102,11 +86,9 @@ class UserRegisterCommand extends Command
         try {
             $this->userManager->registerUser(
                 $userDTO->username,
-                $userDTO->firstName,
-                $userDTO->lastName,
                 $userDTO->password
             );
-            $io->success("User registered: $username ($firstName $lastName)");
+            $io->success('User registered: ' . $username);
         } catch (Exception $e) {
             $io->error('Error registering user: ' . $e->getMessage());
             return Command::FAILURE;

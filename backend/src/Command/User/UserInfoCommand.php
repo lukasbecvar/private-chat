@@ -80,8 +80,6 @@ class UserInfoCommand extends Command
 
         // format user info
         $username = $userInfo['username'];
-        $firstName = $userInfo['first-name'];
-        $lastName = $userInfo['last-name'];
         $roles = $userInfo['roles'];
         $registerTime = $userInfo['register-time'];
         $lastLoginTime = $userInfo['last-login-time'];
@@ -112,12 +110,10 @@ class UserInfoCommand extends Command
 
         // print user info
         $io->table(
-            headers: ['Username', 'First Name', 'Last Name', 'Roles', 'Register Time', 'Last Login Time', 'Ip Address', 'Browser', 'Status'],
+            headers: ['Username', 'Roles', 'Register Time', 'Last Login Time', 'Ip Address', 'Browser', 'Status'],
             rows: [
                 [
                     $username,
-                    $firstName,
-                    $lastName,
                     $role,
                     $registerTime,
                     $lastLoginTime,

@@ -38,8 +38,6 @@ class UserFixtures extends Fixture
         // create test user
         $user = new User();
         $user->setUsername('test')
-            ->setFirstName('test')
-            ->setLastName('User')
             ->setRoles(['ROLE_USER', 'ROLE_ADMIN'])
             ->setPassword($this->userPasswordHasher->hashPassword($user, 'test'))
             ->setRegisterTime($faker->dateTimeBetween('-1 year', 'now'))
@@ -61,8 +59,6 @@ class UserFixtures extends Fixture
 
             // set user properties
             $user->setUsername("testing_user_$i")
-                ->setFirstName($faker->firstName)
-                ->setLastName($faker->lastName)
                 ->setRoles(['ROLE_USER'])
                 ->setPassword($passwordHash)
                 ->setRegisterTime($faker->dateTimeBetween('-1 year', 'now'))

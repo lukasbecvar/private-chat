@@ -16,24 +16,6 @@ class UserDTO
     #[Assert\NotBlank(message: "username value should not be blank.")]
     public string $username;
 
-    #[Assert\NotBlank(message: "first-name value should not be blank.")]
-    #[Assert\Length(
-        min: 2,
-        max: 80,
-        minMessage: "first-name value should have at least {{ limit }} characters.",
-        maxMessage: "first-name value should have at most {{ limit }} characters."
-    )]
-    public string $firstName;
-
-    #[Assert\NotBlank(message: "last-name value should not be blank.")]
-    #[Assert\Length(
-        min: 2,
-        max: 80,
-        minMessage: "last-name value should have at least {{ limit }} characters.",
-        maxMessage: "last-name value should have at most {{ limit }} characters."
-    )]
-    public string $lastName;
-
     #[Assert\NotBlank(message: "password value should not be blank.")]
     #[Assert\Length(
         min: 6,
