@@ -3,7 +3,8 @@ name: Backend docker image builder
 
 on:
   release:
-    types: [created]
+    types:
+      - created
 
 jobs:
   build-and-push-docker-image:
