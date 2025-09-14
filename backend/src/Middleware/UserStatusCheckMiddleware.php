@@ -54,6 +54,11 @@ class UserStatusCheckMiddleware
             /** @var \App\Entity\User $user */
             $user = $this->security->getUser();
 
+            // check if user found (disable check for deleted users)
+            if ($user === null) {
+                return;
+            }
+
             // get user id
             $userId = $user->getId();
 
