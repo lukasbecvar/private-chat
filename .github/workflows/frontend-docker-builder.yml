@@ -10,6 +10,9 @@ jobs:
   build-and-push-docker-image:
     name: Frontend docker image builder
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
 
     steps:
       - name: Checkout repository
