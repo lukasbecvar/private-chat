@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react'
 
-// import sub-components
+// import app components
 import Loading from './sub-components/LoadingComponent'
 import ErrorScreenComponent from './sub-components/ErrorScreenComponent'
 
@@ -9,8 +9,8 @@ const ConfigContext = createContext({})
 
 export const ConfigProvider = ({ children }) => {
     // states
-    const [config, setConfig] = useState(null)
     const [error, setError] = useState(null)
+    const [config, setConfig] = useState(null)
 
     // method for self fetching config file
     useEffect(() => {

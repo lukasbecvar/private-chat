@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useConfig } from '../hooks/useConfig.jsx'
-import Loading from '../sub-components/LoadingComponent.jsx'
+import { useConfig } from '../hooks/useConfig'
+import Loading from '../sub-components/LoadingComponent'
 
 export default function LoginComponent({ onLoginSuccess }) {
     // get config values
@@ -10,10 +10,12 @@ export default function LoginComponent({ onLoginSuccess }) {
     const API_TOKEN = getConfigValue('API_TOKEN')
 
     // states
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(false)
+    
+    // form input states
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
 
     // submit login form on enter key
     const handleKeyDown = (e) => {
@@ -47,7 +49,8 @@ export default function LoginComponent({ onLoginSuccess }) {
                 if (DEV_MODE) console.error(`Login error: ${message}`)
             }
         } catch (err) {
-            setError(err.message)
+            if (DEV_MODE) console.error('Error logging in: ' + err.message)
+            setError('Error logging in.')
         } finally {
             setLoading(false)
         }
@@ -64,8 +67,10 @@ export default function LoginComponent({ onLoginSuccess }) {
                         Sign in to your account
                     </h2>
 
+                    {/* error message box */}
                     {error && <div className="bg-red-500/70 text-white p-3 rounded-lg text-center w-full">{error}</div>}
 
+                    {/* username input */}
                     <div className="relative w-full">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                             <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -75,9 +80,11 @@ export default function LoginComponent({ onLoginSuccess }) {
                         <input
                             className="caret-white appearance-none block w-full bg-gray-700 text-white border border-gray-600 rounded-lg py-3 px-4 pl-10 leading-tight focus:outline-none focus:bg-gray-700 focus:ring-1 focus:ring-blue-200 hover:border-gray-500"
                             id="username" type="text" placeholder="Username" value={username}
-                            onChange={(e) => setUsername(e.target.value)}/>
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
                     </div>
 
+                    {/* password input */}
                     <div className="relative w-full">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                             <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -87,13 +94,19 @@ export default function LoginComponent({ onLoginSuccess }) {
                         <input
                             className="caret-white appearance-none block w-full bg-gray-700 text-white border border-gray-600 rounded-lg py-3 px-4 pl-10 leading-tight focus:outline-none focus:bg-gray-700 focus:ring-1 focus:ring-blue-200 hover:border-gray-500"
                             id="password" type="password" placeholder="Password" value={password}
-                            onChange={(e) => setPassword(e.target.value)}/>
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                     </div>
 
+                    {/* form submit button */}
                     <button
-                        className="relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-700 overflow-hidden
-                                   before:content-[''] before:absolute before:top-0 before:-left-full before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:opacity-30 before:transform before:skew-x-[-25deg] hover:before:left-full hover:before:transition-all hover:before:duration-700"
-                        type="button" onClick={handleLogin} disabled={loading}>
+                        className="
+                            relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-700 overflow-hidden
+                            before:content-[''] before:absolute before:top-0 before:-left-full before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:opacity-30 before:transform before:skew-x-[-25deg] 
+                            hover:before:left-full hover:before:transition-all hover:before:duration-700
+                        "
+                        type="button" onClick={handleLogin} disabled={loading}
+                    >
                         Sign In
                     </button>
                 </div>

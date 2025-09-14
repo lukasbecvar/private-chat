@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useConfig } from '../hooks/useConfig.jsx'
-import Loading from '../sub-components/LoadingComponent.jsx'
-import ErrorScreenComponent from '../sub-components/ErrorScreenComponent.jsx'
+import { useConfig } from '../hooks/useConfig'
+import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
 
 export default function LogoutComponent() {
     // get config values
@@ -9,11 +8,12 @@ export default function LogoutComponent() {
     const API_URL = getConfigValue('API_URL')
     const DEV_MODE = getConfigValue('DEV_MODE')
     const API_TOKEN = getConfigValue('API_TOKEN')
-    
-    // states
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
 
+    // states
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(false)
+
+    // user logout process
     const handleLogout = async () => {
         setLoading(true)
         setError(null)
@@ -35,13 +35,15 @@ export default function LogoutComponent() {
                     setError(data.message || 'Logout failed')
                 } catch (e) {
                     if (DEV_MODE) console.error('Error to get error data from response: ' + e.message)
-                    setError('Logout failed with non-JSON response.')
+                    setError('Logout failed.')
                 }
             }
         } catch (err) {
-            setError('Error logging out: ' + err.message)
+            if (DEV_MODE) console.error('Error logging out: ' + err.message)
+            setError('Logout failed.')
         } finally {
-            window.location.reload()
+            // reload the page if logout was successful
+            if (error === null) window.location.reload()
         }
     }
 
@@ -49,8 +51,7 @@ export default function LogoutComponent() {
     if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     return (
-        <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold text-base py-1.5 px-4 rounded focus:outline-none focus:shadow-outline"
+        <button className="bg-red-500 hover:bg-red-700 text-white font-bold text-base py-1.5 px-4 rounded focus:outline-none focus:shadow-outline"
             onClick={handleLogout} disabled={loading}>
             {loading ? 'Logging out...' : 'Logout'}
         </button>

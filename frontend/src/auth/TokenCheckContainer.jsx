@@ -1,12 +1,12 @@
-// src/components/TokenCheckContainer.jsx
 import { useEffect, useState } from 'react'
-import { useConfig } from '../hooks/useConfig.jsx'
-import UserSpaceComponent from '../user-space/UserSpaceComponent.jsx'
-import LoginComponent from './LoginComponent.jsx'
-import Loading from '../sub-components/LoadingComponent.jsx'
-import ErrorScreenComponent from '../sub-components/ErrorScreenComponent.jsx'
+import { useConfig } from '../hooks/useConfig'
 
-export default function TokenCheckContainer() {
+// import app components
+import LoginComponent from './LoginComponent'
+import Loading from '../sub-components/LoadingComponent'
+import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
+
+export default function TokenCheckContainer({ children }) {
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
@@ -14,8 +14,8 @@ export default function TokenCheckContainer() {
     const API_TOKEN = getConfigValue('API_TOKEN')
 
     // states
-    const [status, setStatus] = useState('checking')
     const [message, setMessage] = useState('')
+    const [status, setStatus] = useState('checking')
 
     // check if user is authenticated
     useEffect(() => {
@@ -78,12 +78,8 @@ export default function TokenCheckContainer() {
     // show error screen
     if (status === 'error') return <ErrorScreenComponent errorMessage={message}/>
 
-    // show user space
-    if (status === 'authenticated') {
-        return (
-            <UserSpaceComponent/>
-        )
-    }
+    // show children if user is authenticated
+    if (status === 'authenticated') return <main>{children}</main>
 
     return null
 }

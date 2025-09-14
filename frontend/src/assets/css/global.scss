@@ -1,0 +1,22 @@
+/* main global styles */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+    color: white;
+	background-color: #111827;
+}
+
+/* auth component */
+.auth-component input:-webkit-autofill,
+.auth-component input:-webkit-autofill:hover,
+.auth-component input:-webkit-autofill:focus,
+.auth-component input:-webkit-autofill:active {
+	caret-color: #ffffff;
+	-webkit-text-fill-color: #ffffff;
+	-webkit-box-shadow: 0 0 0 1000px #374151 inset;
+	transition: background-color 9999s ease-in-out 0s;
+}

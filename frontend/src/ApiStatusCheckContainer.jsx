@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useConfig } from './hooks/useConfig.jsx'
+import { useConfig } from './hooks/useConfig'
 
 // import sub-components
-import Loading from './sub-components/LoadingComponent.jsx'
-import ErrorScreenComponent from './sub-components/ErrorScreenComponent.jsx'
+import Loading from './sub-components/LoadingComponent'
+import ErrorScreenComponent from './sub-components/ErrorScreenComponent'
 
 export default function ApiStatusCheckContainer({ children }) {
     // init config provider
@@ -43,11 +43,8 @@ export default function ApiStatusCheckContainer({ children }) {
                     setErrorMessage(null)
                 }
             } catch (e) {
-                const msg = DEV_MODE 
-                    ? `API connection error: failed to connect ${API_URL}, error: ${e.message}` 
-                    : 'Unable to connect to the server. Please try again later.'
-                setErrorMessage(msg)
-                if (DEV_MODE) console.error(`Error connecting to API: ${API_URL}`, e)
+                setErrorMessage('Unable to connect to the server. Please try again later.')
+                if (DEV_MODE) console.error(`Error connecting to API: ${API_URL}`, e.message)
             }
             setLoading(false)
         }

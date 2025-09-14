@@ -1,45 +1,10 @@
 /* main style index */
 
 // include tailwind
-@import './tailwind.css';
+@use './tailwind.css';
 
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
+// include global styles
+@use './global.scss';
 
-body {
-	background-color: #111827;
-	color: white;
-}
-
-/* loading spinner */
-.gradient-spinner {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.gradient-spinner::before {
-	content: '';
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	border-radius: 50%;
-	background: conic-gradient(#60a5fa, #3b82f6, transparent);
-	-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #fff calc(100% - 20px + 1px));
-	mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #fff calc(100% - 20px + 1px));
-}
-
-/* auth component */
-.auth-component input:-webkit-autofill,
-.auth-component input:-webkit-autofill:hover,
-.auth-component input:-webkit-autofill:focus,
-.auth-component input:-webkit-autofill:active {
-	-webkit-box-shadow: 0 0 0 1000px #374151 inset;
-	-webkit-text-fill-color: #ffffff;
-	caret-color: #ffffff;
-	transition: background-color 9999s ease-in-out 0s;
-}
+// include loading spinner
+@use './loading-spinner.scss';

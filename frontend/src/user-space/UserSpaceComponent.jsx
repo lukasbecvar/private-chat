@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useConfig } from '../hooks/useConfig.jsx'
-import Loading from '../sub-components/LoadingComponent.jsx'
-import ErrorScreenComponent from '../sub-components/ErrorScreenComponent.jsx'
-import LogoutComponent from '../auth/LogoutComponent.jsx'
+import { useConfig } from '../hooks/useConfig'
+
+// import app components
+import NavbarElement from './elements/NavbarElement'
+import Loading from '../sub-components/LoadingComponent'
+import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
 
 export default function UserSpaceComponent() {
     // get config values
@@ -12,9 +14,9 @@ export default function UserSpaceComponent() {
     const API_TOKEN = getConfigValue('API_TOKEN')
 
     // states
-    const [userData, setUserData] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [userData, setUserData] = useState(null)
     
     // fetch user data
     useEffect(() => {
@@ -57,19 +59,11 @@ export default function UserSpaceComponent() {
     return (
         <div>
             {/* nav-bar */}
-            <nav className="bg-gray-800 p-2">
-                <div className="flex mx-1 justify-between items-center">
-                    <div className="text-white flex items-center">
-                        <p className="text-2xl mr-2">{userData.username}</p>
-                        <p className="text-lg text-gray-400">({userData.status})</p>
-                    </div>
-                    <LogoutComponent/>
-                </div>
-            </nav>
+            <NavbarElement userData={userData}/>
 
             {/* example content */}
             <div className="p-2">
-                <p>testing msg</p>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam quasi eius exercitationem. Aliquid et rerum dolorem ex perferendis aliquam facilis quis? Velit nulla voluptates incidunt asperiores optio. Vero, aperiam incidunt.</p>
             </div>
         </div>
     )
