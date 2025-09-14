@@ -25,7 +25,7 @@
 - [X] Remove first name and last name from user entity
 - [X] Basic frontend styling
 - [X] Frontend testing
-- [ ] Try docker images building + create tesing docker-compose for production use
+- [X] Try docker images building + create tesing docker-compose for production use
 - [ ] Base refactoring
 ### Chat system
 - [ ] Global chat system

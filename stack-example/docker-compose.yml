@@ -1,0 +1,108 @@
+# testing example of "production" docker-compose stack
+
+# docker network config
+networks:
+    main:
+        driver: bridge
+
+services:
+    # mysql database
+    mysql:
+        image: mysql:8.0.43
+        container_name: private_chat_mysql
+        restart: always
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - ./configs/mysql/mysqld.conf:/etc/mysql/mysql.conf.d/mysqld.cnf
+            - ./data/mysql/data:/var/lib/mysql
+            - ./data/mysql/logs:/var/log
+        mem_limit: 1g
+        ports:
+            - "3306:3306"
+        networks:
+            - main
+
+    # redis cache
+    redis:
+        image: redis:8.2
+        container_name: private_chat_redis
+        restart: always
+        mem_limit: 1g
+        ports:
+            - "6379:6379"
+        command: ["redis-server", "--requirepass", "redis_test_password"]
+        volumes:
+            - ./data/redis:/data
+        networks:
+            - main
+
+    # backend server
+    php:
+        image: ghcr.io/lukasbecvar/private-chat-backend:latest
+        container_name: private_chat_backend
+        restart: always
+        depends_on:
+            - mysql
+            - redis
+        environment:
+            - APP_ENV=prod
+            - APP_SECRET=369af56dccfce490cb9325e8b4b59a90
+            - API_TOKEN=1234
+            - APP_VERSION=1.0
+            - TRUSTED_HOSTS=^.*$
+            - ALLOWED_IP_ADDRESSES=%
+            - SSL_ONLY=false
+            - MAINTENANCE_MODE=false
+            - LIMIT_CONTENT_PER_PAGE=10
+            - DATABASE_LOGGING=true
+            - LOG_LEVEL=4
+            - RATE_LIMIT_ENABLED=false
+            - RATE_LIMIT_INTERVAL=60
+            - RATE_LIMIT_LIMIT=100
+            - DATABASE_DRIVER=pdo_mysql
+            - DATABASE_VERSION=8.0.43
+            - DATABASE_HOST=mysql
+            - DATABASE_PORT=3306
+            - DATABASE_NAME=private_chat
+            - DATABASE_USERNAME=root
+            - DATABASE_PASSWORD=root
+            - REDIS_SCHEME=redis
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_USER=default
+            - REDIS_PASSWORD=redis_test_password
+            - JWT_TOKEN_TTL=2629536
+            - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+            - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+            - JWT_PASSPHRASE=f82fdd5f4644df4ba8fe9d600c5026abc7d7e97cb4413607073d9fc03aa85ba4
+        volumes:
+            # config files
+            - ./configs/api-server/apache.conf:/etc/apache2/sites-available/000-default.conf
+            - ./configs/api-server/php.ini:/usr/local/etc/php/php.ini
+            
+            # data directories
+            - ./data/api-server/jwt-keys:/var/www/config/jwt
+            - ./data/api-server/log:/var/log
+        mem_limit: 1g
+        ports:
+            - "1337:80"
+        networks:
+            - main
+
+    # frontend
+    node:
+        image: ghcr.io/lukasbecvar/private-chat-frontend:latest
+        restart: always
+        container_name: private_chat_frontend
+        depends_on:
+            - mysql
+            - redis
+            - php
+        volumes:
+            - ./configs/frontend/config.json:/usr/share/nginx/html/config.json
+        mem_limit: 1g
+        ports:
+            - "80:80"
+        networks:
+            - main
