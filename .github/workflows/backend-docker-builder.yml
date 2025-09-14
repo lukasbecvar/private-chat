@@ -9,9 +9,6 @@ jobs:
   build-and-push-docker-image:
     name: Backend docker image builder
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
 
     steps:
       - name: Checkout repository
@@ -39,7 +36,8 @@ jobs:
       - name: Build and push docker image
         uses: docker/build-push-action@v4
         with:
-          file: .docker/DockerFile.prod
+          file: ./backend/.docker/Dockerfile.prod
+          context: ./backend
           context: .
           push: true
           tags: |
