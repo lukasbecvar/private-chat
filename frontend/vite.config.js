@@ -9,6 +9,7 @@ export default defineConfig({
         port: 80
     },
     test: {
+        reporters: 'verbose',
         globals: true,
         environment: 'jsdom',
         setupFiles: './tests/setupTests.js',

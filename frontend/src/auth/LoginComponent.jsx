@@ -26,6 +26,19 @@ export default function LoginComponent({ onLoginSuccess }) {
 
     // handle login process
     const handleLogin = async () => {
+
+        // check if username is empty
+        if (username === '') {
+            setError('Username cannot be empty.')
+            return
+        }
+
+        // check if password is empty
+        if (password === '') {
+            setError('Password cannot be empty.')
+            return
+        }
+
         setLoading(true)
         setError(null)
         try {

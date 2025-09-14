@@ -1,23 +1,4 @@
 import ReactDOM from 'react-dom/client'
-import { ConfigProvider } from './ConfigProvider'
-import TokenCheckContainer from './auth/TokenCheckContainer'
-import ApiStatusCheckContainer from './ApiStatusCheckContainer'
-import UserSpaceComponent from './user-space/UserSpaceComponent'
+import App from './App'
 
-// import styles
-import './assets/css/index.scss'
-
-export default function App() {
-    return (
-        <ConfigProvider>
-            <ApiStatusCheckContainer>
-                <TokenCheckContainer>
-                    <UserSpaceComponent/>
-                </TokenCheckContainer>
-            </ApiStatusCheckContainer>
-        </ConfigProvider>
-    )
-}
-
-// render app to root element
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>)

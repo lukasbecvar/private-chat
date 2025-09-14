@@ -24,7 +24,7 @@
     - [X] Implement logout system
 - [X] Remove first name and last name from user entity
 - [X] Basic frontend styling
-- [ ] Frontend testing
+- [X] Frontend testing
 - [ ] Try docker images building + create tesing docker-compose for production use
 - [ ] Base refactoring
 ### Chat system
