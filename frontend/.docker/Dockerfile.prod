@@ -1,4 +1,4 @@
-# node js builder image
+# define node-nginx image for production use
 FROM node:22 AS builder
 
 # set working directory

@@ -29,11 +29,13 @@ export default function TokenCheckContainer({ children }) {
                     }
                 })
 
+                // check if user is authenticated
                 if (res.ok) {
                     setStatus('authenticated')
                     return
                 }
 
+                // handle errors
                 let errorData = null
                 try {
                     errorData = await res.json()
@@ -44,6 +46,7 @@ export default function TokenCheckContainer({ children }) {
                     return
                 }
 
+                // check if user is unauthenticated
                 if (res.status === 401) {
                     setStatus('unauthenticated')
                 } else {
