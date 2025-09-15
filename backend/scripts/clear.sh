@@ -25,8 +25,8 @@ remove_item() {
     fi
 }
 
+remove_item "var/"
 remove_item "vendor/"
 remove_item "config/jwt"
 remove_item "public/bundles"
 remove_item "public/assets"
-remove_item "var/"

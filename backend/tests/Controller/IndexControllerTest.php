@@ -36,7 +36,7 @@ class IndexControllerTest extends WebTestCase
 
         // assert response
         $this->assertSame('success', $responseData['status']);
-        $this->assertSame('private chat api is running!', $responseData['message']);
+        $this->assertSame('private-chat api is running!', $responseData['message']);
         $this->assertSame($_ENV['APP_VERSION'], $responseData['version']);
         $this->assertResponseStatusCodeSame(JsonResponse::HTTP_OK);
     }

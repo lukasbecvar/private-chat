@@ -1,6 +1,6 @@
 nelmio_cors:
     defaults:
-        allow_origin: ['*']
+        allow_origin: ['%env(resolve:ALLOWED_ORIGINS)%']
         allow_credentials: true
         allow_headers: ['Content-Type', 'Accept', 'Authorization', 'X-API-TOKEN']
         allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS']

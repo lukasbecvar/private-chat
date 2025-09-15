@@ -53,7 +53,7 @@ class IndexController extends AbstractController
         // get backend status
         $responseData = [
             'status' => 'success',
-            'message' => 'private chat api is running!',
+            'message' => 'private-chat api is running!',
             'version' => $_ENV['APP_VERSION']
         ];
 

@@ -1,13 +1,19 @@
 # define base php-apache image for production use
-FROM php:8.4-apache 
+FROM php:8.4-apache
 
 # set container working directory
 WORKDIR /var/www
 
-# copy project file to image
+# copy application files to image
 COPY . /var/www/
+
+# copy config files to image
 COPY .docker/config/php.ini /usr/local/etc/php/php.ini
 COPY .docker/config/apache.conf /etc/apache2/sites-available/000-default.conf
+
+# setup default production environment config
+RUN sed -i 's/^\(APP_ENV=\)dev/\1prod/' .env
+RUN cp .env.dev .env.prod
 
 # install required packages
 RUN apt-get update && apt-get install -y \

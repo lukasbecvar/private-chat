@@ -55,7 +55,7 @@ class SecurityController extends AbstractController
     )]
     #[Response(
         response: JsonResponse::HTTP_UNAUTHORIZED,
-        description: 'The JWT token Invalid message',
+        description: 'JWT token Invalid message',
         content: new JsonContent(
             type: 'object',
             properties: [

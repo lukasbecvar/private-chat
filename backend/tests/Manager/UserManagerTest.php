@@ -226,11 +226,11 @@ class UserManagerTest extends TestCase
     }
 
     /**
-     * Test update user data on login
+     * Test update last login time
      *
      * @return void
      */
-    public function testUpdateUserDataOnLogin(): void
+    public function testUpdateLastLoginTime(): void
     {
         // testing user username
         $identifier = 'test';
@@ -246,7 +246,7 @@ class UserManagerTest extends TestCase
         $this->entityManagerMock->expects($this->once())->method('flush');
 
         // call tested method
-        $this->userManager->updateUserDataOnLogin($identifier);
+        $this->userManager->updateLastLoginTime($identifier);
     }
 
     /**

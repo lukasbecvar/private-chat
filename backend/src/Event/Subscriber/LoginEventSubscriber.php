@@ -96,7 +96,7 @@ class LoginEventSubscriber implements EventSubscriberInterface
             $identifier = $user->getUserIdentifier();
 
             // update user data
-            $this->userManager->updateUserDataOnLogin($identifier);
+            $this->userManager->updateLastLoginTime($identifier);
 
             // log user auth
             $this->logManager->saveLog(

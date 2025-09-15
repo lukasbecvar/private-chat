@@ -340,13 +340,13 @@ class UserManager
     }
 
     /**
-     * Update user data on login
+     * Update last login time
      *
      * @param string $identifier The user identifier
      *
      * @return void
      */
-    public function updateUserDataOnLogin(string $identifier): void
+    public function updateLastLoginTime(string $identifier): void
     {
         // get user by identifier
         $user = $this->userRepository->findOneBy(['username' => $identifier]);

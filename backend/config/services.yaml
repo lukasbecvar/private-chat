@@ -10,7 +10,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # register predis service (redis client)
+    # register predis service (redis client for cache manager)
     Predis\Client:
         arguments:
             $parameters: '%env(resolve:REDIS_SCHEME)%://%env(resolve:REDIS_USER)%:%env(resolve:REDIS_PASSWORD)%@%env(resolve:REDIS_HOST)%:%env(resolve:REDIS_PORT)%'
@@ -42,15 +42,15 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request', priority: 6 }
 
-    # handle maintenance mode
-    App\Middleware\MaintenanceMiddleware:
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 5 }
-
     # check security rules
     App\Middleware\SecurityCheckMiddleware:
         tags:
-            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 4 }
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 5 }
+    
+    # handle maintenance mode
+    App\Middleware\MaintenanceMiddleware:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 4 }
 
     # validate access token
     App\Middleware\AccessTokenValidateMiddleware:

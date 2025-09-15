@@ -80,7 +80,7 @@ class LoginEventSubscriberTest extends TestCase
         $event = new AuthenticationSuccessEvent($token);
 
         // expect update user data call
-        $this->userManager->expects($this->once())->method('updateUserDataOnLogin')->with('testuser');
+        $this->userManager->expects($this->once())->method('updateLastLoginTime')->with('testuser');
 
         // expect save log call
         $this->logManager->expects($this->once())->method('saveLog')->with(

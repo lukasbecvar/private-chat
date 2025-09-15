@@ -12,7 +12,7 @@ when@dev:
                 - url: 'http://localhost:1337'
                   description: 'Local development environment'
                 # live production system server url
-                - url: 'https://chat.becvar.xyz'
+                - url: 'https://private-chat.becvar.xyz'
                   description: 'Production server'
 
             # security components
