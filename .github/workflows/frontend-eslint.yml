@@ -16,20 +16,19 @@ jobs:
         working-directory: ./frontend
 
     steps:
-      # checkout repo
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # setup Node
+      # setup nodejs
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22
 
-      # install npm dependencies
+      # install dependencies with npm
       - name: Install dependencies
         run: npm install
 
-      # run ESLint
+      # ESLint process
       - name: Run ESLint
         run: npx eslint . --ext .js,.jsx

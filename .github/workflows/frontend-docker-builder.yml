@@ -1,4 +1,4 @@
-# publisher for building and publishing docker image to github packages container registry
+# build and publishing docker image to github packages container registry
 name: Frontend docker image builder
 
 on:

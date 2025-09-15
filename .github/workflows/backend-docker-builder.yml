@@ -1,4 +1,4 @@
-# publisher for building and publishing docker image to github packages container registry
+# build and publishing docker image to github packages container registry
 name: Backend docker image builder
 
 on:
@@ -32,7 +32,7 @@ jobs:
         with:
           php-version: 8.4
 
-      # install composer dependencies
+      # install dependencies with composer
       - name: Install backend dependencies
         run: composer install --ignore-platform-reqs --no-interaction --no-progress
 

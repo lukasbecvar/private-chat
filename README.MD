@@ -27,6 +27,8 @@
 - [X] Frontend testing
 - [X] Try docker images building + create tesing docker-compose for production use
 - [ ] Base refactoring
+    - [X] Backend revision
+    - [ ] Frontend revision
 ### Chat system
 - [ ] Global chat system
     - [ ] Create entity for global chat (message, sender(id), timestamp)

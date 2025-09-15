@@ -23,14 +23,14 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
       # redis cache service
       redis:
-        image: redis:latest
+        image: redis:8.2
         ports:
           - 6379:6379
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd "redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
       - name: Checkout repository
@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --no-suggest
 
-      # create test database
+      # create testing database
       - name: Create database
         run: php bin/console doctrine:database:create --if-not-exists --env=test
 

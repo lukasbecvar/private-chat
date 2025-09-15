@@ -6,7 +6,7 @@ networks:
         driver: bridge
 
 services:
-    # composer service for managing php dependencies
+    # composer for managing backend dependencies
     composer:
         image: composer:latest
         container_name: private_chat_composer
@@ -16,7 +16,7 @@ services:
             - ./backend:/app
         command: composer install
 
-    # database container
+    # mysql database container
     mysql:
         image: mysql:8.0.43
         container_name: private_chat_mysql
@@ -33,7 +33,7 @@ services:
         networks:
             - main
 
-    # redis (cache) container
+    # redis cache container
     redis:
         image: redis:8.2
         container_name: private_chat_redis
@@ -52,7 +52,7 @@ services:
         build:
             context: .
             dockerfile: ./backend/.docker/Dockerfile.dev
-        container_name: private_chat_website
+        container_name: private_chat_backend
         restart: always
         depends_on:
             - mysql
