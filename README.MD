@@ -1,23 +1,23 @@
 # Private Chat
 
 ## ROADMAP
-- [ ] Global chat system backend
-    - [ ] Create entity for global chat (message, sender(id), timestamp)
-    - [ ] API for send chat message (POST METHOD)
-    - [ ] API FOR GET CHAT MESSAGES (only last 50 messages) (GET METHOD)
-        - [ ] Implement get more messages for load older messages (scroll message history)
-    - [ ] For chat operations over API (send/get message) implement chat type=global (in furure will be implemented for type=private)
+- [ ] Backend
+    - [ ] API endpoint for get user list (for building chat list)
+        - [ ] id, username, roles, profile picture
+        - [ ] get chat_id from curren logged in user and receiver_id from user list
+    - [ ] PrivateChatMessage entity (message, timestamp, sender_id, receiver_id, chat_id(calculated from user-ids) readed_status)
+    - [ ] API endpoint for get chat messages by chat_id
+        - [ ] Prevent get messages from other users chats
+        - [ ] Option to get messages after timestamp
+    - [ ] API endpoint for send message to chat
 - [ ] Frontend
-    - [ ] Chat select system (hard coded for global chat for now)
-    - [ ] Chat system (frontend)
-        - [ ] Form for send message
-        - [ ] Implement chat polling system (for get new messages)
-        - [ ] Implement chat history scroll system
-        - [ ] Implement chat type for global chat (in furure will be implemented for type=private)
-- [ ] Refactor version 1.0
-- [ ] Create simple documentation in README
-- [ ] Plan for version 2.0
-- [ ] Publish version 1.0 to github public repository
+    - [ ] Chat list component
+    - [ ] Chat box component
+    - [ ] Send chat message component
+- [ ] System for infinite scroll chat history (scroll to top like classic messenger)
+- [ ] Chat list search (search by username)
+- [ ] Show last chat message in chat list under username
+- [ ] Chat messages encryption with AES
 
 ## License
 This software is licensed under the [MIT license](LICENSE). 
