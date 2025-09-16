@@ -267,6 +267,11 @@ class UserManager
         $status = $user->getStatus();
         $profilePicture = $user->getProfilePic();
 
+        // check if profile picture is set
+        if ($profilePicture === null) {
+            $profilePicture = 'nonset-default';
+        }
+
         // check if user info found
         if (
             $username === null || $roles === null

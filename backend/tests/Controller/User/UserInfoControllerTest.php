@@ -122,6 +122,7 @@ class UserInfoControllerTest extends CustomTestCase
         $this->assertArrayHasKey('ip-address', $responseData['data']);
         $this->assertArrayHasKey('user-agent', $responseData['data']);
         $this->assertArrayHasKey('status', $responseData['data']);
+        $this->assertArrayHasKey('profile-picture', $responseData['data']);
         $this->assertResponseStatusCodeSame(JsonResponse::HTTP_OK);
     }
 }
