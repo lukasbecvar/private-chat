@@ -265,6 +265,7 @@ class UserManager
         $ipAddress = $user->getIpAddress();
         $userAgent = $user->getUserAgent();
         $status = $user->getStatus();
+        $profilePicture = $user->getProfilePic();
 
         // check if user info found
         if (
@@ -287,7 +288,8 @@ class UserManager
             'ip-address' => $ipAddress,
             'user-agent' => $userAgent,
             'status' => $status,
-            'is-active' => $status === 'active'
+            'is-active' => $status === 'active',
+            'profile-picture' => $profilePicture
         ];
     }
 

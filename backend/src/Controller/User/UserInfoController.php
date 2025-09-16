@@ -59,7 +59,8 @@ class UserInfoController extends AbstractController
                         new Property(property: 'ip-address', type: 'string', example: '172.19.0.1'),
                         new Property(property: 'user-agent', type: 'string', example: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'),
                         new Property(property: 'status', type: 'string', example: 'active'),
-                        new Property(property: 'is-active', type: 'boolean', example: true)
+                        new Property(property: 'is-active', type: 'boolean', example: true),
+                        new Property(property: 'profile-picture', type: 'string', example: 'nonset-default')
                     ]
                 )
             ]
