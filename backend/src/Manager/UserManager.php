@@ -79,6 +79,30 @@ class UserManager
     }
 
     /**
+     * Check if user is admin
+     *
+     * @param int $id The user id
+     *
+     * @return bool True if user is admin, false otherwise
+     */
+    public function checkIfUserIsAdmin(int $id): bool
+    {
+        // get user
+        $user = $this->userRepository->find($id);
+
+        // check if user exists
+        if ($user === null) {
+            $this->errorManager->handleError(
+                message: 'User not found with id: ' . $id,
+                code: JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // check if user have admin role
+        return in_array('ROLE_ADMIN', $user->getRoles());
+    }
+
+    /**
      * Get user id by username
      *
      * @param string $username The username address of the user

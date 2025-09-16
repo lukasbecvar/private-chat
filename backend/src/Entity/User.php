@@ -169,6 +169,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
     /**
      * Get identifier that represents this user
      *

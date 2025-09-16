@@ -1,7 +1,6 @@
 # Private Chat
 
 ## ROADMAP
-- [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Backend
     - [X] PrivateChatMessage entity (message, timestamp, sender_id, receiver_id, chat_id(calculated from user-ids) readed_status)
     - [X] PrivateChatMessage data fixture
@@ -22,6 +21,15 @@
 - [ ] Chat list search (search by username)
 - [ ] Show last chat message in chat list under username
 - [ ] Chat messages encryption with AES
+
+## Version 2.0
+- [ ] API version check (check if backend version is compatible with frontend version)
+- [ ] Ban system
+    - [ ] Command for ban/unban user
+    - [ ] Show banned status in user list and chat list
+
+## Version 3.0
+- [ ] Global chat for all users
 
 ## License
 This software is licensed under the [MIT license](LICENSE). 

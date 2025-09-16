@@ -53,6 +53,25 @@ class UserManagerTest extends TestCase
     }
 
     /**
+     * Test check if user is admin
+     *
+     * @return void
+     */
+    public function testCheckIfUserIsAdmin(): void
+    {
+        // mock user
+        $user = $this->createMock(User::class);
+        $user->method('getRoles')->willReturn(['ROLE_ADMIN']);
+        $this->userRepositoryMock->method('find')->willReturn($user);
+
+        // call tested method
+        $result = $this->userManager->checkIfUserIsAdmin(1);
+
+        // assert result
+        $this->assertTrue($result);
+    }
+
+    /**
      * Test get user id by username
      *
      * @return void
