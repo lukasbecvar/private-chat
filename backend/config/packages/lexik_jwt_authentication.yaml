@@ -11,8 +11,8 @@ lexik_jwt_authentication:
             name: BEARER
     set_cookies:
         BEARER:
-            lifetime: '%env(JWT_TOKEN_TTL)%'
-            samesite: lax
             path: /
-            secure: false
+            samesite: lax
+            secure: '%env(SSL_ONLY)%'
+            lifetime: '%env(JWT_TOKEN_TTL)%'
             httpOnly: true
