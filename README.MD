@@ -5,9 +5,9 @@
     - [X] PrivateChatMessage entity (message, timestamp, sender_id, receiver_id, chat_id(calculated from user-ids) readed_status)
     - [X] PrivateChatMessage data fixture
     - [X] Deterministic and symmetric chat ID generation method
-    - [ ] API endpoint for get user list (for building chat list)
-        - [ ] id, username, roles, profile picture
-        - [ ] get chat_id from curren logged in user and receiver_id from user list
+    - [X] API endpoint for get user list (for building chat list)
+        - [X] id, username, roles, profile picture
+        - [X] get chat_id from curren logged in user and receiver_id from user list
     - [ ] API endpoint for get chat messages by chat_id
         - [ ] Prevent get messages from other users chats
         - [ ] Option to get messages after timestamp

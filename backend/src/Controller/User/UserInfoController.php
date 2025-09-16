@@ -90,30 +90,21 @@ class UserInfoController extends AbstractController
     public function userInfo(Security $security): JsonResponse
     {
         try {
-            /** @var \App\Entity\User $user */
+            /** @var \App\Entity\User|null $user */
             $user = $security->getUser();
 
-            // check if user exists
-            if ($user === null) {
+            if (!$user?->getId()) {
                 return $this->json([
                     'status' => 'error',
-                    'message' => 'user not found.'
+                    'message' => 'User not found or invalid.'
                 ], JsonResponse::HTTP_UNAUTHORIZED);
             }
 
-            // get user id
-            $id = $user->getId();
-
-            // check if user id found
-            if ($id === null) {
-                return $this->json([
-                    'status' => 'error',
-                    'message' => 'user id not found.'
-                ], JsonResponse::HTTP_NOT_FOUND);
-            }
+            // get current logged user id
+            $currentUserId = $user->getId();
 
             // get user info
-            $userInfo = $this->userManager->getUserInfo($id);
+            $userInfo = $this->userManager->getUserInfo($currentUserId);
 
             // return user info
             return $this->json([

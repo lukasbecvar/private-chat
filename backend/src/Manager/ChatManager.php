@@ -30,7 +30,7 @@ class ChatManager
      *
      * @param int $currentUserId The current user id (for excluding self chat)
      *
-     * @return list<array<string, int|string|bool|null>> The available chats list
+     * @return list<array<string, mixed>> The available chats list
      */
     public function getAvailableChatsList(int $currentUserId): array
     {
@@ -62,6 +62,7 @@ class ChatManager
             // get user data
             $username = $user->getUsername();
             $profilePic = $user->getProfilePic();
+            $roles = $user->getRoles();
             $isAdmin = $this->userManager->checkIfUserIsAdmin($userId);
 
             // get chat data
@@ -71,6 +72,7 @@ class ChatManager
             $chatList[] = [
                 'user-id' => $userId,
                 'chat-id' => $chatId,
+                'roles' => $roles,
                 'is-admin' => $isAdmin,
                 'username' => $username,
                 'profile-picture' => $profilePic
