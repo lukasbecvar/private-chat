@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Util\ChatUtil;
 use App\Repository\UserRepository;
+use App\Repository\PrivateChatMessageRepository;
 
 /**
  * Class ChatManager
@@ -17,12 +18,18 @@ class ChatManager
     private ChatUtil $chatUtil;
     private UserManager $userManager;
     private UserRepository $userRepository;
+    private PrivateChatMessageRepository $privateChatMessageRepository;
 
-    public function __construct(ChatUtil $chatUtil, UserManager $userManager, UserRepository $userRepository)
-    {
+    public function __construct(
+        ChatUtil $chatUtil,
+        UserManager $userManager,
+        UserRepository $userRepository,
+        PrivateChatMessageRepository $privateChatMessageRepository
+    ) {
         $this->chatUtil = $chatUtil;
         $this->userManager = $userManager;
         $this->userRepository = $userRepository;
+        $this->privateChatMessageRepository = $privateChatMessageRepository;
     }
 
     /**
@@ -80,5 +87,57 @@ class ChatManager
         }
 
         return $chatList;
+    }
+
+    /**
+     * Check if chat exists
+     *
+     * @param string $chatId The chat identifier
+     *
+     * @return bool True if chat exists, otherwise false
+     */
+    public function checkIfChatExists(string $chatId): bool
+    {
+        $countOfMessages = $this->getChatHistoryCount($chatId);
+        return $countOfMessages > 0;
+    }
+
+    /**
+     * Get chat history count (repository wrapper)
+     *
+     * @param string $chatId The unique chat identifier
+     *
+     * @return int Number of messages in the chat
+     */
+    public function getChatHistoryCount(string $chatId): int
+    {
+        return $this->privateChatMessageRepository->getMessageCountByChatId($chatId);
+    }
+
+    /**
+     * Check if user has access to given chat (as sender or receiver)
+     *
+     * @param string $chatId The chat identifier
+     * @param int $userId The user identifier
+     *
+     * @return bool True if user is part of the chat, otherwise false
+     */
+    public function userHasAccessToChat(string $chatId, int $userId): bool
+    {
+        return $this->privateChatMessageRepository->userHasAccessToChat($chatId, $userId);
+    }
+
+    /**
+     * Get chat history (repository wrapper)
+     *
+     * @param string $chatId The unique chat identifier
+     * @param int|null $limit Optional limit of messages
+     * @param int|null $offset Optional offset for pagination
+     *
+     * @return \App\Entity\PrivateChatMessage[]
+     */
+    public function getChatHistory(string $chatId, ?int $limit = null, ?int $offset = null): array
+    {
+        return $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset);
     }
 }

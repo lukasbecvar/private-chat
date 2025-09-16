@@ -9,6 +9,7 @@ use App\Manager\UserManager;
 use PHPUnit\Framework\TestCase;
 use App\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use App\Repository\PrivateChatMessageRepository;
 
 /**
  * Class ChatManagerTest
@@ -23,6 +24,7 @@ class ChatManagerTest extends TestCase
     private ChatUtil & MockObject $chatUtilMock;
     private UserManager & MockObject $userManagerMock;
     private UserRepository & MockObject $userRepositoryMock;
+    private PrivateChatMessageRepository & MockObject $privateChatMessageRepositoryMock;
 
     protected function setUp(): void
     {
@@ -30,12 +32,14 @@ class ChatManagerTest extends TestCase
         $this->chatUtilMock = $this->createMock(ChatUtil::class);
         $this->userManagerMock = $this->createMock(UserManager::class);
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
+        $this->privateChatMessageRepositoryMock = $this->createMock(PrivateChatMessageRepository::class);
 
         // create chat manager instance
         $this->chatManager = new ChatManager(
             $this->chatUtilMock,
             $this->userManagerMock,
-            $this->userRepositoryMock
+            $this->userRepositoryMock,
+            $this->privateChatMessageRepositoryMock
         );
     }
 
@@ -81,5 +85,73 @@ class ChatManagerTest extends TestCase
         $this->assertIsBool($result[0]['is-admin']);
         $this->assertEquals('Bob', $result[0]['username']);
         $this->assertEquals('bob.png', $result[0]['profile-picture']);
+    }
+
+    /**
+     * Test check if chat exists
+     *
+     * @return void
+     */
+    public function testCheckIfChatExists(): void
+    {
+        // expect call method from repository
+        $this->privateChatMessageRepositoryMock->expects($this->once())->method('getMessageCountByChatId')->willReturn(10);
+
+        // call tested method
+        $result = $this->chatManager->checkIfChatExists('chat_1_2');
+
+        // assert result
+        $this->assertIsBool($result);
+    }
+
+    /**
+     * Test get chat history count
+     *
+     * @return void
+     */
+    public function testGetChatHistoryCount(): void
+    {
+        // expect call method from repository
+        $this->privateChatMessageRepositoryMock->expects($this->once())->method('getMessageCountByChatId')->willReturn(10);
+
+        // call tested method
+        $result = $this->chatManager->getChatHistoryCount('chat_1_2');
+
+        // assert result
+        $this->assertIsInt($result);
+    }
+
+    /**
+     * Test user has access to chat
+     *
+     * @return void
+     */
+    public function testUserHasAccessToChat(): void
+    {
+        // expect call method from repository
+        $this->privateChatMessageRepositoryMock->expects($this->once())->method('userHasAccessToChat')->willReturn(true);
+
+        // call tested method
+        $result = $this->chatManager->userHasAccessToChat('chat_1_2', 1);
+
+        // assert result
+        $this->assertIsBool($result);
+    }
+
+    /**
+     * Test get chat history
+     *
+     * @return void
+     */
+    public function testGetChatHistory(): void
+    {
+        // expect call method from repository
+        $this->privateChatMessageRepositoryMock->expects($this->once())->method('getChatHistoryByChatId');
+
+        // call tested method
+        $result = $this->chatManager->getChatHistory('chat_1_2');
+
+        // assert result
+        $this->assertIsArray($result);
     }
 }

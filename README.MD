@@ -8,11 +8,12 @@
     - [X] API endpoint for get user list (for building chat list)
         - [X] id, username, roles, profile picture
         - [X] get chat_id from curren logged in user and receiver_id from user list
-    - [ ] API endpoint for get chat messages by chat_id
-        - [ ] Prevent get messages from other users chats
-        - [ ] Option to get messages after timestamp
+    - [X] API endpoint for get chat messages by chat_id
+        - [X] Prevent get messages from other users chats
+        - [X] Option to get messages with limit and offset parameters
     - [ ] DTO validation for for message send
     - [ ] API endpoint for send message to chat
+        - [ ] Prevent send messages to other users chats
 - [ ] Frontend
     - [ ] Chat list component
     - [ ] Chat box component

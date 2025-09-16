@@ -35,14 +35,14 @@ class PrivateChatMessage
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'id', nullable: false)]
-    private ?User $sender = null;
+    private User $sender;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'receiver_id', referencedColumnName: 'id', nullable: false)]
-    private ?User $receiver = null;
+    private User $receiver;
 
     #[ORM\Column(length: 64)]
-    private ?string $chat_id = null;
+    private string $chat_id;
 
     public function getId(): ?int
     {
@@ -61,7 +61,7 @@ class PrivateChatMessage
         return $this;
     }
 
-    public function getTimestamp(): ?DateTimeInterface
+    public function getTimestamp(): DateTimeInterface
     {
         return $this->timestamp;
     }
@@ -73,7 +73,7 @@ class PrivateChatMessage
         return $this;
     }
 
-    public function getSender(): ?User
+    public function getSender(): User
     {
         return $this->sender;
     }
@@ -84,7 +84,7 @@ class PrivateChatMessage
         return $this;
     }
 
-    public function getReceiver(): ?User
+    public function getReceiver(): User
     {
         return $this->receiver;
     }
@@ -95,7 +95,7 @@ class PrivateChatMessage
         return $this;
     }
 
-    public function getChatId(): ?string
+    public function getChatId(): string
     {
         return $this->chat_id;
     }

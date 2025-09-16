@@ -27,6 +27,60 @@ class PrivateChatMessageRepositoryTest extends KernelTestCase
     }
 
     /**
+     * Test get message count by chat ID
+     *
+     * @return void
+     */
+    public function testGetMessageCountByChatId(): void
+    {
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+        $this->assertGreaterThanOrEqual(2, count($users), 'There should be at least 2 users for message count test');
+
+        $userA = $users[0];
+        $userB = $users[1];
+
+        $ids = [(int)$userA->getId(), (int)$userB->getId()];
+        sort($ids);
+        $chatId = hash('sha256', $ids[0] . '_' . $ids[1]);
+
+        /** @var \App\Repository\PrivateChatMessageRepository $repo */
+        $repo = $this->entityManager->getRepository(PrivateChatMessage::class);
+
+        // call tested method
+        $count = $repo->getMessageCountByChatId($chatId);
+
+        // assert result
+        $this->assertIsInt($count, 'Message count should be an integer');
+        $this->assertGreaterThanOrEqual(0, $count, 'Message count should not be negative');
+    }
+
+    /**
+     * Test user access to chat
+     *
+     * @return void
+     */
+    public function testUserHasAccessToChat(): void
+    {
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+        $this->assertGreaterThanOrEqual(2, count($users), 'There should be at least 2 users for access test');
+
+        $userA = $users[0];
+        $userB = $users[1];
+
+        $ids = [(int)$userA->getId(), (int)$userB->getId()];
+        sort($ids);
+        $chatId = hash('sha256', $ids[0] . '_' . $ids[1]);
+
+        /** @var \App\Repository\PrivateChatMessageRepository $repo */
+        $repo = $this->entityManager->getRepository(PrivateChatMessage::class);
+
+        // call tested method and assert result
+        $this->assertTrue($repo->userHasAccessToChat($chatId, (int)$userA->getId()), 'User A should have access');
+        $this->assertTrue($repo->userHasAccessToChat($chatId, (int)$userB->getId()), 'User B should have access');
+        $this->assertFalse($repo->userHasAccessToChat($chatId, 999999), 'Random user should not have access');
+    }
+
+    /**
      * Test get chat history by chat ID
      *
      * @return void
@@ -57,9 +111,6 @@ class PrivateChatMessageRepositoryTest extends KernelTestCase
 
         // assert each message has correct chatId and sender/receiver
         foreach ($messages as $message) {
-            $this->assertNotNull($message->getSender(), 'Sender should not be null');
-            $this->assertNotNull($message->getReceiver(), 'Receiver should not be null');
-
             // assert chat reciver and sender ids are correct
             $this->assertEquals($chatId, $message->getChatId());
             $this->assertContains($message->getSender()->getId(), [$userA->getId(), $userB->getId()]);
@@ -68,7 +119,6 @@ class PrivateChatMessageRepositoryTest extends KernelTestCase
 
         // assert chronological order
         $timestamps = array_map(function (PrivateChatMessage $m) {
-            $this->assertNotNull($m->getTimestamp(), 'Timestamp should not be null');
             return $m->getTimestamp()->getTimestamp();
         }, $messages);
 

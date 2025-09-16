@@ -23,6 +23,43 @@ class PrivateChatMessageRepository extends ServiceEntityRepository
     }
 
     /**
+     * Get total number of messages in given chat
+     *
+     * @param string $chatId The chat identifier
+     *
+     * @return int Number of messages in the chat
+     */
+    public function getMessageCountByChatId(string $chatId): int
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->andWhere('m.chat_id = :chatId')
+            ->setParameter('chatId', $chatId);
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Check if user has access to given chat (as sender or receiver)
+     *
+     * @param string $chatId The chat identifier
+     * @param int $userId The user identifier
+     *
+     * @return bool True if user is part of the chat, otherwise false
+     */
+    public function userHasAccessToChat(string $chatId, int $userId): bool
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->andWhere('m.chat_id = :chatId')
+            ->andWhere('(m.sender = :userId OR m.receiver = :userId)')
+            ->setParameter('chatId', $chatId)
+            ->setParameter('userId', $userId);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    /**
      * Get chat history by chat id
      *
      * @param string $chatId The unique chat identifier
