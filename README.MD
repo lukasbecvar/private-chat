@@ -1,6 +1,7 @@
 # Private Chat
 
 ## ROADMAP
+- [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Backend
     - [X] PrivateChatMessage entity (message, timestamp, sender_id, receiver_id, chat_id(calculated from user-ids) readed_status)
     - [X] PrivateChatMessage data fixture
