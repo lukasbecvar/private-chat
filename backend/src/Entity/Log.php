@@ -88,12 +88,12 @@ class Log
         return $this;
     }
 
-    public function getTime(): ?\DateTimeInterface
+    public function getTime(): ?DateTimeInterface
     {
         return $this->time;
     }
 
-    public function setTime(\DateTimeInterface $time): static
+    public function setTime(DateTimeInterface $time): static
     {
         $this->time = $time;
 
