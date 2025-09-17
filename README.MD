@@ -11,7 +11,7 @@
     - [X] API endpoint for get chat messages by chat_id
         - [X] Prevent get messages from other users chats
         - [X] Option to get messages with limit and offset parameters
-    - [ ] DTO validation for for message send
+    - [X] DTO validation for for message send
     - [ ] API endpoint for send message to chat
         - [ ] Prevent send messages to other users chats
 - [ ] Frontend

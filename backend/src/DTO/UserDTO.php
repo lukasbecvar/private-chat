@@ -13,15 +13,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class UserDTO
 {
-    #[Assert\NotBlank(message: "username value should not be blank.")]
+    #[Assert\NotBlank(message: 'username value should not be blank.')]
     public string $username;
 
-    #[Assert\NotBlank(message: "password value should not be blank.")]
+    #[Assert\NotBlank(message: 'password value should not be blank.')]
     #[Assert\Length(
         min: 6,
         max: 128,
-        minMessage: "password value should have at least {{ limit }} characters.",
-        maxMessage: "password value should have at most {{ limit }} characters."
+        minMessage: 'password value should have at least {{ limit }} characters.',
+        maxMessage: 'password value should have at most {{ limit }} characters.'
     )]
     public string $password;
 }
