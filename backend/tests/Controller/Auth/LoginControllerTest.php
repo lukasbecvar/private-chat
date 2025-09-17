@@ -90,6 +90,26 @@ class LoginControllerTest extends WebTestCase
     }
 
     /**
+     * Test user login when user is banned
+     *
+     * @return void
+     */
+    public function testUserLoginWhenUserIsBanned(): void
+    {
+        $this->client->request('POST', '/api/auth/login', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
+            'username' => 'testing_user_10',
+            'password' => 'password'
+        ]) ?: null);
+
+        /** @var array<mixed> $responseData */
+        $responseData = json_decode(($this->client->getResponse()->getContent() ?: '{}'), true);
+
+        // assert response
+        $this->assertSame('Account is not active, account status is: banned', $responseData['message']);
+        $this->assertResponseStatusCodeSame(JsonResponse::HTTP_FORBIDDEN);
+    }
+
+    /**
      * Test user login when credentials are invalid
      *
      * @return void

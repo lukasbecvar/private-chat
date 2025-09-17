@@ -68,6 +68,11 @@ class UserFixtures extends Fixture
                 ->setStatus('active')
                 ->setProfilePic('nonset-default');
 
+            // set user 11 as banned
+            if ($i == 10) {
+                $user->setStatus('banned');
+            }
+
             // persist user entity
             $manager->persist($user);
         }

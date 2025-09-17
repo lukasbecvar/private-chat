@@ -12,8 +12,8 @@
         - [X] Prevent get messages from other users chats
         - [X] Option to get messages with limit and offset parameters
     - [X] DTO validation for for message send
-    - [ ] API endpoint for send message to chat
-        - [ ] Prevent send messages to other users chats
+    - [X] API endpoint for send message to chat
+        - [X] Prevent send messages to other users chats
 - [ ] Frontend
     - [ ] Chat list component
     - [ ] Chat box component
