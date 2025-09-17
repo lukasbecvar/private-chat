@@ -6,8 +6,10 @@ use App\Entity\User;
 use App\Util\ChatUtil;
 use App\Manager\ChatManager;
 use App\Manager\UserManager;
+use App\Manager\ErrorManager;
 use PHPUnit\Framework\TestCase;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Repository\PrivateChatMessageRepository;
 
@@ -23,7 +25,9 @@ class ChatManagerTest extends TestCase
     private ChatManager $chatManager;
     private ChatUtil & MockObject $chatUtilMock;
     private UserManager & MockObject $userManagerMock;
+    private ErrorManager & MockObject $errorManagerMock;
     private UserRepository & MockObject $userRepositoryMock;
+    private EntityManagerInterface & MockObject $entityManagerMock;
     private PrivateChatMessageRepository & MockObject $privateChatMessageRepositoryMock;
 
     protected function setUp(): void
@@ -31,14 +35,18 @@ class ChatManagerTest extends TestCase
         // mock dependencies
         $this->chatUtilMock = $this->createMock(ChatUtil::class);
         $this->userManagerMock = $this->createMock(UserManager::class);
+        $this->errorManagerMock = $this->createMock(ErrorManager::class);
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
+        $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->privateChatMessageRepositoryMock = $this->createMock(PrivateChatMessageRepository::class);
 
         // create chat manager instance
         $this->chatManager = new ChatManager(
             $this->chatUtilMock,
             $this->userManagerMock,
+            $this->errorManagerMock,
             $this->userRepositoryMock,
+            $this->entityManagerMock,
             $this->privateChatMessageRepositoryMock
         );
     }
@@ -153,5 +161,26 @@ class ChatManagerTest extends TestCase
 
         // assert result
         $this->assertIsArray($result);
+    }
+
+    /**
+     * Test save message to chat
+     *
+     * @return void
+     */
+    public function testSaveMessageToChat(): void
+    {
+        // expect call chat id generation method
+        $this->chatUtilMock->expects($this->once())->method('generateChatId')->willReturn('chat_1_2');
+
+        // expect call user entity method
+        $this->userManagerMock->expects($this->exactly(2))->method('getUserEntityById')->willReturn($this->createMock(User::class));
+
+        // expect call message entity method
+        $this->entityManagerMock->expects($this->once())->method('persist');
+        $this->entityManagerMock->expects($this->once())->method('flush');
+
+        // call tested method
+        $this->chatManager->saveMessageToChat(1, 2, 'message');
     }
 }

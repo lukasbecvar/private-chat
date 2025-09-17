@@ -110,6 +110,20 @@ class UserManagerTest extends TestCase
     }
 
     /**
+     * Test get user entity by id
+     *
+     * @return void
+     */
+    public function testGetUserEntityById(): void
+    {
+        // expect call method from repository
+        $this->userRepositoryMock->expects($this->once())->method('find')->with(1)->willReturn($this->createMock(User::class));
+
+        // call tested method
+        $this->userManager->getUserEntityById(1);
+    }
+
+    /**
      * Test get users list
      *
      * @return void

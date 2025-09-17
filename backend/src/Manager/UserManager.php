@@ -79,6 +79,28 @@ class UserManager
     }
 
     /**
+     * Get user entity by id
+     *
+     * @param int $id The user id
+     *
+     * @return User The user entity object
+     */
+    public function getUserEntityById(int $id): User
+    {
+        $user = $this->userRepository->find($id);
+
+        // check if user exists
+        if ($user === null) {
+            $this->errorManager->handleError(
+                message: 'User not found with id: ' . $id,
+                code: JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        return $user;
+    }
+
+    /**
      * Check if user is admin
      *
      * @param int $id The user id
