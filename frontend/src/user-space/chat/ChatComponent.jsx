@@ -1,7 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack, onMessageSent, API_URL, API_TOKEN }) => {
     const [newMessage, setNewMessage] = useState('');
+    const [lastMessageId, setLastMessageId] = useState(null);
+    const chatContainerRef = useRef(null);
+    const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+
+    const handleScroll = () => {
+        if (chatContainerRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+            // If the user is within 100px of the bottom, enable auto-scroll
+            if (scrollHeight - scrollTop <= clientHeight + 100) {
+                setShouldScrollToBottom(true);
+            } else {
+                setShouldScrollToBottom(false);
+            }
+        }
+    };
+
+    // Effect to set up autofetch
+    useEffect(() => {
+        if (!chat) return;
+
+        // Initialize lastMessageId with the ID of the last message if available
+        if (messages && messages.length > 0) {
+            setLastMessageId(messages[messages.length - 1].id);
+        } else {
+            setLastMessageId(null);
+        }
+
+        const fetchNewMessages = async () => {
+            try {
+                const url = lastMessageId ? `${API_URL}/api/chat/history?after_id=${lastMessageId}&chat_id=${chat['chat-id']}` : `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}`;
+                const res = await fetch(url, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'X-API-TOKEN': API_TOKEN,
+                    },
+                });
+                const data = await res.json();
+
+                if (data.status === 'success' && data.data.length > 0) {
+                    console.log('New messages:', data.data);
+                    // Update lastMessageId with the ID of the latest new message
+                    setLastMessageId(data.data[data.data.length - 1].id);
+                    onMessageSent(); // Trigger a refresh of messages in the parent component
+                }
+            } catch (error) {
+                console.error('Error fetching new messages:', error);
+            }
+        };
+
+        const intervalId = setInterval(fetchNewMessages, 1000); // Fetch every 1 second
+
+        return () => clearInterval(intervalId); // Cleanup on unmount or chat change
+    }, [chat, lastMessageId, API_URL, API_TOKEN, onMessageSent, messages]);
+
+    // Effect to scroll to bottom when messages change, if shouldScrollToBottom is true
+    useEffect(() => {
+        if (chatContainerRef.current && shouldScrollToBottom) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages, shouldScrollToBottom]);
 
     const handleSendMessage = async () => {
         if (newMessage.trim() === '') return;
@@ -48,7 +109,7 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
                 </button>
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
-            <div className="flex-1 p-4 overflow-y-auto">
+            <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
                 {messagesLoading && <div className="text-white">Loading messages...</div>}
                 {messagesError && <div className="text-red-500">{messagesError}</div>}
                 {messages && messages.map(message => (
