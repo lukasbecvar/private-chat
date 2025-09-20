@@ -61,7 +61,7 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
                     continue;
                 }
 
-                for ($m = 0; $m < 50; $m++) {
+                for ($m = 0; $m < 500; $m++) {
                     $message = new PrivateChatMessage();
 
                     // generate chat identifier with deterministic and symmetric method
@@ -92,6 +92,6 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
         }
 
         // flush messages to database
-        $manager->flush();
+        //$manager->flush();
     }
 }

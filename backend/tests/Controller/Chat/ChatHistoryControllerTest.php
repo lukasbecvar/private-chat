@@ -135,7 +135,7 @@ class ChatHistoryControllerTest extends CustomTestCase
         $responseData = json_decode(($this->client->getResponse()->getContent() ?: '{}'), true);
 
         // assert response
-        $this->assertSame('Chat not found', $responseData['message']);
+        $this->assertSame('This chat is empty', $responseData['message']);
         $this->assertResponseStatusCodeSame(JsonResponse::HTTP_NOT_FOUND);
     }
 

@@ -91,7 +91,7 @@ class ChatHistoryController extends AbstractController
         content: new JsonContent(
             example: [
                 "status" => "error",
-                "message" => "Chat not found"
+                "message" => "This chat is empty"
             ]
         )
     )]
@@ -147,7 +147,7 @@ class ChatHistoryController extends AbstractController
         if (!$this->chatManager->checkIfChatExists($chatId)) {
             return $this->json([
                 'status' => 'error',
-                'message' => 'Chat not found'
+                'message' => 'This chat is empty'
             ], JsonResponse::HTTP_NOT_FOUND);
         }
 

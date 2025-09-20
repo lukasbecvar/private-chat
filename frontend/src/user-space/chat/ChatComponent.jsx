@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack, onMessageSent, API_URL, API_TOKEN }) => {
+const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack, onMessageSent, onLoadMoreMessages, hasMoreMessages, isFetchingMoreMessages, API_URL, API_TOKEN }) => {
     const [newMessage, setNewMessage] = useState('');
-    const [lastMessageId, setLastMessageId] = useState(null);
     const chatContainerRef = useRef(null);
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+    const prevScrollHeight = useRef(0);
 
     const handleScroll = () => {
         if (chatContainerRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+
+            // Detect scroll to top for loading more messages
+            if (scrollTop === 0 && hasMoreMessages && !isFetchingMoreMessages) {
+                console.log(`[ChatComponent] Scrolling to top. Requesting more messages.`);
+                onLoadMoreMessages();
+            }
+
             // If the user is within 100px of the bottom, enable auto-scroll
             if (scrollHeight - scrollTop <= clientHeight + 100) {
                 setShouldScrollToBottom(true);
@@ -18,51 +25,27 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
         }
     };
 
-    // Effect to set up autofetch
-    useEffect(() => {
-        if (!chat) return;
-
-        // Initialize lastMessageId with the ID of the last message if available
-        if (messages && messages.length > 0) {
-            setLastMessageId(messages[messages.length - 1].id);
-        } else {
-            setLastMessageId(null);
-        }
-
-        const fetchNewMessages = async () => {
-            try {
-                const url = lastMessageId ? `${API_URL}/api/chat/history?after_id=${lastMessageId}&chat_id=${chat['chat-id']}` : `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}`;
-                const res = await fetch(url, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'X-API-TOKEN': API_TOKEN,
-                    },
-                });
-                const data = await res.json();
-
-                if (data.status === 'success' && data.data.length > 0) {
-                    console.log('New messages:', data.data);
-                    // Update lastMessageId with the ID of the latest new message
-                    setLastMessageId(data.data[data.data.length - 1].id);
-                    onMessageSent(); // Trigger a refresh of messages in the parent component
-                }
-            } catch (error) {
-                console.error('Error fetching new messages:', error);
-            }
-        };
-
-        const intervalId = setInterval(fetchNewMessages, 1000); // Fetch every 1 second
-
-        return () => clearInterval(intervalId); // Cleanup on unmount or chat change
-    }, [chat, lastMessageId, API_URL, API_TOKEN, onMessageSent, messages]);
-
     // Effect to scroll to bottom when messages change, if shouldScrollToBottom is true
+    // Or maintain scroll position when loading older messages
     useEffect(() => {
-        if (chatContainerRef.current && shouldScrollToBottom) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        if (chatContainerRef.current) {
+            if (shouldScrollToBottom) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            } else if (isFetchingMoreMessages) {
+                // If loading older messages, maintain scroll position
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight.current;
+            }
+            prevScrollHeight.current = chatContainerRef.current.scrollHeight;
         }
-    }, [messages, shouldScrollToBottom]);
+    }, [messages, shouldScrollToBottom, isFetchingMoreMessages]);
+
+    // Effect to scroll to bottom when a new chat is selected
+    useEffect(() => {
+        if (chatContainerRef.current && chat) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            setShouldScrollToBottom(true);
+        }
+    }, [chat]);
 
     const handleSendMessage = async () => {
         if (newMessage.trim() === '') return;
@@ -85,7 +68,7 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
 
             if (data.status === 'success') {
                 setNewMessage('');
-                onMessageSent(); // Callback to refresh messages
+                onMessageSent(data.data); // Callback to refresh initial messages and scroll to bottom
             } else {
                 // Handle error
                 console.error('Failed to send message:', data.message);
@@ -94,6 +77,7 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
             console.error('Error sending message:', error);
         }
     };
+
 
     if (!chat) {
         return <div className="w-full md:w-2/3 flex items-center justify-center text-gray-400">Select a chat to start messaging</div>;
@@ -110,8 +94,9 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
             <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
-                {messagesLoading && <div className="text-white">Loading messages...</div>}
-                {messagesError && <div className="text-red-500">{messagesError}</div>}
+                {isFetchingMoreMessages && <div className="text-white text-center">Loading more messages...</div>}
+                {messagesLoading && <div className="text-white text-center">Loading messages...</div>}
+                {messagesError && <div className="text-red-500 text-center">{messagesError}</div>}
                 {messages && messages.map(message => (
                     <div key={message.id} className={`flex ${message.sender !== chat['user-id'] ? 'justify-end' : 'justify-start'} mb-4`}>
                         <div className={`p-3 rounded-lg max-w-xs ${message.sender !== chat['user-id'] ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>

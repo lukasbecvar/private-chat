@@ -26,6 +26,10 @@ export default function UserSpaceComponent() {
     const [messages, setMessages] = useState([])
     const [messagesLoading, setMessagesLoading] = useState(false)
     const [messagesError, setMessagesError] = useState(null)
+    const [hasMoreMessages, setHasMoreMessages] = useState(true)
+    const [isFetchingMoreMessages, setIsFetchingMoreMessages] = useState(false)
+    const [currentOldestMessageOffset, setCurrentOldestMessageOffset] = useState(0)
+    const [totalMessagesCount, setTotalMessagesCount] = useState(0) // This will now be determined on frontend
     
     // fetch user data
     useEffect(() => {
@@ -106,13 +110,25 @@ export default function UserSpaceComponent() {
     }, [DEV_MODE, API_TOKEN, API_URL])
 
     // fetch chat history
-    const fetchChatHistory = async () => {
-        if (!selectedChat) return
+    const fetchChatHistory = async (offset, limit = 100, prepend = false, showLoadingIndicator = true) => {
+        if (!selectedChat || isFetchingMoreMessages) return
 
-        setMessagesLoading(true)
-        setMessagesError(null)
+        if (!prepend && showLoadingIndicator) { // Initial load or refresh with indicator
+            setMessagesLoading(true)
+            setMessagesError(null)
+            setHasMoreMessages(true)
+            setMessages([]) // Clear messages on new chat selection
+            setIsFetchingMoreMessages(false) // Ensure this is false for initial/refresh loads
+        } else if (prepend) { // Loading more messages (prepended)
+            setIsFetchingMoreMessages(true)
+        }
+
         try {
-            const res = await fetch(`${API_URL}/api/chat/history?chat_id=${selectedChat['chat-id']}`, {
+            let url = `${API_URL}/api/chat/history?chat_id=${selectedChat['chat-id']}&limit=${limit}&offset=${offset}`
+            let logMessage = `Fetching chat history for chat_id: ${selectedChat['chat-id']}, limit: ${limit}, offset: ${offset}`
+            if (DEV_MODE) console.log(logMessage)
+
+            const res = await fetch(url, {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json',
@@ -125,7 +141,26 @@ export default function UserSpaceComponent() {
 
             // check if response was successful
             if (res.ok && data.status === 'success') {
-                setMessages(data.data)
+                if (DEV_MODE) {
+                    console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`)
+                }
+                if (data.data.length < limit) {
+                    setHasMoreMessages(false)
+                }
+                if (prepend) {
+                    setMessages(prevMessages => {
+                        const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
+                        const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id));
+                        const newMessages = [...newUniqueMessages, ...prevMessages];
+                        if (DEV_MODE) console.log(`[UserSpaceComponent] Total messages on page: ${newMessages.length}`);
+                        return newMessages;
+                    });
+                } else {
+                    const newMessages = data.data;
+                    setMessages(newMessages);
+                    if (DEV_MODE) console.log(`[UserSpaceComponent] Total messages on page: ${newMessages.length}`);
+                }
+                setCurrentOldestMessageOffset(offset)
             } else {
                 setMessagesError(data.message || 'Failed to fetch chat history')
             }
@@ -133,12 +168,63 @@ export default function UserSpaceComponent() {
             if (DEV_MODE) console.error('Error fetching chat history: ' + err.message)
             setMessagesError('Error fetching chat history.')
         } finally {
-            setMessagesLoading(false)
+            if (!prepend && showLoadingIndicator) {
+                setMessagesLoading(false)
+            } else if (prepend) {
+                setIsFetchingMoreMessages(false)
+            }
         }
     }
 
     useEffect(() => {
-        fetchChatHistory()
+        const fetchInitialChatHistory = async () => {
+            if (!selectedChat) {
+                setMessages([])
+                return
+            }
+
+            setMessagesLoading(true)
+            setMessagesError(null)
+            setHasMoreMessages(true)
+            setTotalMessagesCount(0)
+
+            // Workaround: Fetch all messages to get total count, then paginate.
+            const allMessagesRes = await fetch(`${API_URL}/api/chat/history?chat_id=${selectedChat['chat-id']}&limit=1000000&offset=0`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                }
+            });
+            const allMessagesData = await allMessagesRes.json();
+
+            if (allMessagesRes.ok && allMessagesData.status === 'success') {
+                const allMessages = allMessagesData.data;
+                const count = allMessages.length;
+                setTotalMessagesCount(count);
+
+                const initialLimit = 100;
+                const initialOffset = Math.max(0, count - initialLimit);
+                
+                // Take the last 'initialLimit' messages from the fetched 'allMessages'
+                const messagesToDisplay = allMessages.slice(initialOffset);
+                setMessages(messagesToDisplay);
+                setCurrentOldestMessageOffset(initialOffset);
+                setMessagesLoading(false);
+                if (DEV_MODE) console.log(`[UserSpaceComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${count}`);
+
+                if (initialOffset === 0) {
+                    setHasMoreMessages(false);
+                }
+
+            } else {
+                console.error('Failed to fetch all messages for count', allMessagesData.message);
+                setMessagesError(allMessagesData.message);
+                setMessagesLoading(false);
+            }
+        }
+
+        fetchInitialChatHistory()
     }, [selectedChat, DEV_MODE, API_TOKEN, API_URL])
 
     // show loading screen
@@ -165,7 +251,17 @@ export default function UserSpaceComponent() {
                         messagesError={messagesError} 
                         currentUser={userData} 
                         onBack={() => setSelectedChat(null)} 
-                        onMessageSent={fetchChatHistory} 
+                        onMessageSent={() => {
+                            setTotalMessagesCount(prevCount => prevCount + 1);
+                            const newInitialOffset = Math.max(0, totalMessagesCount + 1 - 100); // +1 for the new message
+                            fetchChatHistory(newInitialOffset, 100, false, false); // showLoadingIndicator = false
+                        }} 
+                        onLoadMoreMessages={() => {
+                            const newOffset = Math.max(0, currentOldestMessageOffset - 100);
+                            fetchChatHistory(newOffset, 100, true);
+                        }} 
+                        hasMoreMessages={hasMoreMessages && currentOldestMessageOffset > 0}
+                        isFetchingMoreMessages={isFetchingMoreMessages}
                         API_URL={API_URL} 
                         API_TOKEN={API_TOKEN} 
                     />
