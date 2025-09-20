@@ -1,7 +1,8 @@
 # Private Chat
 
-## ROADMAP
-- [ ] Backend
+# ROADMAP
+## Version 1.0
+- [X] Backend
     - [X] PrivateChatMessage entity (message, timestamp, sender_id, receiver_id, chat_id(calculated from user-ids) readed_status)
     - [X] PrivateChatMessage data fixture
     - [X] Deterministic and symmetric chat ID generation method
@@ -15,13 +16,17 @@
     - [X] API endpoint for send message to chat
         - [X] Prevent send messages to other users chats
 - [ ] Frontend
-    - [ ] Chat list component
-    - [ ] Chat box component
-    - [ ] Send chat message component
-- [ ] System for infinite scroll chat history (scroll to top like classic messenger)
-- [ ] Chat list search (search by username)
+    - [X] Chat list component
+    - [X] Chat box component
+    - [X] Send chat message component
+    - [ ] Chat history refresh show new messages wihout reloading page
+    - [ ] System for infinite scroll chat history (scroll to top like classic messenger)
+        - [ ] Scroll from bottom to top (like in classic messenger)
 - [ ] Show last chat message in chat list under username
-- [ ] Chat messages encryption with AES
+- [ ] Sort chat list by last message time
+- [ ] Chat list search (search by username)
+- [ ] Highlight admin usernames in chat list
+- [ ] Simple readme documentation
 
 ## Version 2.0
 - [ ] API version check (check if backend version is compatible with frontend version)
@@ -31,6 +36,29 @@
 
 ## Version 3.0
 - [ ] Global chat for all users
+
+## Version 4.0
+- [ ] Chat messages encryption with AES
+
+## Version 5.0
+- [ ] User info view
+    - [ ] Show user info in chat component on right side after clicking on ? button
+        - [ ] User info
+            - [ ] Profile picture
+            - [ ] Username
+            - [ ] Role
+            - [ ] Registered time
+            - [ ] Last login time
+
+## Version 6.0
+- [ ] File sharing
+    - [ ] Image viewer
+    - [ ] Video player
+    - [ ] Audo player
+    - [ ] Shared file downloading
+
+## Version 7.0
+- [ ] Admin system
 
 ## License
 This software is licensed under the [MIT license](LICENSE). 
