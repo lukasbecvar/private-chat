@@ -144,12 +144,13 @@ class ChatManager
      * @param string $chatId The unique chat identifier
      * @param int|null $limit Optional limit of messages
      * @param int|null $offset Optional offset for pagination
+     * @param int|null $afterId Optional id of the last message in the previous page
      *
      * @return \App\Entity\PrivateChatMessage[]
      */
-    public function getChatHistory(string $chatId, ?int $limit = null, ?int $offset = null): array
+    public function getChatHistory(string $chatId, ?int $limit = null, ?int $offset = null, ?int $afterId = null): array
     {
-        return $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset);
+        return $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset, $afterId);
     }
 
     /**

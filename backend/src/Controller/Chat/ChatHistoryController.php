@@ -42,8 +42,9 @@ class ChatHistoryController extends AbstractController
      */
     #[Tag(name: 'Chat')]
     #[Parameter(name: 'chat_id', in: 'query', description: 'The chat id', required: true)]
-    #[Parameter(name: 'limit', in: 'query', description: 'The limit of messages', required: false)]
-    #[Parameter(name: 'offset', in: 'query', description: 'The offset for pagination', required: false)]
+    #[Parameter(name: 'after_id', in: 'query', description: 'The id of the last message in the previous page', required: false)]
+    #[Parameter(name: 'limit', in: 'query', description: 'The limit of messages (cannot be used with after_id parameter)', required: false)]
+    #[Parameter(name: 'offset', in: 'query', description: 'The offset for pagination (cannot be used with after_id parameter)', required: false)]
     #[Response(
         response: JsonResponse::HTTP_OK,
         description: 'The chat history',
@@ -122,10 +123,19 @@ class ChatHistoryController extends AbstractController
 
         // get query params
         $chatId = $request->query->get('chat_id');
-        $limit = $request->query->getInt('limit', 0) ?: null;
-        $offset = $request->query->getInt('offset', 0) ?: null;
+        $afterId = (int) $request->query->get('after_id') ?: null;
+        $limit = (int) $request->query->getInt('limit', 0) ?: null;
+        $offset = (int) $request->query->getInt('offset', 0) ?: null;
 
-        // validate
+        // check if after_id is used with limit or offset
+        if ($afterId !== null && ($limit !== null || $offset !== null)) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'The after_id parameter cannot be used with the limit or offset parameters'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        // check if chat id parameter is set
         if (!$chatId) {
             return $this->json([
                 'status' => 'error',
@@ -150,7 +160,7 @@ class ChatHistoryController extends AbstractController
         }
 
         /** @var PrivateChatMessage[] $messages */
-        $messages = $this->chatManager->getChatHistory($chatId, $limit, $offset);
+        $messages = $this->chatManager->getChatHistory($chatId, $limit, $offset, $afterId);
 
         return $this->json([
             'status' => 'success',

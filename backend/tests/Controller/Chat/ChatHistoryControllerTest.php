@@ -161,6 +161,27 @@ class ChatHistoryControllerTest extends CustomTestCase
     }
 
     /**
+     * Test chat history when after_id parameter is used with limit or offset
+     *
+     * @return void
+     */
+    public function testChatHistoryWhenAfterIdParameterIsUsedWithLimitOrOffset(): void
+    {
+        $this->client->request('GET', '/api/chat/history', ['chat_id' => '9d21ef536a074f046f12156c0f2893f85874b2a281e14520122571455a4a6c98', 'after_id' => 1, 'limit' => 5, 'offset' => 5], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN'],
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $this->generateJwtToken()
+        ]);
+
+        /** @var array<mixed> $responseData */
+        $responseData = json_decode(($this->client->getResponse()->getContent() ?: '{}'), true);
+
+        // assert response
+        $this->assertSame('The after_id parameter cannot be used with the limit or offset parameters', $responseData['message']);
+        $this->assertResponseStatusCodeSame(JsonResponse::HTTP_BAD_REQUEST);
+    }
+
+    /**
      * Test chat history with valid chat id
      *
      * @return void

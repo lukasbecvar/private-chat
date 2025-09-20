@@ -62,18 +62,24 @@ class PrivateChatMessageRepository extends ServiceEntityRepository
     /**
      * Get chat history by chat id
      *
-     * @param string $chatId The unique chat identifier
-     * @param int|null $limit Optional limit of messages
-     * @param int|null $offset Optional offset for pagination
+     * @param string   $chatId   The unique chat identifier
+     * @param int|null $limit    Optional limit of messages
+     * @param int|null $offset   Optional offset for pagination
+     * @param int|null $afterId  Optional id of the last received message
      *
      * @return PrivateChatMessage[]
      */
-    public function getChatHistoryByChatId(string $chatId, ?int $limit = null, ?int $offset = null): array
+    public function getChatHistoryByChatId(string $chatId, ?int $limit = null, ?int $offset = null, ?int $afterId = null): array
     {
         $qb = $this->createQueryBuilder('m')
             ->andWhere('m.chat_id = :chatId')
             ->setParameter('chatId', $chatId)
             ->orderBy('m.timestamp', 'ASC'); // chronological order
+
+        if ($afterId !== null) {
+            $qb->andWhere('m.id > :afterId')
+            ->setParameter('afterId', $afterId);
+        }
 
         if ($limit !== null) {
             $qb->setMaxResults($limit);
