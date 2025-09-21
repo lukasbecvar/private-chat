@@ -83,21 +83,11 @@ export default function UserSpaceComponent() {
 
                 // check if response was successful
                 if (res.ok && data.status === 'success') {
-                    const chatsWithLastMessage = await Promise.all(data.data.map(async (chat) => {
-                        const historyRes = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=1`, {
-                            credentials: 'include',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-API-TOKEN': API_TOKEN,
-                            }
-                        });
-                        const historyData = await historyRes.json();
-                        if (historyData.status === 'success' && historyData.data.length > 0) {
-                            chat.lastMessage = historyData.data[0];
-                        }
-                        return chat;
+                    const transformedChats = data.data.map(chat => ({
+                        ...chat,
+                        lastMessage: chat['last-message']
                     }));
-                    setChatList(chatsWithLastMessage)
+                    setChatList(transformedChats);
                 } else {
                     setChatListError(data.message || 'Failed to fetch chat list')
                 }
