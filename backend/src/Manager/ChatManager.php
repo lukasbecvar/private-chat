@@ -162,10 +162,10 @@ class ChatManager
 
     /**
      * Get last chat message by chat id
-     * 
+     *
      * @param string $chatId The chat identifier
      *
-     * @return \App\Entity\PrivateChatMessage[]|null The last chat message or null if no messages found;
+     * @return \App\Entity\PrivateChatMessage|null The last chat message or null if no messages found
      */
     public function getLastChatMessage(string $chatId): ?PrivateChatMessage
     {

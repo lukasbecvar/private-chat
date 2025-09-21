@@ -155,7 +155,12 @@ export default function UserSpaceComponent() {
                 }
                 setCurrentOldestMessageOffset(offset)
             } else {
-                setMessagesError(data.message || 'Failed to fetch chat history')
+                if (res.status === 404) {
+                    setMessages([]);
+                    setMessagesError("This chat is empty \n You can start messaging by sending a message!");
+                } else {
+                    setMessagesError(data.message || 'Failed to fetch chat history')
+                }
             }
         } catch (err) {
             if (DEV_MODE) console.error('Error fetching chat history: ' + err.message)
@@ -213,6 +218,7 @@ export default function UserSpaceComponent() {
                 console.error('Failed to fetch all messages for count', allMessagesData.message);
                 
                 if (allMessagesRes.status === 404) {
+                    setMessages([]);
                     setMessagesError("This chat is empty \n You can start messaging by sending a message!");
                 } else {
                     setMessagesError(allMessagesData.message);

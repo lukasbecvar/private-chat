@@ -13,35 +13,30 @@ const ChatListComponent = ({ chats, onSelectChat, loading, error, currentUser })
     return (
         <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full">
             {chats.map(chat => (
-                <div key={chat['chat-id']} className="flex items-center p-3 cursor-pointer border-b border-gray-700 hover:bg-gray-700" onClick={() => onSelectChat(chat)}>
-                    <img 
+                <div
+                    key={chat['chat-id']}
+                    className="flex items-center p-3 cursor-pointer border-b border-gray-700 hover:bg-gray-700"
+                    onClick={() => onSelectChat(chat)}
+                >
+                    <img
                         src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
-                        alt={chat.username} 
-                        className="w-12 h-12 rounded-full mr-4" 
+                        alt={chat.username}
+                        className="w-12 h-12 rounded-full mr-4 flex-shrink-0"
                     />
-                    <div className="flex-1">
-                        <div className="font-bold text-white">{chat.username}</div>
-
+                    <div className="flex-1 min-w-0">
+                        <div className="font-bold text-white truncate">{chat.username}</div>
                         {chat.lastMessage && chat.lastMessage['sender-name'] && chat.lastMessage.message && currentUser && (
-                        <div className="flex-1 min-w-0">
-                            {chat.lastMessage && chat.lastMessage['sender-name'] && chat.lastMessage.message && currentUser && (
-                                <div className="text-gray-400 text-sm truncate">
+                            <div className="text-gray-400 text-sm truncate">
                                 <span className="font-semibold">
                                     {chat.lastMessage['sender-name'] === currentUser.username ? 'You' : chat.lastMessage['sender-name']}
                                 </span>
                                 : {chat.lastMessage.message}
-                                </div>
-                            )}
-                        </div>
-
-
-
-
-
+                            </div>
                         )}
-
                     </div>
                 </div>
+
+
             ))}
         </div>
     );

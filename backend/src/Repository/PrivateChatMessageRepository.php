@@ -96,9 +96,10 @@ class PrivateChatMessageRepository extends ServiceEntityRepository
      * Get the last message in a chat by chatId
      *
      * @param string $chatId
+     *
      * @return PrivateChatMessage|null
      */
-    public function getLastMessageByChatId(string $chatId): ?PrivateChatMessage
+    public function getLastMessageByChatId(string $chatId): PrivateChatMessage|null
     {
         return $this->createQueryBuilder('m')
             ->andWhere('m.chat_id = :chatId')
