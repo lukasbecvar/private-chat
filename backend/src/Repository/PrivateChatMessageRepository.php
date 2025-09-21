@@ -91,4 +91,21 @@ class PrivateChatMessageRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Get the last message in a chat by chatId
+     *
+     * @param string $chatId
+     * @return PrivateChatMessage|null
+     */
+    public function getLastMessageByChatId(string $chatId): ?PrivateChatMessage
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.chat_id = :chatId')
+            ->setParameter('chatId', $chatId)
+            ->orderBy('m.timestamp', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

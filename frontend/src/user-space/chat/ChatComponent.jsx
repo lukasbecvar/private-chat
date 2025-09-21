@@ -78,10 +78,14 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
             <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
                 {isFetchingMoreMessages && <div className="text-white text-center">Loading more messages...</div>}
                 {messagesLoading && <div className="text-white text-center">Loading messages...</div>}
-                {messagesError && <div className="text-red-500 text-center">{messagesError}</div>}
+                {messagesError && (
+                    <div className="text-red-500 text-center whitespace-pre-line mt-10">
+                        {messagesError}
+                    </div>
+                )}
                 {messages && messages.map(message => (
                     <div key={message.id} className={`flex ${message.sender !== chat['user-id'] ? 'justify-end' : 'justify-start'} mb-4`}>
-                        <div className={`p-3 rounded-lg max-w-xs ${message.sender !== chat['user-id'] ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                        <div className={`p-3 rounded-lg max-w-xs break-words whitespace-pre-wrap ${message.sender !== chat['user-id'] ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
                             {message.message}
                         </div>
                     </div>

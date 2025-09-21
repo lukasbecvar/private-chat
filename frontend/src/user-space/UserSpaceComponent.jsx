@@ -205,14 +205,18 @@ export default function UserSpaceComponent() {
                 setCurrentOldestMessageOffset(initialOffset);
                 setMessagesLoading(false);
                 if (DEV_MODE) console.log(`[UserSpaceComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${count}`);
-
                 if (initialOffset === 0) {
                     setHasMoreMessages(false);
                 }
 
             } else {
                 console.error('Failed to fetch all messages for count', allMessagesData.message);
-                setMessagesError(allMessagesData.message);
+                
+                if (allMessagesRes.status === 404) {
+                    setMessagesError("This chat is empty \n You can start messaging by sending a message!");
+                } else {
+                    setMessagesError(allMessagesData.message);
+                }
                 setMessagesLoading(false);
             }
         }
@@ -240,6 +244,11 @@ export default function UserSpaceComponent() {
             if (res.ok && data.status === 'success') {
                 // Immediately poll for new messages to get the one we just sent.
                 await pollNewMessages();
+
+                if (messagesError !== null) {
+                    setMessagesError(null);
+                }
+
                 return true; // Indicate success
             } else {
                 console.error('Failed to send message:', data.message);

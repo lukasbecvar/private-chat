@@ -21,9 +21,25 @@ const ChatListComponent = ({ chats, onSelectChat, loading, error, currentUser })
                     />
                     <div className="flex-1">
                         <div className="font-bold text-white">{chat.username}</div>
-                        <div className="text-gray-400 text-sm">
-                            {chat.lastMessage}
+
+                        {chat.lastMessage && chat.lastMessage['sender-name'] && chat.lastMessage.message && currentUser && (
+                        <div className="flex-1 min-w-0">
+                            {chat.lastMessage && chat.lastMessage['sender-name'] && chat.lastMessage.message && currentUser && (
+                                <div className="text-gray-400 text-sm truncate">
+                                <span className="font-semibold">
+                                    {chat.lastMessage['sender-name'] === currentUser.username ? 'You' : chat.lastMessage['sender-name']}
+                                </span>
+                                : {chat.lastMessage.message}
+                                </div>
+                            )}
                         </div>
+
+
+
+
+
+                        )}
+
                     </div>
                 </div>
             ))}
