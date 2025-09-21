@@ -91,12 +91,6 @@ class SendMessageController extends AbstractController
     #[Route('/api/chat/send', methods: ['POST'], name: 'send_message')]
     public function sendMessage(Request $request, Security $security): JsonResponse
     {
-        // testing error
-        return $this->json([
-            'status' => 'error',
-            'message' => 'Testing error'
-        ], JsonResponse::HTTP_BAD_REQUEST);
-
         /** @var \App\Entity\User|null $user */
         $user = $security->getUser();
 

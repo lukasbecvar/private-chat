@@ -209,8 +209,8 @@ export default function UserSpaceComponent() {
                 const initialLimit = CHAT_LIMIT;
                 const initialOffset = Math.max(0, count - initialLimit);
                 
-                // Take the last 'initialLimit' messages from the fetched 'allMessages'
-                const messagesToDisplay = allMessages.slice(initialOffset).reverse();
+                // Take the last 'initialLimit' messages from the fetched 'allMessages' and sort them by ID
+                const messagesToDisplay = allMessages.slice(initialOffset).sort((a, b) => a.id - b.id);
                 setMessages(messagesToDisplay);
                 setCurrentOldestMessageOffset(initialOffset);
                 setMessagesLoading(false);
@@ -253,10 +253,12 @@ export default function UserSpaceComponent() {
                 return true; // Indicate success
             } else {
                 console.error('Failed to send message:', data.message);
+                setError(data.message);
                 return false; // Indicate failure
             }
         } catch (error) {
             console.error('Error sending message:', error);
+            setError(data.message);
             return false; // Indicate failure
         }
     };

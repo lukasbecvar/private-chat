@@ -4,6 +4,7 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
     const chatContainerRef = useRef(null);
+    const inputRef = useRef(null);
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
     const prevScrollHeight = useRef(0);
 
@@ -51,6 +52,11 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
 
         if (success) {
             setNewMessage('');
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                }
+            }, 0);
         }
     };
 
@@ -82,7 +88,8 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
             </div>
             <div className="p-4 bg-gray-800 border-t border-gray-700">
                 <div className="relative">
-                    <input 
+                    <input
+                        ref={inputRef}
                         type="text" 
                         placeholder="Type a message..." 
                         className="w-full bg-gray-700 text-white rounded-full py-3 px-4 focus:outline-none focus:ring-1 focus:ring-blue-500" 
