@@ -52,6 +52,7 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
 
         if (success) {
             setNewMessage('');
+            setShouldScrollToBottom(true);
             setTimeout(() => {
                 if (inputRef.current) {
                     inputRef.current.focus();

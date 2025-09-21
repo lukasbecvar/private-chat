@@ -284,12 +284,18 @@ export default function UserSpaceComponent() {
             const data = await res.json();
 
             if (res.ok && data.status === 'success' && data.data.length > 0) {
+                if (DEV_MODE) console.log('[UserSpaceComponent] Polling for new messages...');
                 const newMessages = data.data.reverse();
                 setMessages(prevMessages => {
                     const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
                     const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
                     if (uniqueNewMessages.length > 0) {
-                        return [...prevMessages, ...uniqueNewMessages];
+                        const updatedMessages = [...prevMessages, ...uniqueNewMessages];
+                        if (DEV_MODE) {
+                            console.log(`[UserSpaceComponent] Polled ${uniqueNewMessages.length} new messages.`);
+                            console.log(`[UserSpaceComponent] Total messages on page: ${updatedMessages.length}`);
+                        }
+                        return updatedMessages;
                     }
                     return prevMessages;
                 });
