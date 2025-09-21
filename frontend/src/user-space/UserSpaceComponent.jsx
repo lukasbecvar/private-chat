@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useConfig } from '../hooks/useConfig'
 
 // import app components
@@ -14,6 +14,8 @@ export default function UserSpaceComponent() {
     const API_URL = getConfigValue('API_URL')
     const DEV_MODE = getConfigValue('DEV_MODE')
     const API_TOKEN = getConfigValue('API_TOKEN')
+    const CHAT_LIMIT = getConfigValue('CHAT_LIMIT')
+    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME')
 
     // states
     const [error, setError] = useState(null)
@@ -30,6 +32,7 @@ export default function UserSpaceComponent() {
     const [isFetchingMoreMessages, setIsFetchingMoreMessages] = useState(false)
     const [currentOldestMessageOffset, setCurrentOldestMessageOffset] = useState(0)
     const [totalMessagesCount, setTotalMessagesCount] = useState(0) // This will now be determined on frontend
+    const isPollingRef = useRef(false)
     
     // fetch user data
     useEffect(() => {
@@ -110,7 +113,7 @@ export default function UserSpaceComponent() {
     }, [DEV_MODE, API_TOKEN, API_URL])
 
     // fetch chat history
-    const fetchChatHistory = async (offset, limit = 100, prepend = false, showLoadingIndicator = true) => {
+    const fetchChatHistory = async (offset, limit = CHAT_LIMIT, prepend = false, showLoadingIndicator = true) => {
         if (!selectedChat || isFetchingMoreMessages) return
 
         if (!prepend && showLoadingIndicator) { // Initial load or refresh with indicator
@@ -151,12 +154,12 @@ export default function UserSpaceComponent() {
                     setMessages(prevMessages => {
                         const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
                         const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id));
-                        const newMessages = [...newUniqueMessages, ...prevMessages];
+                        const newMessages = [...newUniqueMessages.reverse(), ...prevMessages];
                         if (DEV_MODE) console.log(`[UserSpaceComponent] Total messages on page: ${newMessages.length}`);
                         return newMessages;
                     });
                 } else {
-                    const newMessages = data.data;
+                    const newMessages = data.data.reverse();
                     setMessages(newMessages);
                     if (DEV_MODE) console.log(`[UserSpaceComponent] Total messages on page: ${newMessages.length}`);
                 }
@@ -203,11 +206,11 @@ export default function UserSpaceComponent() {
                 const count = allMessages.length;
                 setTotalMessagesCount(count);
 
-                const initialLimit = 100;
+                const initialLimit = CHAT_LIMIT;
                 const initialOffset = Math.max(0, count - initialLimit);
                 
                 // Take the last 'initialLimit' messages from the fetched 'allMessages'
-                const messagesToDisplay = allMessages.slice(initialOffset);
+                const messagesToDisplay = allMessages.slice(initialOffset).reverse();
                 setMessages(messagesToDisplay);
                 setCurrentOldestMessageOffset(initialOffset);
                 setMessagesLoading(false);
@@ -225,7 +228,86 @@ export default function UserSpaceComponent() {
         }
 
         fetchInitialChatHistory()
-    }, [selectedChat, DEV_MODE, API_TOKEN, API_URL])
+    }, [selectedChat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT])
+
+    const handleSendMessage = async (message) => {
+        try {
+            const res = await fetch(`${API_URL}/api/chat/send`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                },
+                body: JSON.stringify({
+                    message: message,
+                    receiver_id: selectedChat['user-id'],
+                }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success') {
+                // Immediately poll for new messages to get the one we just sent.
+                await pollNewMessages();
+                return true; // Indicate success
+            } else {
+                console.error('Failed to send message:', data.message);
+                return false; // Indicate failure
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            return false; // Indicate failure
+        }
+    };
+
+    const pollNewMessages = useCallback(async () => {
+        if (!selectedChat || isPollingRef.current) {
+            return;
+        }
+        isPollingRef.current = true;
+
+        const lastPermanentMessage = [...messages].reverse().find(msg => msg.id);
+        const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0;
+
+        try {
+            const res = await fetch(`${API_URL}/api/chat/history?chat_id=${selectedChat['chat-id']}&after_id=${lastMessageId}`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                }
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success' && data.data.length > 0) {
+                const newMessages = data.data.reverse();
+                setMessages(prevMessages => {
+                    const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
+                    const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
+                    if (uniqueNewMessages.length > 0) {
+                        return [...prevMessages, ...uniqueNewMessages];
+                    }
+                    return prevMessages;
+                });
+            }
+        } catch (err) {
+            if (DEV_MODE) console.error('Error polling for new messages: ' + err.message);
+        } finally {
+            isPollingRef.current = false;
+        }
+    }, [selectedChat, messages, API_URL, API_TOKEN, DEV_MODE]);
+
+    useEffect(() => {
+        if (!selectedChat) {
+            return;
+        }
+
+        const intervalId = setInterval(pollNewMessages, CHAT_POLLING_TIME);
+
+        return () => clearInterval(intervalId);
+    }, [selectedChat, pollNewMessages, CHAT_POLLING_TIME]);
 
     // show loading screen
     if (loading) return <Loading/>
@@ -251,14 +333,10 @@ export default function UserSpaceComponent() {
                         messagesError={messagesError} 
                         currentUser={userData} 
                         onBack={() => setSelectedChat(null)} 
-                        onMessageSent={() => {
-                            setTotalMessagesCount(prevCount => prevCount + 1);
-                            const newInitialOffset = Math.max(0, totalMessagesCount + 1 - 100); // +1 for the new message
-                            fetchChatHistory(newInitialOffset, 100, false, false); // showLoadingIndicator = false
-                        }} 
+                        onSendMessage={handleSendMessage} 
                         onLoadMoreMessages={() => {
-                            const newOffset = Math.max(0, currentOldestMessageOffset - 100);
-                            fetchChatHistory(newOffset, 100, true);
+                            const newOffset = Math.max(0, currentOldestMessageOffset - CHAT_LIMIT);
+                            fetchChatHistory(newOffset, CHAT_LIMIT, true);
                         }} 
                         hasMoreMessages={hasMoreMessages && currentOldestMessageOffset > 0}
                         isFetchingMoreMessages={isFetchingMoreMessages}

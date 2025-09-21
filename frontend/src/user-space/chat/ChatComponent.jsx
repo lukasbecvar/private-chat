@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack, onMessageSent, onLoadMoreMessages, hasMoreMessages, isFetchingMoreMessages, API_URL, API_TOKEN }) => {
+const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack, onSendMessage, onLoadMoreMessages, hasMoreMessages, isFetchingMoreMessages, currentUser, API_URL, API_TOKEN }) => {
     const [newMessage, setNewMessage] = useState('');
+    const [isSending, setIsSending] = useState(false);
     const chatContainerRef = useRef(null);
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
     const prevScrollHeight = useRef(0);
@@ -10,13 +11,10 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
         if (chatContainerRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
 
-            // Detect scroll to top for loading more messages
             if (scrollTop === 0 && hasMoreMessages && !isFetchingMoreMessages) {
-                console.log(`[ChatComponent] Scrolling to top. Requesting more messages.`);
                 onLoadMoreMessages();
             }
 
-            // If the user is within 100px of the bottom, enable auto-scroll
             if (scrollHeight - scrollTop <= clientHeight + 100) {
                 setShouldScrollToBottom(true);
             } else {
@@ -25,21 +23,17 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
         }
     };
 
-    // Effect to scroll to bottom when messages change, if shouldScrollToBottom is true
-    // Or maintain scroll position when loading older messages
     useEffect(() => {
         if (chatContainerRef.current) {
             if (shouldScrollToBottom) {
                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
             } else if (isFetchingMoreMessages) {
-                // If loading older messages, maintain scroll position
                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight.current;
             }
             prevScrollHeight.current = chatContainerRef.current.scrollHeight;
         }
     }, [messages, shouldScrollToBottom, isFetchingMoreMessages]);
 
-    // Effect to scroll to bottom when a new chat is selected
     useEffect(() => {
         if (chatContainerRef.current && chat) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -48,36 +42,17 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
     }, [chat]);
 
     const handleSendMessage = async () => {
-        if (newMessage.trim() === '') return;
+        const trimmedMessage = newMessage.trim();
+        if (trimmedMessage === '' || isSending) return;
 
-        try {
-            const res = await fetch(`${API_URL}/api/chat/send`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-TOKEN': API_TOKEN,
-                },
-                body: JSON.stringify({
-                    message: newMessage,
-                    receiver_id: chat['user-id'],
-                }),
-            });
+        setIsSending(true);
+        const success = await onSendMessage(trimmedMessage);
+        setIsSending(false);
 
-            const data = await res.json();
-
-            if (data.status === 'success') {
-                setNewMessage('');
-                onMessageSent(data.data); // Callback to refresh initial messages and scroll to bottom
-            } else {
-                // Handle error
-                console.error('Failed to send message:', data.message);
-            }
-        } catch (error) {
-            console.error('Error sending message:', error);
+        if (success) {
+            setNewMessage('');
         }
     };
-
 
     if (!chat) {
         return <div className="w-full md:w-2/3 flex items-center justify-center text-gray-400">Select a chat to start messaging</div>;
@@ -114,12 +89,14 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        disabled={isSending}
                     />
                     <button 
-                        className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400"
+                        className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400 disabled:opacity-50"
                         onClick={handleSendMessage}
+                        disabled={isSending}
                     >
-                        Send
+                        {isSending ? 'Sending...' : 'Send'}
                     </button>
                 </div>
             </div>
