@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useConfig } from '../../hooks/useConfig';
+import BouncingLoader from '../../sub-components/BouncingLoader';
+import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent';
 
 const ChatComponent = ({ chat, onBack, currentUser }) => {
     const { getConfigValue } = useConfig();
@@ -17,6 +19,8 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
     const [currentOldestMessageOffset, setCurrentOldestMessageOffset] = useState(0);
     const [totalMessagesCount, setTotalMessagesCount] = useState(0);
     const isPollingRef = useRef(false);
+
+    const [error, setError] = useState(null);
 
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
@@ -56,7 +60,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                 if (DEV_MODE) {
                     console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`);
                 }
-                if (data.data.length < limit) {
+                if (data.data.length < limit || offset === 0) {
                     setHasMoreMessages(false);
                 }
                 if (prepend) {
@@ -78,7 +82,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                     setMessages([]);
                     setMessagesError("This chat is empty \n You can start messaging by sending a message!");
                 } else {
-                    setMessagesError(data.message || 'Failed to fetch chat history');
+                    setError(data.message || 'Failed to fetch chat history');
                 }
             }
         } catch (err) {
@@ -138,7 +142,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                     setMessages([]);
                     setMessagesError("This chat is empty \n You can start messaging by sending a message!");
                 } else {
-                    setMessagesError(allMessagesData.message);
+                    setError(allMessagesData.message);
                 }
                 setMessagesLoading(false);
             }
@@ -181,6 +185,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                     }
                 }, 0);
             } else {
+                setError(data.message);
                 console.error('Failed to send message:', data.message);
             }
         } catch (error) {
@@ -229,6 +234,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
             }
         } catch (err) {
             if (DEV_MODE) console.error('Error polling for new messages: ' + err.message);
+            setError('Polling for new messages failed: ' + err.message);
         } finally {
             isPollingRef.current = false;
         }
@@ -279,6 +285,8 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
         }
     }, [chat]);
 
+    if (error) return <ErrorScreenComponent errorMessage={error}/>;
+
     if (!chat) {
         return <div className="w-full md:w-2/3 flex items-center justify-center text-gray-400">Select a chat to start messaging</div>;
     }
@@ -294,8 +302,8 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
             <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
-                {isFetchingMoreMessages && <div className="text-white text-center">Loading more messages...</div>}
-                {messagesLoading && <div className="text-white text-center">Loading messages...</div>}
+                {isFetchingMoreMessages && <BouncingLoader />}
+                {messagesLoading && <BouncingLoader />}
                 {messagesError && (
                     <div className="text-red-500 text-center whitespace-pre-line mt-10">
                         {messagesError}
