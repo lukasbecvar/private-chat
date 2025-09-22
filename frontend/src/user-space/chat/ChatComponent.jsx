@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import defaultProfileImage from '../../assets/images/default-profile-image.png';
 import { useConfig } from '../../hooks/useConfig';
 import BouncingLoader from '../../sub-components/BouncingLoader';
 import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent';
@@ -299,6 +300,11 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </button>
+                <img 
+                    src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']} 
+                    alt={chat.username} 
+                    className="w-8 h-8 rounded-full mr-3"
+                />
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
             <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
