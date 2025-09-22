@@ -315,14 +315,28 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                         {messagesError}
                     </div>
                 )}
-                {messages && messages.map(message => (
-                    <div key={message.id} className={`flex ${message.sender !== chat['user-id'] ? 'justify-end' : 'justify-start'} mb-4`}>
-                        <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${message.sender !== chat['user-id'] ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
-                            {message.message}
+                {messages && messages.map((message, index) => {
+                    const nextMessage = messages[index + 1];
+                    const showImage = !nextMessage || nextMessage.sender !== message.sender;
+
+                    const isCurrentUser = message.sender !== chat['user-id'];
+                    const profilePicture = chat['profile-picture'];
+
+                    return (
+                        <div key={message.id} className={`flex items-end ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
+                            {!isCurrentUser && showImage && (
+                                <img 
+                                    src={profilePicture === 'nonset-default' ? defaultProfileImage : profilePicture} 
+                                    alt="Sender" 
+                                    className="w-6 h-6 rounded-full mr-2"
+                                />
+                            )}
+                            <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
+                                {message.message}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    )
+                })}            </div>
             <div className="p-4 bg-gray-800 border-t border-gray-700">
                 <div className="relative">
                     <input
