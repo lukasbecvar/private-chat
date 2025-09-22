@@ -304,7 +304,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                 <img 
                     src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']} 
                     alt={chat.username} 
-                    className="w-8 h-8 rounded-full mr-3"
+                    className="w-8 h-8 rounded-full mr-3 border border-gray-400/50"
                 />
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
@@ -348,13 +348,13 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                         </div>
                     )
                 })}            </div>
-            <div className="p-4 bg-gray-800 border-t border-gray-700">
+            <div className="p-2 bg-gray-800 border-t border-gray-700">
                 <div className="relative">
                     <input
                         ref={inputRef}
                         type="text" 
                         placeholder="Type a message..." 
-                        className="w-full bg-gray-700 text-white rounded-full py-3 px-4 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                        className="w-full bg-gray-700 text-white rounded-lg py-2 px-2 pr-16 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(newMessage)}

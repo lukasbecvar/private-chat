@@ -67,7 +67,7 @@ const ChatListComponent = ({ onSelectChat, currentUser, onChatListLoad }) => {
                     <img
                         src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
                         alt={chat.username}
-                        className="w-12 h-12 rounded-full mr-4 flex-shrink-0"
+                        className="w-12 h-12 rounded-full mr-4 flex-shrink-0 border border-gray-400/50"
                     />
                     <div className="flex-1 min-w-0">
                         <div className="font-bold text-white truncate">{chat.username}</div>
