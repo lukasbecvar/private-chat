@@ -29,6 +29,8 @@
 - [ ] Simple readme documentation
 
 ## Version 2.0
+- [ ] User online/offline status (show online status in chat list)
+- [ ] Show send time in chat history 
 - [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Ban system
     - [ ] Command for ban/unban user
