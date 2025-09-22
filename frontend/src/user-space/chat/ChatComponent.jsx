@@ -290,7 +290,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
     if (error) return <ErrorScreenComponent errorMessage={error}/>;
 
     if (!chat) {
-        return <div className="w-full md:w-2/3 flex items-center justify-center text-gray-400">Select a chat to start messaging</div>;
+        return <div className="w-full md:w-2/2 mt-10 flex items-center justify-center text-2xl text-gray-400">Select a chat to start messaging</div>;
     }
 
     return (

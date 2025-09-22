@@ -20,6 +20,7 @@ export default function UserSpaceComponent() {
     const [loading, setLoading] = useState(true)
     const [userData, setUserData] = useState(null)
     const [selectedChat, setSelectedChat] = useState(null)
+    const [chatList, setChatList] = useState([])
     
     // fetch user data
     useEffect(() => {
@@ -59,6 +60,13 @@ export default function UserSpaceComponent() {
     // show error screen
     if (error) return <ErrorScreenComponent errorMessage={error}/>
 
+    const handleChatListLoad = (chats) => {
+        setChatList(chats);
+        if (chats.length > 0) {
+            setSelectedChat(chats[0]);
+        }
+    };
+
     return (
         <div className="h-screen flex flex-col bg-gray-800">
             {/* nav-bar */}
@@ -67,7 +75,7 @@ export default function UserSpaceComponent() {
             {/* chat layout */}
             <div className="flex flex-grow overflow-hidden">
                 <div className={`w-full md:w-1/4 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`}>
-                    <ChatListComponent onSelectChat={setSelectedChat} currentUser={userData} />
+                    <ChatListComponent onSelectChat={setSelectedChat} currentUser={userData} onChatListLoad={handleChatListLoad} />
                 </div>
                 <div className={`w-full md:w-2/2 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`}>
                     <ChatComponent 

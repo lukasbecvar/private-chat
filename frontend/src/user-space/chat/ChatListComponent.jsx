@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import defaultProfileImage from '../../assets/images/default-profile-image.png';
 import { useConfig } from '../../hooks/useConfig';
 
-const ChatListComponent = ({ onSelectChat, currentUser }) => {
+const ChatListComponent = ({ onSelectChat, currentUser, onChatListLoad }) => {
     const { getConfigValue } = useConfig();
     const API_URL = getConfigValue('API_URL');
     const DEV_MODE = getConfigValue('DEV_MODE');
@@ -31,6 +31,9 @@ const ChatListComponent = ({ onSelectChat, currentUser }) => {
                         lastMessage: chat['last-message']
                     }));
                     setChats(transformedChats);
+                    if (onChatListLoad) {
+                        onChatListLoad(transformedChats);
+                    }
                 } else {
                     setError(data.message || 'Failed to fetch chat list');
                 }
