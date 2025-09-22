@@ -1,6 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useConfig } from '../../hooks/useConfig';
 
-const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack, onSendMessage, onLoadMoreMessages, hasMoreMessages, isFetchingMoreMessages, currentUser, API_URL, API_TOKEN }) => {
+const ChatComponent = ({ chat, onBack, currentUser }) => {
+    const { getConfigValue } = useConfig();
+    const API_URL = getConfigValue('API_URL');
+    const DEV_MODE = getConfigValue('DEV_MODE');
+    const API_TOKEN = getConfigValue('API_TOKEN');
+    const CHAT_LIMIT = getConfigValue('CHAT_LIMIT');
+    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME');
+
+    const [messages, setMessages] = useState([]);
+    const [messagesLoading, setMessagesLoading] = useState(false);
+    const [messagesError, setMessagesError] = useState(null);
+    const [hasMoreMessages, setHasMoreMessages] = useState(true);
+    const [isFetchingMoreMessages, setIsFetchingMoreMessages] = useState(false);
+    const [currentOldestMessageOffset, setCurrentOldestMessageOffset] = useState(0);
+    const [totalMessagesCount, setTotalMessagesCount] = useState(0);
+    const isPollingRef = useRef(false);
+
     const [newMessage, setNewMessage] = useState('');
     const [isSending, setIsSending] = useState(false);
     const chatContainerRef = useRef(null);
@@ -8,12 +25,232 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
     const prevScrollHeight = useRef(0);
 
+    const fetchChatHistory = async (offset, limit = CHAT_LIMIT, prepend = false, showLoadingIndicator = true) => {
+        if (!chat || isFetchingMoreMessages) return;
+
+        if (!prepend && showLoadingIndicator) {
+            setMessagesLoading(true);
+            setMessagesError(null);
+            setHasMoreMessages(true);
+            setMessages([]);
+            setIsFetchingMoreMessages(false);
+        } else if (prepend) {
+            setIsFetchingMoreMessages(true);
+        }
+
+        try {
+            let url = `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${limit}&offset=${offset}`;
+            if (DEV_MODE) console.log(`Fetching chat history for chat_id: ${chat['chat-id']}, limit: ${limit}, offset: ${offset}`);
+
+            const res = await fetch(url, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                }
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success') {
+                if (DEV_MODE) {
+                    console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`);
+                }
+                if (data.data.length < limit) {
+                    setHasMoreMessages(false);
+                }
+                if (prepend) {
+                    setMessages(prevMessages => {
+                        const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
+                        const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id));
+                        const newMessages = [...newUniqueMessages.reverse(), ...prevMessages];
+                        if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`);
+                        return newMessages;
+                    });
+                } else {
+                    const newMessages = data.data.reverse();
+                    setMessages(newMessages);
+                    if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`);
+                }
+                setCurrentOldestMessageOffset(offset);
+            } else {
+                if (res.status === 404) {
+                    setMessages([]);
+                    setMessagesError("This chat is empty \n You can start messaging by sending a message!");
+                } else {
+                    setMessagesError(data.message || 'Failed to fetch chat history');
+                }
+            }
+        } catch (err) {
+            if (DEV_MODE) console.error('Error fetching chat history: ' + err.message);
+            setMessagesError('Error fetching chat history.');
+        } finally {
+            if (!prepend && showLoadingIndicator) {
+                setMessagesLoading(false);
+            } else if (prepend) {
+                setIsFetchingMoreMessages(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const fetchInitialChatHistory = async () => {
+            if (!chat) {
+                setMessages([]);
+                return;
+            }
+
+            setMessagesLoading(true);
+            setMessagesError(null);
+            setHasMoreMessages(true);
+            setTotalMessagesCount(0);
+
+            const allMessagesRes = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=1000000&offset=0`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                }
+            });
+            const allMessagesData = await allMessagesRes.json();
+
+            if (allMessagesRes.ok && allMessagesData.status === 'success') {
+                const allMessages = allMessagesData.data;
+                const count = allMessages.length;
+                setTotalMessagesCount(count);
+
+                const initialLimit = CHAT_LIMIT;
+                const initialOffset = Math.max(0, count - initialLimit);
+                
+                const messagesToDisplay = allMessages.slice(initialOffset).sort((a, b) => a.id - b.id);
+                setMessages(messagesToDisplay);
+                setCurrentOldestMessageOffset(initialOffset);
+                setMessagesLoading(false);
+                if (DEV_MODE) console.log(`[ChatComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${count}`);
+                if (initialOffset === 0) {
+                    setHasMoreMessages(false);
+                }
+
+            } else {
+                console.error('Failed to fetch all messages for count', allMessagesData.message);
+                
+                if (allMessagesRes.status === 404) {
+                    setMessages([]);
+                    setMessagesError("This chat is empty \n You can start messaging by sending a message!");
+                } else {
+                    setMessagesError(allMessagesData.message);
+                }
+                setMessagesLoading(false);
+            }
+        }
+
+        fetchInitialChatHistory();
+    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT]);
+
+    const handleSendMessage = async (message) => {
+        const trimmedMessage = message.trim();
+        if (trimmedMessage === '' || isSending) return;
+
+        setIsSending(true);
+        try {
+            const res = await fetch(`${API_URL}/api/chat/send`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                },
+                body: JSON.stringify({
+                    message: trimmedMessage,
+                    receiver_id: chat['user-id'],
+                }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success') {
+                await pollNewMessages();
+                if (messagesError !== null) {
+                    setMessagesError(null);
+                }
+                setNewMessage('');
+                setShouldScrollToBottom(true);
+                setTimeout(() => {
+                    if (inputRef.current) {
+                        inputRef.current.focus();
+                    }
+                }, 0);
+            } else {
+                console.error('Failed to send message:', data.message);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    const pollNewMessages = useCallback(async () => {
+        if (!chat || isPollingRef.current) {
+            return;
+        }
+        isPollingRef.current = true;
+
+        const lastPermanentMessage = [...messages].reverse().find(msg => msg.id);
+        const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0;
+
+        try {
+            const res = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&after_id=${lastMessageId}`, {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-API-TOKEN': API_TOKEN,
+                }
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.status === 'success' && data.data.length > 0) {
+                if (DEV_MODE) console.log('[ChatComponent] Polling for new messages...');
+                const newMessages = data.data.reverse();
+                setMessages(prevMessages => {
+                    const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
+                    const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
+                    if (uniqueNewMessages.length > 0) {
+                        const updatedMessages = [...prevMessages, ...uniqueNewMessages];
+                        if (DEV_MODE) {
+                            console.log(`[ChatComponent] Polled ${uniqueNewMessages.length} new messages.`);
+                            console.log(`[ChatComponent] Total messages on page: ${updatedMessages.length}`);
+                        }
+                        return updatedMessages;
+                    }
+                    return prevMessages;
+                });
+            }
+        } catch (err) {
+            if (DEV_MODE) console.error('Error polling for new messages: ' + err.message);
+        } finally {
+            isPollingRef.current = false;
+        }
+    }, [chat, messages, API_URL, API_TOKEN, DEV_MODE]);
+
+    useEffect(() => {
+        if (!chat) {
+            return;
+        }
+
+        const intervalId = setInterval(pollNewMessages, CHAT_POLLING_TIME);
+
+        return () => clearInterval(intervalId);
+    }, [chat, pollNewMessages, CHAT_POLLING_TIME]);
+
     const handleScroll = () => {
         if (chatContainerRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
 
             if (scrollTop === 0 && hasMoreMessages && !isFetchingMoreMessages) {
-                onLoadMoreMessages();
+                const newOffset = Math.max(0, currentOldestMessageOffset - CHAT_LIMIT);
+                fetchChatHistory(newOffset, CHAT_LIMIT, true);
             }
 
             if (scrollHeight - scrollTop <= clientHeight + 100) {
@@ -41,25 +278,6 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
             setShouldScrollToBottom(true);
         }
     }, [chat]);
-
-    const handleSendMessage = async () => {
-        const trimmedMessage = newMessage.trim();
-        if (trimmedMessage === '' || isSending) return;
-
-        setIsSending(true);
-        const success = await onSendMessage(trimmedMessage);
-        setIsSending(false);
-
-        if (success) {
-            setNewMessage('');
-            setShouldScrollToBottom(true);
-            setTimeout(() => {
-                if (inputRef.current) {
-                    inputRef.current.focus();
-                }
-            }, 0);
-        }
-    };
 
     if (!chat) {
         return <div className="w-full md:w-2/3 flex items-center justify-center text-gray-400">Select a chat to start messaging</div>;
@@ -100,12 +318,12 @@ const ChatComponent = ({ chat, messages, messagesLoading, messagesError, onBack,
                         className="w-full bg-gray-700 text-white rounded-full py-3 px-4 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(newMessage)}
                         disabled={isSending}
                     />
                     <button 
                         className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400 disabled:opacity-50"
-                        onClick={handleSendMessage}
+                        onClick={() => handleSendMessage(newMessage)}
                         disabled={isSending}
                     >
                         {isSending ? 'Sending...' : 'Send'}

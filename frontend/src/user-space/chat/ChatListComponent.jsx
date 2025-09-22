@@ -1,7 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import defaultProfileImage from '../../assets/images/default-profile-image.png';
+import { useConfig } from '../../hooks/useConfig';
 
-const ChatListComponent = ({ chats, onSelectChat, loading, error, currentUser }) => {
+const ChatListComponent = ({ onSelectChat, currentUser }) => {
+    const { getConfigValue } = useConfig();
+    const API_URL = getConfigValue('API_URL');
+    const DEV_MODE = getConfigValue('DEV_MODE');
+    const API_TOKEN = getConfigValue('API_TOKEN');
+
+    const [chats, setChats] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchChatList = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/chat/chat-list`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-API-TOKEN': API_TOKEN,
+                    }
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.status === 'success') {
+                    const transformedChats = data.data.map(chat => ({
+                        ...chat,
+                        lastMessage: chat['last-message']
+                    }));
+                    setChats(transformedChats);
+                } else {
+                    setError(data.message || 'Failed to fetch chat list');
+                }
+            } catch (err) {
+                if (DEV_MODE) console.error('Error fetching chat list: ' + err.message);
+                setError('Error fetching chat list.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchChatList();
+    }, [DEV_MODE, API_TOKEN, API_URL]);
+
     if (loading) {
         return <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full p-3 text-white">Loading chats...</div>;
     }
@@ -35,8 +78,6 @@ const ChatListComponent = ({ chats, onSelectChat, loading, error, currentUser })
                         )}
                     </div>
                 </div>
-
-
             ))}
         </div>
     );
