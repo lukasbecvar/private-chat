@@ -1,13 +1,13 @@
 /* main style index */
 
-// include tailwind
-@use './tailwind.css';
-
 // include global styles
 @use './global.scss';
 
-// include loading spinner
-@use './loading-spinner.scss';
+// include tailwind
+@use './tailwind.css';
 
 // include scrollbar
 @use './scrollbar.scss';
+
+// include loading spinner
+@use './loading-spinner.scss';

@@ -1,330 +1,403 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import defaultProfileImage from '../../assets/images/default-profile-image.png';
-import { useConfig } from '../../hooks/useConfig';
-import { formatTimestamp } from '../../utils/formatTimestamp';
-import BouncingLoader from '../../sub-components/BouncingLoader';
-import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent';
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useConfig } from '../../hooks/useConfig'
+import { formatTimestamp } from '../../utils/formatTimestamp'
 
-const ChatComponent = ({ chat, onBack, currentUser }) => {
-    const { getConfigValue } = useConfig();
-    const API_URL = getConfigValue('API_URL');
-    const DEV_MODE = getConfigValue('DEV_MODE');
-    const API_TOKEN = getConfigValue('API_TOKEN');
-    const CHAT_LIMIT = getConfigValue('CHAT_LIMIT');
-    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME');
+// import app components
+import BouncingLoader from '../../sub-components/BouncingLoader'
+import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent'
 
-    const [messages, setMessages] = useState([]);
-    const [messagesLoading, setMessagesLoading] = useState(false);
-    const [messagesError, setMessagesError] = useState(null);
-    const [hasMoreMessages, setHasMoreMessages] = useState(true);
-    const [isFetchingMoreMessages, setIsFetchingMoreMessages] = useState(false);
-    const [currentOldestMessageOffset, setCurrentOldestMessageOffset] = useState(0);
-    const [totalMessagesCount, setTotalMessagesCount] = useState(0);
-    const isPollingRef = useRef(false);
+// import default profile image asset
+import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
-    const [error, setError] = useState(null);
+export default function ChatComponent({ chat, onBack }) {
+    // get config
+    const { getConfigValue } = useConfig()
+    const API_URL = getConfigValue('API_URL')
+    const DEV_MODE = getConfigValue('DEV_MODE')
+    const API_TOKEN = getConfigValue('API_TOKEN')
+    const CHAT_LIMIT = getConfigValue('CHAT_LIMIT')
+    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME')
 
-    const [newMessage, setNewMessage] = useState('');
-    const [isSending, setIsSending] = useState(false);
-    const chatContainerRef = useRef(null);
-    const inputRef = useRef(null);
-    const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-    const prevScrollHeight = useRef(0);
+    // fatal error state
+    const [error, setError] = useState(null)
 
+    // history polling states
+    const isPollingRef = useRef(false)
+    const [messages, setMessages] = useState([])
+    const [messagesError, setMessagesError] = useState(null)
+    const [hasMoreMessages, setHasMoreMessages] = useState(true)
+    const [messagesLoading, setMessagesLoading] = useState(false)
+    const [isFetchingMoreMessages, setIsFetchingMoreMessages] = useState(false)
+    const [currentOldestMessageOffset, setCurrentOldestMessageOffset] = useState(0)
+
+    // message sending states
+    const inputRef = useRef(null)
+    const prevScrollHeight = useRef(0)
+    const chatContainerRef = useRef(null)
+    const [newMessage, setNewMessage] = useState('')
+    const [isSending, setIsSending] = useState(false)
+    const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
+
+    // fetch chat history
     const fetchChatHistory = async (offset, limit = CHAT_LIMIT, prepend = false, showLoadingIndicator = true) => {
-        if (!chat || isFetchingMoreMessages) return;
+        if (!chat || isFetchingMoreMessages) return
 
+        // manage loading indicators for initial load vs fetching older messages
         if (!prepend && showLoadingIndicator) {
-            setMessagesLoading(true);
-            setMessagesError(null);
-            setHasMoreMessages(true);
-            setMessages([]);
-            setIsFetchingMoreMessages(false);
+            setMessagesLoading(true)
+            setMessagesError(null)
+            setHasMoreMessages(true)
+            setMessages([])
+            setIsFetchingMoreMessages(false)
         } else if (prepend) {
-            setIsFetchingMoreMessages(true);
+            setIsFetchingMoreMessages(true)
         }
 
+        // fetch chat history for infinite scroll
         try {
-            let url = `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${limit}&offset=${offset}`;
-            if (DEV_MODE) console.log(`Fetching chat history for chat_id: ${chat['chat-id']}, limit: ${limit}, offset: ${offset}`);
+            // log fetching chat history
+            if (DEV_MODE) console.log(`Fetching chat history for chat_id: ${chat['chat-id']}, limit: ${limit}, offset: ${offset}`)
 
+            // fetch chat history
+            let url = `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${limit}&offset=${offset}`
             const res = await fetch(url, {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json',
-                    'X-API-TOKEN': API_TOKEN,
+                    'X-API-TOKEN': API_TOKEN
                 }
-            });
+            })
 
-            const data = await res.json();
+            // get response data
+            const data = await res.json()
 
+            // check if response was successful
             if (res.ok && data.status === 'success') {
                 if (DEV_MODE) {
-                    console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`);
+                    console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`)
                 }
                 if (data.data.length < limit || offset === 0) {
-                    setHasMoreMessages(false);
+                    setHasMoreMessages(false)
                 }
+                // add messages to history
                 if (prepend) {
                     setMessages(prevMessages => {
-                        const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
-                        const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id));
-                        const newMessages = [...newUniqueMessages, ...prevMessages];
-                        if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`);
-                        return newMessages;
-                    });
+                        const existingMessageIds = new Set(prevMessages.map(msg => msg.id))
+                        const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id))
+                        const newMessages = [...newUniqueMessages, ...prevMessages]
+                        if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`)
+                        return newMessages
+                    })
                 } else {
-                    const newMessages = data.data.reverse();
-                    setMessages(newMessages);
+                    const newMessages = data.data.reverse()
+                    setMessages(newMessages)
                 }
 
-                setCurrentOldestMessageOffset(offset);
+                // set current oldest message offset
+                setCurrentOldestMessageOffset(offset)
             } else {
+                // chat not found status
                 if (res.status === 404) {
-                    setMessages([]);
-                    setMessagesError("This chat is empty \n You can start messaging by sending a message!");
+                    setMessages([])
+                    setMessagesError("This chat is empty \n You can start messaging by sending a message!")
                 } else {
-                    setError(data.message || 'Failed to fetch chat history');
+                    setError(data.message || 'Failed to fetch chat history')
+                    if (DEV_MODE) console.error('Error fetching chat history: ' + data.message)
                 }
             }
         } catch (err) {
-            if (DEV_MODE) console.error('Error fetching chat history: ' + err.message);
-            setMessagesError('Error fetching chat history.');
+            setMessagesError('Error fetching chat history.')
+            if (DEV_MODE) console.error('Error fetching chat history: ' + err.message)
         } finally {
             if (!prepend && showLoadingIndicator) {
-                setMessagesLoading(false);
+                setMessagesLoading(false)
             } else if (prepend) {
-                setIsFetchingMoreMessages(false);
+                setIsFetchingMoreMessages(false)
             }
         }
-    };
+    }
 
+    // fetch initial chat history (chat open)
     useEffect(() => {
         const fetchInitialChatHistory = async () => {
+            // clean chat history if chat is not set
             if (!chat) {
-                setMessages([]);
-                return;
+                setMessages([])
+                return
             }
 
-            setMessagesLoading(true);
-            setMessagesError(null);
-            setHasMoreMessages(true);
-            setTotalMessagesCount(0);
+            // enable loading indicator
+            setMessagesError(null)
+            setMessagesLoading(true)
+            setHasMoreMessages(true)
 
-            const allMessagesRes = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=1000000&offset=0`, {
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-API-TOKEN': API_TOKEN,
-                }
-            });
-            const allMessagesData = await allMessagesRes.json();
+            try {
+                // first fetch just to get total messages count
+                const countRes = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=1&offset=0`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-API-TOKEN': API_TOKEN
+                    }
+                })
 
-            if (allMessagesRes.ok && allMessagesData.status === 'success') {
-                const allMessages = allMessagesData.data;
-                const count = allMessages.length;
-                setTotalMessagesCount(count);
+                // get response data
+                const countData = await countRes.json()
 
-                const initialLimit = CHAT_LIMIT;
-                const initialOffset = Math.max(0, count - initialLimit);
-                
-                const messagesToDisplay = allMessages.slice(initialOffset).sort((a, b) => a.id - b.id);
-                setMessages(messagesToDisplay);
-                setCurrentOldestMessageOffset(initialOffset);
-                setMessagesLoading(false);
-                if (DEV_MODE) console.log(`[ChatComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${count}`);
-                if (initialOffset === 0) {
-                    setHasMoreMessages(false);
+                // check if response was successful
+                if (!countRes.ok || countData.status !== 'success') {
+                    if (DEV_MODE) console.error('Error fetching chat history: ' + countData.message)
+                    setError('Error fetching chat history: ' + countData.message)
+                    return
                 }
 
-            } else {
-                console.error('Failed to fetch all messages for count', allMessagesData.message);
-                
-                if (allMessagesRes.status === 404) {
-                    setMessages([]);
-                    setMessagesError("This chat is empty \n You can start messaging by sending a message!");
+                const initialLimit = CHAT_LIMIT
+                const totalCount = countData['messages-count']
+                const initialOffset = Math.max(0, totalCount - initialLimit)
+
+                // fetch initial chat history
+                const messagesRes = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${initialLimit}&offset=${initialOffset}`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-API-TOKEN': API_TOKEN
+                    }
+                })
+
+                // get response data
+                const messagesData = await messagesRes.json()
+
+                // check if response was successful
+                if (messagesRes.ok && messagesData.status === 'success') {
+                    const messagesToDisplay = messagesData.data.sort((a, b) => a.id - b.id)
+                    setMessages(messagesToDisplay)
+                    setCurrentOldestMessageOffset(initialOffset)
+                    if (initialOffset === 0) {
+                        setHasMoreMessages(false)
+                    }
+                    if (DEV_MODE) console.log(`[ChatComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${totalCount}`)
                 } else {
-                    setError(allMessagesData.message);
+                    if (DEV_MODE) console.error('Error fetching chat history: ' + messagesData.message)
+                    setError('Error fetching chat history: ' + messagesData.message)
                 }
-                setMessagesLoading(false);
+            } catch (err) {
+                if (DEV_MODE) console.error('Error fetching chat history: ' + err.message)
+                setError('Error fetching chat history: ' + err.message)
+            } finally {
+                setMessagesLoading(false)
             }
         }
 
-        fetchInitialChatHistory();
-    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT]);
+        fetchInitialChatHistory()
+    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT])
 
+    // send message to chat
     const handleSendMessage = async (message) => {
-        const trimmedMessage = message.trim();
-        if (trimmedMessage === '' || isSending) return;
+        const trimmedMessage = message.trim()
 
-        setIsSending(true);
+        // check if message is empty or sending
+        if (trimmedMessage === '' || isSending) return
+
+        // set sending state
+        setIsSending(true)
+
         try {
+            // send message to API
             const res = await fetch(`${API_URL}/api/chat/send`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-API-TOKEN': API_TOKEN,
+                    'X-API-TOKEN': API_TOKEN
                 },
                 body: JSON.stringify({
                     message: trimmedMessage,
-                    receiver_id: chat['user-id'],
-                }),
-            });
+                    receiver_id: chat['user-id']
+                })
+            })
 
-            const data = await res.json();
+            // get response data
+            const data = await res.json()
 
+            // check if response was successful
             if (res.ok && data.status === 'success') {
-                await pollNewMessages();
+                await pollNewMessages()
                 if (messagesError !== null) {
-                    setMessagesError(null);
+                    setMessagesError(null)
                 }
-                setNewMessage('');
-                setShouldScrollToBottom(true);
+                setNewMessage('')
+                setShouldScrollToBottom(true)
                 setTimeout(() => {
                     if (inputRef.current) {
-                        inputRef.current.focus();
+                        inputRef.current.focus()
                     }
-                }, 0);
+                }, 0)
             } else {
-                setError(data.message);
-                console.error('Failed to send message:', data.message);
+                if (DEV_MODE) console.error('Error sending message: ' + data.message)
+                setError(data.message)
             }
         } catch (error) {
-            console.error('Error sending message:', error);
+            if (DEV_MODE) console.error('Error sending message: ' + error.message)
+            setError('Error sending message: ' + error.message)
         } finally {
-            setIsSending(false);
+            setIsSending(false)
         }
-    };
+    }
 
+    // new messages polling mechanism
     const pollNewMessages = useCallback(async () => {
+        // check if chat is not set or polling is already in progress
         if (!chat || isPollingRef.current) {
-            return;
+            return
         }
-        isPollingRef.current = true;
+        isPollingRef.current = true
 
-        const lastPermanentMessage = [...messages].reverse().find(msg => msg.id);
-        const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0;
+        const lastPermanentMessage = [...messages].reverse().find(msg => msg.id)
+        const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0
 
         try {
+            // fetch new messages
             const res = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&after_id=${lastMessageId}`, {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json',
-                    'X-API-TOKEN': API_TOKEN,
+                    'X-API-TOKEN': API_TOKEN
                 }
-            });
+            })
 
-            const data = await res.json();
+            // get response data
+            const data = await res.json()
 
+            // check if response was successful
             if (res.ok && data.status === 'success' && data.data.length > 0) {
-                if (DEV_MODE) console.log('[ChatComponent] Polling for new messages...');
-                const newMessages = data.data.reverse();
+                if (DEV_MODE) console.log('[ChatComponent] Polling for new messages...')
+                const newMessages = data.data.reverse()
                 setMessages(prevMessages => {
-                    const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
-                    const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
+                    const existingMessageIds = new Set(prevMessages.map(msg => msg.id))
+                    const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id))
                     if (uniqueNewMessages.length > 0) {
-                        const updatedMessages = [...prevMessages, ...uniqueNewMessages];
+                        const updatedMessages = [...prevMessages, ...uniqueNewMessages]
                         if (DEV_MODE) {
-                            console.log(`[ChatComponent] Polled ${uniqueNewMessages.length} new messages.`);
-                            console.log(`[ChatComponent] Total messages on page: ${updatedMessages.length}`);
+                            console.log(`[ChatComponent] Polled ${uniqueNewMessages.length} new messages.`)
+                            console.log(`[ChatComponent] Total messages on page: ${updatedMessages.length}`)
                         }
-                        return updatedMessages;
+                        return updatedMessages
                     }
-                    return prevMessages;
-                });
+                    return prevMessages
+                })
             }
         } catch (err) {
-            if (DEV_MODE) console.error('Error polling for new messages: ' + err.message);
-            setError('Polling for new messages failed: ' + err.message);
+            if (DEV_MODE) console.error('Error polling for new messages: ' + err.message)
+            setError('Polling for new messages failed: ' + err.message)
         } finally {
-            isPollingRef.current = false;
+            isPollingRef.current = false
         }
-    }, [chat, messages, API_URL, API_TOKEN, DEV_MODE]);
+    }, [chat, messages, API_URL, API_TOKEN, DEV_MODE])
 
+    // start new messages polling mechanism
     useEffect(() => {
+        // check if chat is not set
         if (!chat) {
-            return;
+            return
         }
 
-        const intervalId = setInterval(pollNewMessages, CHAT_POLLING_TIME);
+        // start messages polling
+        const intervalId = setInterval(pollNewMessages, CHAT_POLLING_TIME)
+        return () => clearInterval(intervalId)
+    }, [chat, pollNewMessages, CHAT_POLLING_TIME])
 
-        return () => clearInterval(intervalId);
-    }, [chat, pollNewMessages, CHAT_POLLING_TIME]);
-
+    // handle chat scroll
     const handleScroll = () => {
         if (chatContainerRef.current) {
-            const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+            const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
 
+            // if user scrolled to very top -> try to load older messages (pagination upwards)
             if (scrollTop === 0 && hasMoreMessages && !isFetchingMoreMessages) {
-                const newOffset = Math.max(0, currentOldestMessageOffset - CHAT_LIMIT);
-                fetchChatHistory(newOffset, CHAT_LIMIT, true);
+                const newOffset = Math.max(0, currentOldestMessageOffset - CHAT_LIMIT)
+                fetchChatHistory(newOffset, CHAT_LIMIT, true)
             }
 
+            // if user is close to bottom (within 100px) -> enable auto-scroll to bottom
             if (scrollHeight - scrollTop <= clientHeight + 100) {
-                setShouldScrollToBottom(true);
+                setShouldScrollToBottom(true)
             } else {
-                setShouldScrollToBottom(false);
+                setShouldScrollToBottom(false)
             }
         }
-    };
+    }
 
+    // handle chat scroll behavior when messages update or when fetching more
     useEffect(() => {
         if (chatContainerRef.current) {
             if (shouldScrollToBottom) {
-                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                // if user is near bottom or opened new chat -> scroll to bottom on new messages
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
             } else if (isFetchingMoreMessages) {
-                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight.current;
+                // if older messages are fetched (prepend), keep scroll position stable
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight.current
             }
-            prevScrollHeight.current = chatContainerRef.current.scrollHeight;
+            // store current scroll height for next comparison
+            prevScrollHeight.current = chatContainerRef.current.scrollHeight
         }
-    }, [messages, shouldScrollToBottom, isFetchingMoreMessages]);
+    }, [messages, shouldScrollToBottom, isFetchingMoreMessages])
 
+    // when switching to another chat -> always jump to the latest message at bottom
     useEffect(() => {
         if (chatContainerRef.current && chat) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-            setShouldScrollToBottom(true);
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+            setShouldScrollToBottom(true) // enable auto-scroll for subsequent messages
         }
-    }, [chat]);
+    }, [chat])
 
-    if (error) return <ErrorScreenComponent errorMessage={error}/>;
+    // show error screen
+    if (error) return <ErrorScreenComponent errorMessage={error} />
 
+    // show info when chat is not selected
     if (!chat) {
-        return <div className="w-full md:w-2/2 mt-10 flex items-center justify-center text-2xl text-gray-400">Select a chat to start messaging</div>;
+        return <div className="w-full md:w-2/2 mt-10 flex items-center justify-center text-2xl text-gray-400">Select a chat to start messaging</div>
     }
 
+    // render chat component
     return (
         <div className="flex flex-col bg-gray-800 h-full">
+
+            {/* chat title */}
             <div className="flex items-center p-3 border-b border-gray-700">
                 <button className="md:hidden mr-4 text-white" onClick={onBack}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </button>
-                <img 
-                    src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']} 
-                    alt={chat.username} 
+                <img
+                    src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
+                    alt={chat.username}
                     className="w-8 h-8 rounded-full mr-3 border border-gray-400/50"
                 />
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
+
             <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
+                {/* loading elements */}
                 {isFetchingMoreMessages && <BouncingLoader />}
                 {messagesLoading && <BouncingLoader />}
+
+                {/* error message */}
                 {messagesError && (
                     <div className="text-red-500 text-center whitespace-pre-line mt-10">
                         {messagesError}
                     </div>
                 )}
+
+                {/* chat messages */}
                 {messages && messages.map((message, index) => {
-                    const nextMessage = messages[index + 1];
-                    const showImage = !nextMessage || nextMessage.sender !== message.sender;
+                    const nextMessage = messages[index + 1]
+                    const showImage = !nextMessage || nextMessage.sender !== message.sender
 
-                    const isCurrentUser = message.sender !== chat['user-id'];
-                    const profilePicture = chat['profile-picture'];
+                    const isCurrentUser = message.sender !== chat['user-id']
+                    const profilePicture = chat['profile-picture']
 
-                    const previousMessage = messages[index - 1];
-                    const showTimestamp = (!previousMessage || (new Date(message.timestamp) - new Date(previousMessage.timestamp)) > 3600 * 1000) || index === messages.length - 1;
+                    const previousMessage = messages[index - 1]
+                    const showTimestamp = (!previousMessage || (new Date(message.timestamp) - new Date(previousMessage.timestamp)) > 3600 * 1000) || index === messages.length - 1
 
                     return (
                         <div key={message.id}>
@@ -335,10 +408,10 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                             )}
                             <div className={`flex items-end ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
                                 {!isCurrentUser && showImage && (
-                                    <img 
-                                        src={profilePicture === 'nonset-default' ? defaultProfileImage : profilePicture} 
-                                        alt="Sender" 
+                                    <img
+                                        alt="Sender"
                                         className="w-6 h-6 rounded-full mr-2"
+                                        src={profilePicture === 'nonset-default' ? defaultProfileImage : profilePicture}
                                     />
                                 )}
                                 <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
@@ -347,30 +420,31 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                             </div>
                         </div>
                     )
-                })}            </div>
+                })}
+            </div>
+
+            {/* new message input */}
             <div className="p-2 bg-gray-800 border-t border-gray-700">
                 <div className="relative">
                     <input
                         ref={inputRef}
-                        type="text" 
-                        placeholder="Type a message..." 
-                        className="w-full bg-gray-700 text-white rounded-lg py-2 px-2 pr-16 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                        type="text"
+                        placeholder="Type a message..."
+                        className="w-full bg-gray-700 text-white rounded-lg py-2 px-2 pr-16 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(newMessage)}
                         disabled={isSending}
                     />
-                    <button 
-                        className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400 disabled:opacity-50"
-                        onClick={() => handleSendMessage(newMessage)}
+                    <button
                         disabled={isSending}
+                        onClick={() => handleSendMessage(newMessage)}
+                        className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400 disabled:opacity-50"
                     >
                         {isSending ? 'Sending...' : 'Send'}
                     </button>
                 </div>
             </div>
         </div>
-    );
-};
-
-export default ChatComponent;
+    )
+}

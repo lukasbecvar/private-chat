@@ -162,9 +162,12 @@ class ChatHistoryController extends AbstractController
         /** @var PrivateChatMessage[] $messages */
         $messages = $this->chatManager->getChatHistory($chatId, $limit, $offset, $afterId);
 
+        // get chat message count
+        $messageCount = $this->chatManager->getChatHistoryCount($chatId);
+
         return $this->json([
             'status' => 'success',
-            'messages-count' => count($messages),
+            'messages-count' => $messageCount,
             'data' => array_map(function (PrivateChatMessage $message) {
                 return [
                     'id' => $message->getId(),

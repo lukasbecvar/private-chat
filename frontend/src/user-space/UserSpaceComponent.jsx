@@ -1,12 +1,14 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useConfig } from '../hooks/useConfig'
 
-// import app components
-import NavbarElement from './elements/NavbarElement'
+// import sub-components
 import Loading from '../sub-components/LoadingComponent'
 import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
-import ChatListComponent from './chat/ChatListComponent'
+
+// import app components
 import ChatComponent from './chat/ChatComponent'
+import NavbarElement from './elements/NavbarElement'
+import ChatListComponent from './chat/ChatListComponent'
 
 export default function UserSpaceComponent() {
     // get config values
@@ -20,8 +22,7 @@ export default function UserSpaceComponent() {
     const [loading, setLoading] = useState(true)
     const [userData, setUserData] = useState(null)
     const [selectedChat, setSelectedChat] = useState(null)
-    const [chatList, setChatList] = useState([])
-    
+
     // fetch user data
     useEffect(() => {
         const fetchUserData = async () => {
@@ -54,23 +55,23 @@ export default function UserSpaceComponent() {
         fetchUserData()
     }, [DEV_MODE, API_TOKEN, API_URL])
 
+    // handle chat list load
+    const handleChatListLoad = useCallback((chats) => {
+        if (chats.length > 0) {
+            setSelectedChat(chats[0])
+        }
+    }, [])
+
     // show loading screen
-    if (loading) return <Loading/>
+    if (loading) return <Loading />
 
     // show error screen
-    if (error) return <ErrorScreenComponent errorMessage={error}/>
-
-    const handleChatListLoad = (chats) => {
-        setChatList(chats);
-        if (chats.length > 0) {
-            setSelectedChat(chats[0]);
-        }
-    };
+    if (error) return <ErrorScreenComponent errorMessage={error} />
 
     return (
         <div className="h-screen flex flex-col bg-gray-800">
             {/* nav-bar */}
-            <NavbarElement userData={userData}/>
+            <NavbarElement userData={userData} />
 
             {/* chat layout */}
             <div className="flex flex-grow overflow-hidden">
@@ -78,10 +79,9 @@ export default function UserSpaceComponent() {
                     <ChatListComponent onSelectChat={setSelectedChat} currentUser={userData} onChatListLoad={handleChatListLoad} />
                 </div>
                 <div className={`w-full md:w-2/2 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`}>
-                    <ChatComponent 
-                        chat={selectedChat} 
-                        currentUser={userData} 
-                        onBack={() => setSelectedChat(null)} 
+                    <ChatComponent
+                        chat={selectedChat}
+                        onBack={() => setSelectedChat(null)}
                     />
                 </div>
             </div>

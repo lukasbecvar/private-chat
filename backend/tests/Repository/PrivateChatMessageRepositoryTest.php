@@ -131,4 +131,39 @@ class PrivateChatMessageRepositoryTest extends KernelTestCase
         $limitedMessages = $repo->getChatHistoryByChatId($chatId, $limit);
         $this->assertCount($limit, $limitedMessages, 'Limited messages should match the limit');
     }
+
+    /**
+     * Test get last message by chat id
+     *
+     * @return void
+     */
+    public function testGetLastMessageByChatId(): void
+    {
+        // create test data for chat
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+        $this->assertGreaterThanOrEqual(2, count($users), 'There should be at least 2 users for chat test');
+
+        $userA = $users[0];
+        $userB = $users[1];
+
+        $ids = [(int)$userA->getId(), (int)$userB->getId()];
+        sort($ids);
+        $chatId = hash('sha256', $ids[0] . '_' . $ids[1]);
+
+        /** @var \App\Repository\PrivateChatMessageRepository $repo */
+        $repo = $this->entityManager->getRepository(PrivateChatMessage::class);
+
+        // get last message
+        $lastMessage = $repo->getLastMessageByChatId($chatId);
+
+        // assert that we get an object
+        $this->assertInstanceOf(PrivateChatMessage::class, $lastMessage, 'Last message should be an object');
+
+        // assert that the chat id is correct
+        $this->assertEquals($chatId, $lastMessage->getChatId(), 'Chat id should match');
+
+        // assert that the sender and receiver are correct
+        $this->assertContains($lastMessage->getSender()->getId(), [$userA->getId(), $userB->getId()]);
+        $this->assertContains($lastMessage->getReceiver()->getId(), [$userA->getId(), $userB->getId()]);
+    }
 }

@@ -5,5 +5,5 @@ export default function BouncingLoader() {
             <div></div>
             <div></div>
         </div>
-    );
+    )
 }
