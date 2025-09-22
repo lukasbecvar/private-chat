@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import defaultProfileImage from '../../assets/images/default-profile-image.png';
 import { useConfig } from '../../hooks/useConfig';
+import { formatTimestamp } from '../../utils/formatTimestamp';
 import BouncingLoader from '../../sub-components/BouncingLoader';
 import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent';
 
@@ -322,17 +323,27 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                     const isCurrentUser = message.sender !== chat['user-id'];
                     const profilePicture = chat['profile-picture'];
 
+                    const previousMessage = messages[index - 1];
+                    const showTimestamp = (!previousMessage || (new Date(message.timestamp) - new Date(previousMessage.timestamp)) > 3600 * 1000) || index === messages.length - 1;
+
                     return (
-                        <div key={message.id} className={`flex items-end ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
-                            {!isCurrentUser && showImage && (
-                                <img 
-                                    src={profilePicture === 'nonset-default' ? defaultProfileImage : profilePicture} 
-                                    alt="Sender" 
-                                    className="w-6 h-6 rounded-full mr-2"
-                                />
+                        <div key={message.id}>
+                            {showTimestamp && (
+                                <div className="text-center text-gray-500 text-xs my-2">
+                                    {formatTimestamp(message.timestamp)}
+                                </div>
                             )}
-                            <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
-                                {message.message}
+                            <div className={`flex items-end ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
+                                {!isCurrentUser && showImage && (
+                                    <img 
+                                        src={profilePicture === 'nonset-default' ? defaultProfileImage : profilePicture} 
+                                        alt="Sender" 
+                                        className="w-6 h-6 rounded-full mr-2"
+                                    />
+                                )}
+                                <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
+                                    {message.message}
+                                </div>
                             </div>
                         </div>
                     )

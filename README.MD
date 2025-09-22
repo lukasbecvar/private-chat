@@ -19,22 +19,26 @@
     - [X] Chat list component
     - [X] Chat box component
     - [X] Send chat message component
-    - [ ] Chat history refresh show new messages wihout reloading page
-    - [ ] System for infinite scroll chat history (scroll to top like classic messenger)
-        - [ ] Scroll from bottom to top (like in classic messenger)
-- [ ] Show last chat message in chat list under username
+    - [X] Chat history refresh show new messages wihout reloading page
+    - [X] System for infinite scroll chat history (scroll to top like classic messenger)
+        - [X] Scroll from bottom to top (like in classic messenger)
+    - [X] Show last chat message in chat list under username
+    - [ ] Refactor frontend code
+    - [ ] Add tests for chat component
 - [ ] Sort chat list by last message time
 - [ ] Chat list search (search by username)
 - [ ] Highlight admin usernames in chat list
 - [ ] Simple readme documentation
+- [ ] Complete version audit and refactoring
 
 ## Version 2.0
-- [ ] User online/offline status (show online status in chat list)
-- [ ] Show send time in chat history 
 - [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Ban system
     - [ ] Command for ban/unban user
     - [ ] Show banned status in user list and chat list
+
+## Version 2.1
+- [ ] User online/offline status (show online status in chat list)
 
 ## Version 3.0
 - [ ] Global chat for all users
