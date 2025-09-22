@@ -67,15 +67,15 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                     setMessages(prevMessages => {
                         const existingMessageIds = new Set(prevMessages.map(msg => msg.id));
                         const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id));
-                        const newMessages = [...newUniqueMessages.reverse(), ...prevMessages];
+                        const newMessages = [...newUniqueMessages, ...prevMessages];
                         if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`);
                         return newMessages;
                     });
                 } else {
                     const newMessages = data.data.reverse();
                     setMessages(newMessages);
-                    if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`);
                 }
+
                 setCurrentOldestMessageOffset(offset);
             } else {
                 if (res.status === 404) {
@@ -311,7 +311,7 @@ const ChatComponent = ({ chat, onBack, currentUser }) => {
                 )}
                 {messages && messages.map(message => (
                     <div key={message.id} className={`flex ${message.sender !== chat['user-id'] ? 'justify-end' : 'justify-start'} mb-4`}>
-                        <div className={`p-3 rounded-lg max-w-xs break-words whitespace-pre-wrap ${message.sender !== chat['user-id'] ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                        <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${message.sender !== chat['user-id'] ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
                             {message.message}
                         </div>
                     </div>

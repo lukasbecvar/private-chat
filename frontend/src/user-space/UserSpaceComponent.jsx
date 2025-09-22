@@ -66,10 +66,10 @@ export default function UserSpaceComponent() {
 
             {/* chat layout */}
             <div className="flex flex-grow overflow-hidden">
-                <div className={`w-full md:w-1/3 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`}>
+                <div className={`w-full md:w-1/4 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`}>
                     <ChatListComponent onSelectChat={setSelectedChat} currentUser={userData} />
                 </div>
-                <div className={`w-full md:w-2/3 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`}>
+                <div className={`w-full md:w-2/2 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`}>
                     <ChatComponent 
                         chat={selectedChat} 
                         currentUser={userData} 
