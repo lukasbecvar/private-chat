@@ -86,6 +86,9 @@ class ChatManager
             // get chat data
             $chatId = $this->chatUtil->generateChatId($currentUserId, $userId);
 
+            // get last message
+            $lastMessage = $this->getLastChatMessage($chatId);
+
             // build chat item
             $chatList[] = [
                 'user-id' => $userId,
@@ -93,7 +96,11 @@ class ChatManager
                 'roles' => $roles,
                 'is-admin' => $isAdmin,
                 'username' => $username,
-                'profile-picture' => $profilePic
+                'profile-picture' => $profilePic,
+                'last-message' => [
+                    'sender-name' => $lastMessage?->getSender()->getUsername(),
+                    'message' => $lastMessage?->getMessage()
+                ]
             ];
         }
 
@@ -144,12 +151,25 @@ class ChatManager
      * @param string $chatId The unique chat identifier
      * @param int|null $limit Optional limit of messages
      * @param int|null $offset Optional offset for pagination
+     * @param int|null $afterId Optional id of the last message in the previous page
      *
      * @return \App\Entity\PrivateChatMessage[]
      */
-    public function getChatHistory(string $chatId, ?int $limit = null, ?int $offset = null): array
+    public function getChatHistory(string $chatId, ?int $limit = null, ?int $offset = null, ?int $afterId = null): array
     {
-        return $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset);
+        return $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset, $afterId);
+    }
+
+    /**
+     * Get last chat message by chat id
+     *
+     * @param string $chatId The chat identifier
+     *
+     * @return \App\Entity\PrivateChatMessage|null The last chat message or null if no messages found
+     */
+    public function getLastChatMessage(string $chatId): ?PrivateChatMessage
+    {
+        return $this->privateChatMessageRepository->getLastMessageByChatId($chatId);
     }
 
     /**

@@ -219,6 +219,30 @@ class SendMessageControllerTest extends CustomTestCase
     }
 
     /**
+     * Test send message when receiver id is self chat
+     *
+     * @return void
+     */
+    public function testSendMessageWhenReceiverIdIsSelfChat(): void
+    {
+        $this->client->request('POST', '/api/chat/send', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN'],
+            'HTTP_AUTHORIZATION' => 'Bearer ' . $this->generateJwtToken()
+        ], json_encode([
+            'message' => 'Hello world!',
+            'receiver_id' => 1
+        ]) ?: null);
+
+        /** @var array<mixed> $responseData */
+        $responseData = json_decode(($this->client->getResponse()->getContent() ?: '{}'), true);
+
+        // assert response
+        $this->assertSame('You cannot send message to yourself', $responseData['message']);
+        $this->assertResponseStatusCodeSame(JsonResponse::HTTP_BAD_REQUEST);
+    }
+
+    /**
      * Test send message when message is too long
      *
      * @return void
@@ -231,7 +255,7 @@ class SendMessageControllerTest extends CustomTestCase
             'HTTP_AUTHORIZATION' => 'Bearer ' . $this->generateJwtToken()
         ], json_encode([
             'message' => str_repeat('a', 2001),
-            'receiver_id' => 1
+            'receiver_id' => 2
         ]) ?: null);
 
         /** @var array<mixed> $responseData */
@@ -255,7 +279,7 @@ class SendMessageControllerTest extends CustomTestCase
             'HTTP_AUTHORIZATION' => 'Bearer ' . $this->generateJwtToken()
         ], json_encode([
             'message' => 'Hello world!',
-            'receiver_id' => 1
+            'receiver_id' => 2
         ]) ?: null);
 
         /** @var array<mixed> $responseData */

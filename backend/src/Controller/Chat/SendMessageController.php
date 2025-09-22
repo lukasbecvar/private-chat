@@ -116,6 +116,14 @@ class SendMessageController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
+        // check if receiver id is not self chat
+        if ($receiverId === $user->getId()) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'You cannot send message to yourself'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
         // check if receiver id is active
         $receiverStatus = $this->userManager->getUserStatus($receiverId);
         if ($receiverStatus != 'active') {

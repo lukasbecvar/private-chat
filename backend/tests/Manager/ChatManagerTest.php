@@ -8,6 +8,7 @@ use App\Manager\ChatManager;
 use App\Manager\UserManager;
 use App\Manager\ErrorManager;
 use PHPUnit\Framework\TestCase;
+use App\Entity\PrivateChatMessage;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -93,6 +94,9 @@ class ChatManagerTest extends TestCase
         $this->assertIsBool($result[0]['is-admin']);
         $this->assertEquals('Bob', $result[0]['username']);
         $this->assertEquals('bob.png', $result[0]['profile-picture']);
+        $this->assertArrayHasKey('last-message', $result[0]);
+        $this->assertArrayHasKey('sender-name', $result[0]['last-message']);
+        $this->assertArrayHasKey('message', $result[0]['last-message']);
     }
 
     /**
@@ -161,6 +165,23 @@ class ChatManagerTest extends TestCase
 
         // assert result
         $this->assertIsArray($result);
+    }
+
+    /**
+     * Test get last chat message
+     *
+     * @return void
+     */
+    public function testGetLastChatMessage(): void
+    {
+        // expect call method from repository
+        $this->privateChatMessageRepositoryMock->expects($this->once())->method('getLastMessageByChatId')->willReturn($this->createMock(PrivateChatMessage::class));
+
+        // call tested method
+        $result = $this->chatManager->getLastChatMessage('chat_1_2');
+
+        // assert result
+        $this->assertInstanceOf(PrivateChatMessage::class, $result);
     }
 
     /**

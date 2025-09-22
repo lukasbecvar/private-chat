@@ -55,13 +55,14 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
         // initialize empty array for storing all messages
         $allMessages = [];
 
+        // generate messages for every sender-receiver pair
         foreach ($users as $sender) {
             foreach ($users as $receiver) {
                 if ($sender->getId() >= $receiver->getId()) {
                     continue;
                 }
 
-                for ($m = 0; $m < 50; $m++) {
+                for ($m = 0; $m < 200; $m++) {
                     $message = new PrivateChatMessage();
 
                     // generate chat identifier with deterministic and symmetric method

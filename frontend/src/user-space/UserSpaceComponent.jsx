@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useConfig } from '../hooks/useConfig'
 
-// import app components
-import NavbarElement from './elements/NavbarElement'
+// import sub-components
 import Loading from '../sub-components/LoadingComponent'
 import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
+
+// import app components
+import ChatComponent from './chat/ChatComponent'
+import NavbarElement from './elements/NavbarElement'
+import ChatListComponent from './chat/ChatListComponent'
 
 export default function UserSpaceComponent() {
     // get config values
@@ -17,7 +21,8 @@ export default function UserSpaceComponent() {
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
     const [userData, setUserData] = useState(null)
-    
+    const [selectedChat, setSelectedChat] = useState(null)
+
     // fetch user data
     useEffect(() => {
         const fetchUserData = async () => {
@@ -50,20 +55,35 @@ export default function UserSpaceComponent() {
         fetchUserData()
     }, [DEV_MODE, API_TOKEN, API_URL])
 
+    // handle chat list load
+    const handleChatListLoad = useCallback((chats) => {
+        if (chats.length > 0) {
+            setSelectedChat(chats[0])
+        }
+    }, [])
+
     // show loading screen
-    if (loading) return <Loading/>
+    if (loading) return <Loading />
 
     // show error screen
-    if (error) return <ErrorScreenComponent errorMessage={error}/>
+    if (error) return <ErrorScreenComponent errorMessage={error} />
 
     return (
-        <div>
+        <div className="h-screen flex flex-col bg-gray-800">
             {/* nav-bar */}
-            <NavbarElement userData={userData}/>
+            <NavbarElement userData={userData} />
 
-            {/* example content */}
-            <div className="p-2">
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam quasi eius exercitationem. Aliquid et rerum dolorem ex perferendis aliquam facilis quis? Velit nulla voluptates incidunt asperiores optio. Vero, aperiam incidunt.</p>
+            {/* chat layout */}
+            <div className="flex flex-grow overflow-hidden">
+                <div className={`w-full md:w-1/4 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`}>
+                    <ChatListComponent onSelectChat={setSelectedChat} currentUser={userData} onChatListLoad={handleChatListLoad} />
+                </div>
+                <div className={`w-full md:w-2/2 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`}>
+                    <ChatComponent
+                        chat={selectedChat}
+                        onBack={() => setSelectedChat(null)}
+                    />
+                </div>
             </div>
         </div>
     )
