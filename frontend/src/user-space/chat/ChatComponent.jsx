@@ -397,7 +397,7 @@ export default function ChatComponent({ chat, onBack }) {
                     const profilePicture = chat['profile-picture']
 
                     const previousMessage = messages[index - 1]
-                    const showTimestamp = (!previousMessage || (new Date(message.timestamp) - new Date(previousMessage.timestamp)) > 3600 * 1000) || index === messages.length - 1
+                    const showTimestamp = !previousMessage || (new Date(message.timestamp) - new Date(previousMessage.timestamp)) > 3600 * 1000
 
                     return (
                         <div key={message.id}>
