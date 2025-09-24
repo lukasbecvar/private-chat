@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import UserSpaceComponent from '../../src/user-space/UserSpaceComponent'
 
 // mock config
@@ -27,22 +27,25 @@ vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
     default: ({ errorMessage }) => <div>Error: {errorMessage}</div>
 }))
 
-// mock chat list component
-vi.mock('../../src/user-space/chat/ChatListComponent', () => ({
-    default: ({ onChatListLoad, onSelectChat }) => {
-        const chats = [{ id: 1, name: 'Chat 1' }, { id: 2, name: 'Chat 2' }]
-        setTimeout(() => {
-            onChatListLoad(chats)
-        }, 0)
+// mock chat list component (bez setTimeout!)
+vi.mock('../../src/user-space/chat/ChatListComponent', () => {
+    const React = require('react');
+    const MockChatListComponent = ({ onChatListLoad, onSelectChat }) => {
+        const chats = [{ id: 1, name: 'Chat 1' }, { id: 2, name: 'Chat 2' }];
+        React.useEffect(() => {
+            const chats = [{ id: 1, name: 'Chat 1' }, { id: 2, name: 'Chat 2' }];
+            onChatListLoad(chats);
+        }, [onChatListLoad]);
 
         return (
             <div>
                 <div>ChatListComponent</div>
                 <button onClick={() => onSelectChat(chats[1])}>Select Chat 2</button>
             </div>
-        )
-    }
-}))
+        );
+    };
+    return { default: MockChatListComponent };
+})
 
 // mock chat component
 vi.mock('../../src/user-space/chat/ChatComponent', () => ({
@@ -59,6 +62,14 @@ globalThis.fetch = vi.fn()
 describe('UserSpaceComponent', () => {
     afterEach(() => {
         vi.clearAllMocks()
+    })
+
+    beforeEach(() => {
+        vi.resetAllMocks()
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: { username: 'JohnDoe' } })
+        })
     })
 
     it('shows loading initially', () => {
@@ -98,57 +109,45 @@ describe('UserSpaceComponent', () => {
         expect(await screen.findByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
     })
 
-    // it('switches to another chat on selection', async () => {
-    //     fetch.mockResolvedValue({
-    //         ok: true,
-    //         json: async () => ({ status: 'success', data: { username: 'JohnDoe' } })
-    //     })
+    it('switches to another chat on selection', async () => {
+        render(<UserSpaceComponent />)
 
-    //     render(<UserSpaceComponent />)
+        // wait for Chat 1 to appear
+        await waitFor(() => {
+            expect(screen.getByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
+        })
 
-    //     // Initially, Chat 1 is selected
-    //     expect(await screen.findByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
+        // Click to select Chat 2
+        fireEvent.click(screen.getByText('Select Chat 2'))
 
-    //     // Click to select Chat 2
-    //     const selectButton = screen.getByText('Select Chat 2')
-    //     fireEvent.click(selectButton)
+        // wait for Chat 2
+        await waitFor(() => {
+            expect(screen.getByText(/ChatComponent: Chat 2/i)).toBeInTheDocument()
+        })
+    })
 
-    //     // Now, Chat 2 should be displayed
-    //     expect(await screen.findByText(/ChatComponent: Chat 2/i)).toBeInTheDocument()
-    // })
+    it('shows chat list and hides chat component on back button click (mobile view)', async () => {
+        const { container } = render(<UserSpaceComponent />)
 
-    // it('shows chat list and hides chat component on back button click (mobile view)', async () => {
-    //     fetch.mockResolvedValue({
-    //         ok: true,
-    //         json: async () => ({ status: 'success', data: { username: 'JohnDoe' } })
-    //     })
+        // wait until chat is rendered
+        await waitFor(() => {
+            expect(screen.getByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
+        })
 
-    //     const { container } = render(<UserSpaceComponent />)
+        const chatListComponentContainer = container.querySelector('[data-testid="chat-list"]')
+        const chatComponentContainer = container.querySelector('[data-testid="chat-component"]')
 
-    //     // Initially, Chat 1 is selected and visible
-    //     await screen.findByText(/ChatComponent: Chat 1/i)
+        // Check initial state: list hidden, chat visible
+        expect(chatListComponentContainer).toHaveClass('hidden')
+        expect(chatComponentContainer).not.toHaveClass('hidden')
 
-    //     const chatListComponentContainer = container.querySelector('.md\\:w-1\\/4')
-    //     const chatComponentContainer = container.querySelector('.md\\:w-2\\/2')
+        // Click back
+        fireEvent.click(await screen.findByText('Back'))
 
-    //     // In the initial state (desktop-first), both are flex
-    //     expect(chatListComponentContainer).toHaveClass('md:flex')
-    //     expect(chatComponentContainer).toHaveClass('md:flex')
-
-    //     // After a chat is selected, the list is hidden on mobile
-    //     expect(chatListComponentContainer).toHaveClass('hidden')
-
-    //     // Click the back button inside ChatComponent
-    //     const backButton = screen.getByText('Back')
-    //     fireEvent.click(backButton)
-
-    //     // Now the chat list should be visible, and the chat component hidden
-    //     await waitFor(() => {
-    //         expect(chatListComponentContainer).not.toHaveClass('hidden')
-    //         expect(chatComponentContainer).toHaveClass('hidden')
-    //     })
-    // })
-
-
-
+        // After back: list visible, chat hidden
+        await waitFor(() => {
+            expect(chatListComponentContainer).not.toHaveClass('hidden')
+            expect(chatComponentContainer).toHaveClass('hidden')
+        })
+    })
 })
