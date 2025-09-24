@@ -2,7 +2,6 @@
 
 # ROADMAP
 ## Version 1.0
-- [ ] Add missing tests for frontend
 - [ ] Sort chat list by last message time
 - [ ] Chat list search (search by username)
 - [ ] Highlight admin usernames in chat list
