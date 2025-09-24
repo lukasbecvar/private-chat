@@ -1,4 +1,4 @@
-export function formatTimestamp(timestamp) {
+export function TimestampFormatUtil(timestamp) {
     // convert timestamp to date
     const messageDate = new Date(timestamp)
 
@@ -29,5 +29,5 @@ export function formatTimestamp(timestamp) {
     }
 
     // return formatted date and time
-    return messageDate.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + messageDate.toLocaleTimeString([], timeFormat)
+    return messageDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + messageDate.toLocaleTimeString([], timeFormat)
 }

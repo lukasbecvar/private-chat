@@ -10,7 +10,7 @@ vi.mock('../../../src/auth/LogoutComponent', () => ({
 describe('NavbarElement', () => {
     const mockUserData = {
         username: 'JohnDoe',
-        status: 'online'
+        status: 'active'
     }
 
     it('renders user info correctly', () => {
@@ -18,7 +18,7 @@ describe('NavbarElement', () => {
 
         // expect user info
         expect(screen.getByText('JohnDoe')).toBeInTheDocument()
-        expect(screen.getByText('(online)')).toBeInTheDocument()
+        expect(screen.getByText('(active)')).toBeInTheDocument()
     })
 
     it('renders logout button', () => {

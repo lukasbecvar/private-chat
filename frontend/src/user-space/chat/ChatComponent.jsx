@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useConfig } from '../../hooks/useConfig'
-import { formatTimestamp } from '../../utils/formatTimestamp'
+import { TimestampFormatUtil } from '../../utils/TimestampFormatUtil'
 
 // import app components
 import BouncingLoader from '../../sub-components/BouncingLoader'
@@ -169,7 +169,7 @@ export default function ChatComponent({ chat, onBack }) {
 
                 // check if response was successful
                 if (messagesRes.ok && messagesData.status === 'success') {
-                    const messagesToDisplay = messagesData.data.sort((a, b) => a.id - b.id)
+                    const messagesToDisplay = messagesData.data?.sort((a, b) => a.id - b.id) || []
                     setMessages(messagesToDisplay)
                     setCurrentOldestMessageOffset(initialOffset)
                     if (initialOffset === 0) {
@@ -312,7 +312,7 @@ export default function ChatComponent({ chat, onBack }) {
             const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
 
             // if user scrolled to very top -> try to load older messages (pagination upwards)
-            if (scrollTop === 0 && hasMoreMessages && !isFetchingMoreMessages) {
+            if (scrollTop < 2 && hasMoreMessages && !isFetchingMoreMessages) {
                 const newOffset = Math.max(0, currentOldestMessageOffset - CHAT_LIMIT)
                 fetchChatHistory(newOffset, CHAT_LIMIT, true)
             }
@@ -363,7 +363,7 @@ export default function ChatComponent({ chat, onBack }) {
 
             {/* chat title */}
             <div className="flex items-center p-3 border-b border-gray-700">
-                <button className="md:hidden mr-4 text-white" onClick={onBack}>
+                <button className="md:hidden mr-4 text-white" onClick={onBack} aria-label="Back">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -403,7 +403,7 @@ export default function ChatComponent({ chat, onBack }) {
                         <div key={message.id}>
                             {showTimestamp && (
                                 <div className="text-center text-gray-500 text-xs my-2">
-                                    {formatTimestamp(message.timestamp)}
+                                    {TimestampFormatUtil(message.timestamp)}
                                 </div>
                             )}
                             <div className={`flex items-end ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
