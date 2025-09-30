@@ -31,20 +31,18 @@ describe('LogoutComponent', () => {
         render(<LogoutComponent/>)
 
         // expect logout button
-        expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument()
+        expect(screen.getByTestId('logout-button')).toBeInTheDocument()
     })
 
-    it('shows loading text when logout is in progress', async () => {
-        let resolveFetch
-        fetch.mockImplementationOnce(() => new Promise(res => { resolveFetch = res }))
+    it('disable logout button while loading', () => {
+        // mock fetch to never resolve
+        global.fetch = vi.fn(() => new Promise(() => {}))
 
         render(<LogoutComponent/>)
-        fireEvent.click(screen.getByRole('button', { name: /logout/i }))
+        fireEvent.click(screen.getByTestId('logout-button'))
 
-        expect(screen.getByRole('button', { name: /logging out.../i })).toBeInTheDocument()
-
-        // resolve fetch
-        resolveFetch({ ok: true })
+        // expect loading text
+        expect(screen.getByTestId('logout-button')).toBeDisabled()
     })
 
     it('calls reload on successful logout', async () => {
@@ -55,7 +53,7 @@ describe('LogoutComponent', () => {
         fetch.mockResolvedValueOnce({ ok: true })
 
         render(<LogoutComponent/>)
-        fireEvent.click(screen.getByRole('button', { name: /logout/i }))
+        fireEvent.click(screen.getByTestId('logout-button'))
 
         // expect reload
         await waitFor(() => expect(window.location.reload).toHaveBeenCalled())
@@ -69,7 +67,7 @@ describe('LogoutComponent', () => {
         })
 
         render(<LogoutComponent/>)
-        fireEvent.click(screen.getByRole('button', { name: /logout/i }))
+        fireEvent.click(screen.getByTestId('logout-button'))
 
         // expect error screen
         expect(await screen.findByTestId('error-screen')).toHaveTextContent(
@@ -84,7 +82,7 @@ describe('LogoutComponent', () => {
         })
 
         render(<LogoutComponent/>)
-        fireEvent.click(screen.getByRole('button', { name: /logout/i }))
+        fireEvent.click(screen.getByTestId('logout-button'))
 
         // expect error screen
         expect(await screen.findByTestId('error-screen')).toHaveTextContent('Logout failed')

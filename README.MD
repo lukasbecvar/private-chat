@@ -5,7 +5,7 @@
 - [X] Sort chat list by last message time
 - [X] Chat list search (search by username)
 - [X] Highlight admin usernames in chat list
-- [ ] Simple redesign
+- [X] Simple redesign
 - [ ] Simple readme documentation
 - [ ] Complete version audit and refactoring
 - [ ] Deep testing

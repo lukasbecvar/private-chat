@@ -9,6 +9,10 @@ import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent'
 // import default profile image asset
 import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
+// import fontawesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+
 export default function ChatComponent({ chat, onBack }) {
     // get config
     const { getConfigValue } = useConfig()
@@ -362,7 +366,7 @@ export default function ChatComponent({ chat, onBack }) {
         <div className="flex flex-col bg-gray-800 h-full">
 
             {/* chat title */}
-            <div className="flex items-center p-3 border-b border-gray-700">
+            <div className="flex items-center p-1.5 border-b border-gray-700">
                 <button className="md:hidden mr-4 text-white" onClick={onBack} aria-label="Back">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -376,7 +380,7 @@ export default function ChatComponent({ chat, onBack }) {
                 <h3 className="text-white font-bold">{chat.username}</h3>
             </div>
 
-            <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto" onScroll={handleScroll}>
+            <div ref={chatContainerRef} className="flex-1 p-3 overflow-y-auto" onScroll={handleScroll}>
                 {/* loading elements */}
                 {isFetchingMoreMessages && <BouncingLoader />}
                 {messagesLoading && <BouncingLoader />}
@@ -424,24 +428,25 @@ export default function ChatComponent({ chat, onBack }) {
             </div>
 
             {/* new message input */}
-            <div className="p-2 bg-gray-800 border-t border-gray-700">
+            <div className="p-0.5 bg-gray-800 border-t border-gray-700">
                 <div className="relative">
                     <input
-                        ref={inputRef}
                         type="text"
-                        placeholder="Type a message..."
-                        className="w-full bg-gray-700 text-white rounded-lg py-2 px-2 pr-16 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        ref={inputRef}
                         value={newMessage}
+                        disabled={isSending}
+                        placeholder="Type a message..."
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(newMessage)}
-                        disabled={isSending}
+                        className="w-full bg-gray-700 text-white py-2 px-2 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                     <button
                         disabled={isSending}
+                        data-testid="send-button"
                         onClick={() => handleSendMessage(newMessage)}
-                        className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400 disabled:opacity-50"
+                        className="absolute right-0 top-0 h-full px-3 text-blue-500 hover:text-blue-400 disabled:opacity-50"
                     >
-                        {isSending ? 'Sending...' : 'Send'}
+                        {isSending ? '...' : <FontAwesomeIcon icon={faPaperPlane}/>}
                     </button>
                 </div>
             </div>

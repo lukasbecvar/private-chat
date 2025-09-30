@@ -79,13 +79,13 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     return (
         <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full">
             {/* search bar */}
-            <div className="p-3">
+            <div className="p-0.5 border-b border-gray-700">
                 <input
                     type="text"
                     value={searchTerm}
-                    placeholder="Search by name..."
+                    placeholder="Search username..."
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full p-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
 

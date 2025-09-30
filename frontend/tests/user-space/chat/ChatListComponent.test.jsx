@@ -149,7 +149,7 @@ describe('ChatListComponent', () => {
             expect(screen.getByText('Bob')).toBeInTheDocument()
         })
 
-        const searchInput = screen.getByPlaceholderText('Search by name...')
+        const searchInput = screen.getByPlaceholderText('Search username...')
         fireEvent.change(searchInput, { target: { value: 'Alice' } })
 
         expect(screen.getByText('Alice')).toBeInTheDocument()

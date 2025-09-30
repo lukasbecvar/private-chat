@@ -1,4 +1,3 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import ChatComponent from '../../../src/user-space/chat/ChatComponent'
@@ -115,12 +114,13 @@ describe('ChatComponent', () => {
         render(<ChatComponent chat={mockChat} onBack={() => {}} />)
 
         const input = screen.getByPlaceholderText('Type a message...')
-        const sendButton = screen.getByText('Send')
+        const sendButton = screen.getByTestId('send-button')
 
         fireEvent.change(input, { target: { value: 'Test message' } })
         fireEvent.click(sendButton)
 
-        expect(screen.getByText('Sending...')).toBeInTheDocument()
+        // expect send button to be disabled while sending
+        expect(sendButton).toBeDisabled()
 
         await waitFor(() => {
             expect(fetch).toHaveBeenCalledWith(

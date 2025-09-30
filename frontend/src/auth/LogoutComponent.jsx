@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { useConfig } from '../hooks/useConfig'
 import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
 
+// import fontawesome
+import { faSignOut } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 export default function LogoutComponent() {
     // get config values
     const { getConfigValue } = useConfig()
@@ -51,9 +55,9 @@ export default function LogoutComponent() {
     if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     return (
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold text-base py-1.5 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={handleLogout} disabled={loading}>
-            {loading ? 'Logging out...' : 'Logout'}
+        <button className="bg-red-500 hover:bg-red-400 text-white font-extrabold text-base py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+            onClick={handleLogout} disabled={loading} data-testid="logout-button">
+            <FontAwesomeIcon icon={faSignOut}/>
         </button>
     )
 }
