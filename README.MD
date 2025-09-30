@@ -2,10 +2,7 @@
 
 # ROADMAP
 ## Version 1.0
-- [X] Sort chat list by last message time
-- [X] Chat list search (search by username)
-- [X] Highlight admin usernames in chat list
-- [X] Simple redesign
+- [ ] Chat messages encryption with AES
 - [ ] Simple readme documentation
 - [ ] Complete version audit and refactoring
 - [ ] Deep testing
@@ -23,9 +20,6 @@
 - [ ] Global chat for all users
 
 ## Version 5.0
-- [ ] Chat messages encryption with AES
-
-## Version 6.0
 - [ ] User info view
     - [ ] Show user info in chat component on right side after clicking on ? button
         - [ ] User info
@@ -35,14 +29,14 @@
             - [ ] Registered time
             - [ ] Last login time
 
-## Version 7.0
+## Version 6.0
 - [ ] File sharing
     - [ ] Image viewer
     - [ ] Video player
     - [ ] Audo player
     - [ ] Shared file downloading
 
-## Version 8.0
+## Version 7.0
 - [ ] Admin system
 
 ## License
