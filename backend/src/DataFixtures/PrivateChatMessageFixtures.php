@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use Faker\Factory;
 use App\Entity\User;
 use App\Util\ChatUtil;
+use App\Util\EncryptionUtil;
 use App\Entity\PrivateChatMessage;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -20,10 +21,12 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInterface
 {
     private ChatUtil $chatUtil;
+    private EncryptionUtil $encryptionUtil;
 
-    public function __construct(ChatUtil $chatUtil)
+    public function __construct(ChatUtil $chatUtil, EncryptionUtil $encryptionUtil)
     {
         $this->chatUtil = $chatUtil;
+        $this->encryptionUtil = $encryptionUtil;
     }
 
     /**
@@ -62,7 +65,7 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
                     continue;
                 }
 
-                for ($m = 0; $m < 200; $m++) {
+                for ($m = 0; $m < 10; $m++) {
                     $message = new PrivateChatMessage();
 
                     // generate chat identifier with deterministic and symmetric method
@@ -74,7 +77,7 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
                     // set message properties
                     $message->setSender($sender)
                             ->setReceiver($receiver)
-                            ->setMessage($faker->sentence(8))
+                            ->setMessage($this->encryptionUtil->encryptString($faker->sentence()))
                             ->setTimestamp($timestamp)
                             ->setChatId($chatId);
 

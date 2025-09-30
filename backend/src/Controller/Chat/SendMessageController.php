@@ -6,6 +6,7 @@ use App\DTO\MessageDTO;
 use OpenApi\Attributes\Tag;
 use App\Manager\ChatManager;
 use App\Manager\UserManager;
+use App\Util\EncryptionUtil;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
 use OpenApi\Attributes\JsonContent;
@@ -29,12 +30,18 @@ class SendMessageController extends AbstractController
     private ChatManager $chatManager;
     private UserManager $userManager;
     private ValidatorInterface $validator;
+    private EncryptionUtil $encryptionUtil;
 
-    public function __construct(ChatManager $chatManager, UserManager $userManager, ValidatorInterface $validator)
-    {
+    public function __construct(
+        ChatManager $chatManager,
+        UserManager $userManager,
+        ValidatorInterface $validator,
+        EncryptionUtil $encryptionUtil
+    ) {
         $this->validator = $validator;
         $this->userManager = $userManager;
         $this->chatManager = $chatManager;
+        $this->encryptionUtil = $encryptionUtil;
     }
 
     /**
@@ -147,6 +154,9 @@ class SendMessageController extends AbstractController
                 ], JsonResponse::HTTP_BAD_REQUEST);
             }
         }
+
+        // encrypt message
+        $message = $this->encryptionUtil->encryptString($message);
 
         // save message to chat
         $this->chatManager->saveMessageToChat($user->getId(), (int)$receiverId, $message);

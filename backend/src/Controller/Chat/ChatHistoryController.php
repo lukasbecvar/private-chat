@@ -4,6 +4,7 @@ namespace App\Controller\Chat;
 
 use OpenApi\Attributes\Tag;
 use App\Manager\ChatManager;
+use App\Util\EncryptionUtil;
 use OpenApi\Attributes\Items;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
@@ -26,10 +27,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ChatHistoryController extends AbstractController
 {
     private ChatManager $chatManager;
+    private EncryptionUtil $encryptionUtil;
 
-    public function __construct(ChatManager $chatManager)
+    public function __construct(ChatManager $chatManager, EncryptionUtil $encryptionUtil)
     {
         $this->chatManager = $chatManager;
+        $this->encryptionUtil = $encryptionUtil;
     }
 
     /**
@@ -173,8 +176,8 @@ class ChatHistoryController extends AbstractController
                     'id' => $message->getId(),
                     'sender' => $message->getSender()->getId(),
                     'receiver' => $message->getReceiver()->getId(),
-                    'message' => $message->getMessage(),
-                    'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s')
+                    'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s'),
+                    'message' => $this->encryptionUtil->decryptString($message->getMessage() ?? '')
                 ];
             }, $messages)
         ], JsonResponse::HTTP_OK);

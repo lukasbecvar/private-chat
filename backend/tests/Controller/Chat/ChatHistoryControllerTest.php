@@ -234,7 +234,7 @@ class ChatHistoryControllerTest extends CustomTestCase
         $this->assertArrayHasKey('status', $responseData);
         $this->assertArrayHasKey('messages-count', $responseData);
         $this->assertIsInt($responseData['messages-count']);
-        $this->assertEquals(200, $responseData['messages-count']);
+        $this->assertEquals(10, $responseData['messages-count']);
         $this->assertCount(5, $responseData['data']);
         $this->assertResponseStatusCodeSame(JsonResponse::HTTP_OK);
     }
@@ -260,7 +260,7 @@ class ChatHistoryControllerTest extends CustomTestCase
         $this->assertArrayHasKey('status', $responseData);
         $this->assertArrayHasKey('messages-count', $responseData);
         $this->assertIsInt($responseData['messages-count']);
-        $this->assertEquals(200, $responseData['messages-count']);
+        $this->assertEquals(10, $responseData['messages-count']);
         $this->assertResponseStatusCodeSame(JsonResponse::HTTP_OK);
     }
 }
