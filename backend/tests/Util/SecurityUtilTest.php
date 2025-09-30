@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 class SecurityUtilTest extends TestCase
 {
     private SecurityUtil $securityUtil;
+
     protected function setUp(): void
     {
         // create the security util instance

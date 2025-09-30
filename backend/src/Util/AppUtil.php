@@ -152,4 +152,14 @@ class AppUtil
         // check if HTTPS header is set and its value is either 1 or 'on'
         return isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 1 || strtolower($_SERVER['HTTPS']) === 'on');
     }
+
+    /**
+     * Get the encryption password
+     *
+     * @return string The encryption password
+     */
+    public function getEncryptionPassword(): string
+    {
+        return $this->getEnvValue('APP_SECRET');
+    }
 }

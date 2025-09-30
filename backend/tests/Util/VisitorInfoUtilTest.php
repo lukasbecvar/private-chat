@@ -16,8 +16,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class VisitorInfoUtilTest extends TestCase
 {
-    private SecurityUtil & MockObject $securityUtilMock;
     private VisitorInfoUtil $visitorInfoUtil;
+    private SecurityUtil & MockObject $securityUtilMock;
 
     protected function setUp(): void
     {

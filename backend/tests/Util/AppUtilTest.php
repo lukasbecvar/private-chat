@@ -175,4 +175,15 @@ class AppUtilTest extends TestCase
         unset($_SERVER['HTTPS']);
         $this->assertFalse($this->appUtil->isSsl());
     }
+
+    /**
+     * Test get encryption password
+     *
+     * @return void
+     */
+    public function testGetEncryptionPassword(): void
+    {
+        $_ENV['APP_SECRET'] = 'test-password';
+        $this->assertSame('test-password', $this->appUtil->getEncryptionPassword());
+    }
 }
