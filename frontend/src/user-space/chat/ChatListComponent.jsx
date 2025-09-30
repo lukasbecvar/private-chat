@@ -102,7 +102,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                         src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
                     />
                     <div className="flex-1 min-w-0">
-                        <div className="font-bold text-white truncate">{chat.username}</div>
+                        <div className={`font-bold truncate ${chat.roles.some(role => role.includes('ROLE_ADMIN')) ? 'text-red-400' : 'text-white'}`}>{chat.username}</div>
                         {chat.lastMessage && currentUser && (
                             <div className="text-gray-400 text-sm truncate">
                                 <span className="font-semibold">

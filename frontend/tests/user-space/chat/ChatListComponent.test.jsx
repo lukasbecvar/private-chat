@@ -32,6 +32,7 @@ const mockChats = [
     {
         'chat-id': 'chat-1',
         username: 'Alice',
+        roles: ['ROLE_USER'],
         'profile-picture': 'nonset-default',
         'last-message': {
             'sender-name': 'Alice',
@@ -41,6 +42,7 @@ const mockChats = [
     {
         'chat-id': 'chat-2',
         username: 'Bob',
+        roles: ['ROLE_USER', 'ROLE_ADMIN'],
         'profile-picture': 'nonset-default',
         'last-message': {
             'sender-name': 'CurrentUser',
@@ -203,6 +205,24 @@ describe('ChatListComponent', () => {
 
             expect(aliceChat).toHaveClass('bg-gray-700')
             expect(bobChat).not.toHaveClass('bg-gray-700')
+        })
+    })
+
+    it('renders admin username with red color', async () => {
+        // mock fetch response
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: mockChats })
+        })
+
+        render(<ChatListComponent />)
+
+        await waitFor(() => {
+            const aliceUsername = screen.getByText('Alice')
+            const bobUsername = screen.getByText('Bob')
+
+            expect(aliceUsername).not.toHaveClass('text-red-400')
+            expect(bobUsername).toHaveClass('text-red-400')
         })
     })
 })
