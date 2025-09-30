@@ -98,11 +98,30 @@ class ChatManager
                 'username' => $username,
                 'profile-picture' => $profilePic,
                 'last-message' => [
+                    'message-timestamp' => $lastMessage?->getTimestamp()->format('Y-m-d H:i:s'),
                     'sender-name' => $lastMessage?->getSender()->getUsername(),
                     'message' => $lastMessage?->getMessage()
                 ]
             ];
         }
+
+        // sort chats by last message timestamp (descending)
+        usort($chatList, function ($a, $b) {
+            $timeA = $a['last-message']['message-timestamp'] ?? null;
+            $timeB = $b['last-message']['message-timestamp'] ?? null;
+
+            if ($timeA === null && $timeB === null) {
+                return 0;
+            }
+            if ($timeA === null) {
+                return 1; // null goes last
+            }
+            if ($timeB === null) {
+                return -1;
+            }
+
+            return strtotime($timeB) <=> strtotime($timeA);
+        });
 
         return $chatList;
     }
