@@ -8,7 +8,7 @@ import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent'
 // import app components
 import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
-export default function ChatListComponent({ onSelectChat, currentUser, onChatListLoad }) {
+export default function ChatListComponent({ onSelectChat, currentUser, onChatListLoad, selectedChat }) {
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
@@ -19,6 +19,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     const [chats, setChats] = useState([])
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [searchTerm, setSearchTerm] = useState('')
 
     // fetch chat list from API
     const fetchChatList = useCallback(async () => {
@@ -69,15 +70,31 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
         return <ErrorScreenComponent errorMessage={error} />
     }
 
+    // filter chats based on search term
+    const filteredChats = chats.filter(chat =>
+        chat.username.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     // render chat list
     return (
         <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full">
+            {/* search bar */}
+            <div className="p-3">
+                <input
+                    type="text"
+                    value={searchTerm}
+                    placeholder="Search by name..."
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="w-full p-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
             {/* chat list */}
-            {chats.map(chat => (
+            {filteredChats.map(chat => (
                 <div
                     key={chat['chat-id']}
                     onClick={() => onSelectChat(chat)}
-                    className="flex items-center p-3 cursor-pointer border-b border-gray-700 hover:bg-gray-700"
+                    className={`flex items-center p-3 cursor-pointer border-b border-gray-700 ${selectedChat && selectedChat['chat-id'] === chat['chat-id'] ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
                 >
                     <img
                         alt={chat.username}

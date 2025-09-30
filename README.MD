@@ -3,7 +3,7 @@
 # ROADMAP
 ## Version 1.0
 - [X] Sort chat list by last message time
-- [ ] Chat list search (search by username)
+- [X] Chat list search (search by username)
 - [ ] Highlight admin usernames in chat list
 - [ ] Simple readme documentation
 - [ ] Complete version audit and refactoring

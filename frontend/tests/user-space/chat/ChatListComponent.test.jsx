@@ -133,6 +133,27 @@ describe('ChatListComponent', () => {
         })
     })
 
+    it('filters the chat list based on the search term', async () => {
+        // mock fetch response
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: mockChats })
+        })
+
+        render(<ChatListComponent/>)
+
+        await waitFor(() => {
+            expect(screen.getByText('Alice')).toBeInTheDocument()
+            expect(screen.getByText('Bob')).toBeInTheDocument()
+        })
+
+        const searchInput = screen.getByPlaceholderText('Search by name...')
+        fireEvent.change(searchInput, { target: { value: 'Alice' } })
+
+        expect(screen.getByText('Alice')).toBeInTheDocument()
+        expect(screen.queryByText('Bob')).not.toBeInTheDocument()
+    })
+
     it('displays "You" for last message sent by current user', async () => {
         
         // mock fetch response
@@ -162,6 +183,26 @@ describe('ChatListComponent', () => {
         await waitFor(() => {
             const aliceChat = screen.getAllByText('Alice')[0].closest('.flex.items-center')
             expect(aliceChat).toHaveTextContent('Alice: Hi there!')
+        })
+    })
+
+    it('highlights the selected chat', async () => {
+        // mock fetch response
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: mockChats })
+        })
+
+        const selectedChat = mockChats[0]
+
+        render(<ChatListComponent selectedChat={selectedChat} />)
+
+        await waitFor(() => {
+            const bobChat = screen.getByText('Bob').closest('.flex.items-center')
+            const aliceChat = screen.getByText('Alice').closest('.flex.items-center')
+
+            expect(aliceChat).toHaveClass('bg-gray-700')
+            expect(bobChat).not.toHaveClass('bg-gray-700')
         })
     })
 })
