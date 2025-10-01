@@ -177,7 +177,7 @@ class ChatHistoryController extends AbstractController
                     'sender' => $message->getSender()->getId(),
                     'receiver' => $message->getReceiver()->getId(),
                     'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s'),
-                    'message' => $this->encryptionUtil->decryptString($message->getMessage() ?? '')
+                    'message' => $this->encryptionUtil->decryptAes($message->getMessage() ?? '')
                 ];
             }, $messages)
         ], JsonResponse::HTTP_OK);

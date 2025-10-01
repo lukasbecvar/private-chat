@@ -65,7 +65,7 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
                     continue;
                 }
 
-                for ($m = 0; $m < 10; $m++) {
+                for ($m = 0; $m < 100; $m++) {
                     $message = new PrivateChatMessage();
 
                     // generate chat identifier with deterministic and symmetric method
@@ -77,7 +77,7 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
                     // set message properties
                     $message->setSender($sender)
                             ->setReceiver($receiver)
-                            ->setMessage($this->encryptionUtil->encryptString($faker->sentence()))
+                            ->setMessage($this->encryptionUtil->encryptAes($faker->sentence()))
                             ->setTimestamp($timestamp)
                             ->setChatId($chatId);
 

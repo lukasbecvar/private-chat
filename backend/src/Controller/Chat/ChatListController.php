@@ -91,7 +91,7 @@ class ChatListController extends AbstractController
 
         // decrypt last chat messages
         foreach ($chatList as &$chat) {
-            $chat['last-message']['message'] = $this->encryptionUtil->decryptString($chat['last-message']['message']);
+            $chat['last-message']['message'] = $this->encryptionUtil->decryptAes($chat['last-message']['message']);
         }
 
         // return chat list

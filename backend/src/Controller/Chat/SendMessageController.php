@@ -156,7 +156,7 @@ class SendMessageController extends AbstractController
         }
 
         // encrypt message
-        $message = $this->encryptionUtil->encryptString($message);
+        $message = $this->encryptionUtil->encryptAes($message);
 
         // save message to chat
         $this->chatManager->saveMessageToChat($user->getId(), (int)$receiverId, $message);
