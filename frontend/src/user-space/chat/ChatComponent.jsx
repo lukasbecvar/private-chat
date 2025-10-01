@@ -199,7 +199,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         }
 
         fetchInitialChatHistory()
-    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT])
+    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT, onChatLoaded])
 
     // send message to chat
     const handleSendMessage = async (message) => {

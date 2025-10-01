@@ -2,9 +2,8 @@
 
 # ROADMAP
 ## Version 1.0
-- [X] Chat messages encryption with AES
-- [ ] Simple readme documentation
 - [ ] Complete version audit and refactoring
+- [ ] Simple readme documentation
 - [ ] Deep testing
 
 ## Version 2.0
