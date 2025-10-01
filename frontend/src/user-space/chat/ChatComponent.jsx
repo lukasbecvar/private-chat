@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { useConfig } from '../../hooks/useConfig'
 import { TimestampFormatUtil } from '../../utils/TimestampFormatUtil'
 
@@ -36,8 +36,8 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
     // message sending states
     const inputRef = useRef(null)
-    const prevScrollHeight = useRef(0)
     const chatContainerRef = useRef(null)
+    const scrollHeightBeforePrepend = useRef(null)
     const [newMessage, setNewMessage] = useState('')
     const [isSending, setIsSending] = useState(false)
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
@@ -54,6 +54,9 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
             setMessages([])
             setIsFetchingMoreMessages(false)
         } else if (prepend) {
+            if (chatContainerRef.current) {
+                scrollHeightBeforePrepend.current = chatContainerRef.current.scrollHeight
+            }
             setIsFetchingMoreMessages(true)
         }
 
@@ -333,20 +336,18 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         }
     }
 
-    // handle chat scroll behavior when messages update or when fetching more
-    useEffect(() => {
+    // adjusts scroll position after messages update or when fetching more
+    useLayoutEffect(() => {
         if (chatContainerRef.current) {
-            if (shouldScrollToBottom) {
-                // if user is near bottom or opened new chat -> scroll to bottom on new messages
+            if (scrollHeightBeforePrepend.current !== null) {
+                const newScrollHeight = chatContainerRef.current.scrollHeight
+                chatContainerRef.current.scrollTop = newScrollHeight - scrollHeightBeforePrepend.current
+                scrollHeightBeforePrepend.current = null
+            } else if (shouldScrollToBottom) {
                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-            } else if (isFetchingMoreMessages) {
-                // if older messages are fetched (prepend), keep scroll position stable
-                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - prevScrollHeight.current
             }
-            // store current scroll height for next comparison
-            prevScrollHeight.current = chatContainerRef.current.scrollHeight
         }
-    }, [messages, shouldScrollToBottom, isFetchingMoreMessages])
+    }, [messages, shouldScrollToBottom])
 
     // when switching to another chat -> always jump to the latest message at bottom
     useEffect(() => {
