@@ -22,6 +22,18 @@ export default function UserSpaceComponent() {
     const [loading, setLoading] = useState(true)
     const [userData, setUserData] = useState(null)
     const [selectedChat, setSelectedChat] = useState(null)
+    const [chatLoading, setChatLoading] = useState(false)
+
+    // handle chat selection
+    const handleSelectChat = (chat) => {
+        setChatLoading(true)
+        setSelectedChat(chat)
+    }
+
+    // handle chat loaded
+    const onChatLoaded = () => {
+        setChatLoading(false)
+    }
 
     // fetch user data
     useEffect(() => {
@@ -76,13 +88,17 @@ export default function UserSpaceComponent() {
             {/* chat layout */}
             <div className="flex flex-grow overflow-hidden">
                 <div className={`w-full md:w-1/4 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`} data-testid="chat-list">
-                    <ChatListComponent onSelectChat={setSelectedChat} currentUser={userData} onChatListLoad={handleChatListLoad} selectedChat={selectedChat}/>
+                    <ChatListComponent onSelectChat={handleSelectChat} currentUser={userData} onChatListLoad={handleChatListLoad} selectedChat={selectedChat}/>
                 </div>
                 <div className={`w-full md:w-2/2 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`} data-testid="chat-component">
-                    <ChatComponent
-                        chat={selectedChat}
-                        onBack={() => setSelectedChat(null)}
-                    />
+                    {chatLoading && <Loading />}
+                    <div style={{ display: chatLoading ? 'none' : 'block', height: '100%' }}>
+                        <ChatComponent
+                            chat={selectedChat}
+                            onBack={() => setSelectedChat(null)}
+                            onChatLoaded={onChatLoaded}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

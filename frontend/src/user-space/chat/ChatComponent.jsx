@@ -13,7 +13,7 @@ import defaultProfileImage from '../../assets/images/default-profile-image.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
-export default function ChatComponent({ chat, onBack }) {
+export default function ChatComponent({ chat, onBack, onChatLoaded }) {
     // get config
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
@@ -189,6 +189,9 @@ export default function ChatComponent({ chat, onBack }) {
                 setError('Error fetching chat history: ' + err.message)
             } finally {
                 setMessagesLoading(false)
+                if (onChatLoaded) {
+                    onChatLoaded()
+                }
             }
         }
 
