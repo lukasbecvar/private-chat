@@ -30,12 +30,15 @@ vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
 // mock chat list component (bez setTimeout!)
 vi.mock('../../src/user-space/chat/ChatListComponent', () => {
     const React = require('react');
-    const MockChatListComponent = ({ onChatListLoad, onSelectChat }) => {
-        const chats = [{ id: 1, name: 'Chat 1' }, { id: 2, name: 'Chat 2' }];
+    const MockChatListComponent = ({ onChatListLoad, onSelectChat, onChatListLoaded }) => {
+        const chats = [{ id: 1, username: 'Chat 1' }, { id: 2, username: 'Chat 2' }];
         React.useEffect(() => {
-            const chats = [{ id: 1, name: 'Chat 1' }, { id: 2, name: 'Chat 2' }];
+            const chats = [{ id: 1, username: 'Chat 1' }, { id: 2, username: 'Chat 2' }];
             onChatListLoad(chats);
-        }, [onChatListLoad]);
+            if (onChatListLoaded) {
+                onChatListLoaded();
+            }
+        }, [onChatListLoad, onChatListLoaded]);
 
         return (
             <div>
@@ -51,7 +54,7 @@ vi.mock('../../src/user-space/chat/ChatListComponent', () => {
 vi.mock('../../src/user-space/chat/ChatComponent', () => ({
     default: ({ chat, onBack }) => (
         <div>
-            ChatComponent: {chat?.name}
+            ChatComponent: {chat?.username}
             <button onClick={onBack}>Back</button>
         </div>
     )

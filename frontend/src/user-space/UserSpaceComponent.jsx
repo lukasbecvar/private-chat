@@ -21,19 +21,25 @@ export default function UserSpaceComponent() {
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
     const [userData, setUserData] = useState(null)
-    const [selectedChat, setSelectedChat] = useState(null)
     const [chatLoading, setChatLoading] = useState(false)
+    const [selectedChat, setSelectedChat] = useState(null)
+    const [isChatListLoading, setChatListLoading] = useState(true)
 
     // handle chat selection
-    const handleSelectChat = (chat) => {
+    const handleSelectChat = useCallback((chat) => {
         setChatLoading(true)
         setSelectedChat(chat)
-    }
+    }, [])
 
     // handle chat loaded
-    const onChatLoaded = () => {
+    const onChatLoaded = useCallback(() => {
         setChatLoading(false)
-    }
+    }, [])
+
+    // handle chat list loaded
+    const onChatListLoaded = useCallback(() => {
+        setChatListLoading(false)
+    }, [])
 
     // fetch user data
     useEffect(() => {
@@ -88,17 +94,23 @@ export default function UserSpaceComponent() {
             {/* chat layout */}
             <div className="flex flex-grow overflow-hidden">
                 <div className={`w-full md:w-1/4 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`} data-testid="chat-list">
-                    <ChatListComponent onSelectChat={handleSelectChat} currentUser={userData} onChatListLoad={handleChatListLoad} selectedChat={selectedChat}/>
+                    <ChatListComponent onSelectChat={handleSelectChat} currentUser={userData} onChatListLoad={handleChatListLoad} selectedChat={selectedChat} onChatListLoaded={onChatListLoaded}/>
                 </div>
-                <div className={`w-full md:w-2/2 ${selectedChat ? 'flex' : 'hidden'} md:flex flex-col`} data-testid="chat-component">
-                    {chatLoading && <Loading />}
-                    <div style={{ display: chatLoading ? 'none' : 'block', height: '100%' }}>
-                        <ChatComponent
-                            chat={selectedChat}
-                            onBack={() => setSelectedChat(null)}
-                            onChatLoaded={onChatLoaded}
-                        />
-                    </div>
+                <div className={`w-full md:w-3/4 ${selectedChat || isChatListLoading ? 'flex' : 'hidden'} md:flex flex-col items-center justify-center`} data-testid="chat-component">
+                    {isChatListLoading ? (
+                        <Loading />
+                    ) : (
+                        <>
+                            {chatLoading && <Loading />}
+                            <div style={{ display: chatLoading ? 'none' : 'block', height: '100%', width: '100%' }}>
+                                <ChatComponent
+                                    chat={selectedChat}
+                                    onBack={() => setSelectedChat(null)}
+                                    onChatLoaded={onChatLoaded}
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

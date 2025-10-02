@@ -8,7 +8,7 @@ import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent'
 // import app components
 import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
-export default function ChatListComponent({ onSelectChat, currentUser, onChatListLoad, selectedChat }) {
+export default function ChatListComponent({ onSelectChat, currentUser, onChatListLoad, selectedChat, onChatListLoaded }) {
     // get config values
     const { getConfigValue } = useConfig()
     const API_URL = getConfigValue('API_URL')
@@ -52,8 +52,11 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
             setError('Error fetching chat list.')
         } finally {
             setLoading(false)
+            if (onChatListLoaded) {
+                onChatListLoaded()
+            }
         }
-    }, [API_URL, API_TOKEN, DEV_MODE, onChatListLoad])
+    }, [API_URL, API_TOKEN, DEV_MODE, onChatListLoad, onChatListLoaded])
 
     // initial call to fetch chat list
     useEffect(() => {
@@ -61,8 +64,16 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     }, [fetchChatList])
 
     // show loading screen
-    if (loading) {
-        return <BouncingLoader />
+    if (loading && !onChatListLoaded) {
+        return <BouncingLoader/>
+    }
+
+    if (loading && onChatListLoaded) {
+        return (
+            <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full flex items-center justify-center">
+                <BouncingLoader/>
+            </div>
+        )
     }
 
     // show error screen
