@@ -14,6 +14,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     const API_URL = getConfigValue('API_URL')
     const DEV_MODE = getConfigValue('DEV_MODE')
     const API_TOKEN = getConfigValue('API_TOKEN')
+    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME')
 
     // states
     const [chats, setChats] = useState([])
@@ -22,7 +23,10 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     const [searchTerm, setSearchTerm] = useState('')
 
     // fetch chat list from API
-    const fetchChatList = useCallback(async () => {
+    const fetchChatList = useCallback(async (isPolling = false) => {
+        if (!isPolling) {
+            setLoading(true)
+        }
         try {
             const res = await fetch(`${API_URL}/api/chat/chat-list`, {
                 credentials: 'include',
@@ -51,17 +55,26 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
             if (DEV_MODE) console.error('Error fetching chat list: ' + err.message)
             setError('Error fetching chat list.')
         } finally {
-            setLoading(false)
-            if (onChatListLoaded) {
-                onChatListLoaded()
+            if (!isPolling) {
+                setLoading(false)
+                if (onChatListLoaded) {
+                    onChatListLoaded()
+                }
             }
         }
     }, [API_URL, API_TOKEN, DEV_MODE, onChatListLoad, onChatListLoaded])
 
-    // initial call to fetch chat list
+    // initial call to fetch chat list & set up polling
     useEffect(() => {
-        fetchChatList()
-    }, [fetchChatList])
+        // initial fetch
+        fetchChatList(false)
+
+        // set up interval for polling
+        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME)
+
+        // clean up interval on component unmount
+        return () => clearInterval(intervalId)
+    }, [fetchChatList, CHAT_POLLING_TIME])
 
     // show loading screen
     if (loading && !onChatListLoaded) {
@@ -119,7 +132,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                                 <span className="font-semibold">
                                     {chat.lastMessage['sender-name'] === currentUser.username ? 'You' : chat.lastMessage['sender-name']}
                                 </span>
-                                : {chat.lastMessage.message}
+                                {chat.lastMessage.message && <span>: {chat.lastMessage.message}</span>}
                             </div>
                         )}
                     </div>

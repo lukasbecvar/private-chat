@@ -36,11 +36,14 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
     // message sending states
     const inputRef = useRef(null)
+    const messagesRef = useRef(messages)
     const chatContainerRef = useRef(null)
+    messagesRef.current = messages // keep ref updated with the latest messages
+
     const scrollHeightBeforePrepend = useRef(null)
+    const userScrolledUp = useRef(false)
     const [newMessage, setNewMessage] = useState('')
     const [isSending, setIsSending] = useState(false)
-    const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
 
     // fetch chat history
     const fetchChatHistory = async (offset, limit = CHAT_LIMIT, prepend = false, showLoadingIndicator = true) => {
@@ -153,8 +156,13 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
                 // check if response was successful
                 if (!countRes.ok || countData.status !== 'success') {
-                    if (DEV_MODE) console.error('Error fetching chat history: ' + countData.message)
-                    setError('Error fetching chat history: ' + countData.message)
+                    if (countRes.status === 404) {
+                        setMessages([])
+                        setMessagesError("This chat is empty \n You can start messaging by sending a message!")
+                    } else {
+                        if (DEV_MODE) console.error('Error fetching chat history: ' + countData.message)
+                        setError('Error fetching chat history: ' + countData.message)
+                    }
                     return
                 }
 
@@ -199,7 +207,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         }
 
         fetchInitialChatHistory()
-    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT, onChatLoaded])
+    }, [chat?.['chat-id'], DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT, onChatLoaded])
 
     // send message to chat
     const handleSendMessage = async (message) => {
@@ -210,6 +218,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
         // set sending state
         setIsSending(true)
+        userScrolledUp.current = false // force scroll to bottom for new message
 
         try {
             // send message to API
@@ -236,7 +245,6 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                     setMessagesError(null)
                 }
                 setNewMessage('')
-                setShouldScrollToBottom(true)
                 setTimeout(() => {
                     if (inputRef.current) {
                         inputRef.current.focus()
@@ -262,7 +270,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         }
         isPollingRef.current = true
 
-        const lastPermanentMessage = [...messages].reverse().find(msg => msg.id)
+        const lastPermanentMessage = [...messagesRef.current].reverse().find(msg => msg.id)
         const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0
 
         try {
@@ -281,6 +289,16 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
             // check if response was successful
             if (res.ok && data.status === 'success' && data.data.length > 0) {
                 if (DEV_MODE) console.log('[ChatComponent] Polling for new messages...')
+
+                // check if user is scrolled to the bottom before adding new messages
+                if (chatContainerRef.current) {
+                    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
+                    const isAtBottom = scrollHeight - scrollTop - clientHeight < 1
+                    if (isAtBottom) {
+                        userScrolledUp.current = false
+                    }
+                }
+
                 const newMessages = data.data.reverse()
                 setMessages(prevMessages => {
                     const existingMessageIds = new Set(prevMessages.map(msg => msg.id))
@@ -302,7 +320,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         } finally {
             isPollingRef.current = false
         }
-    }, [chat, messages, API_URL, API_TOKEN, DEV_MODE])
+    }, [chat, API_URL, API_TOKEN, DEV_MODE])
 
     // start new messages polling mechanism
     useEffect(() => {
@@ -327,12 +345,9 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                 fetchChatHistory(newOffset, CHAT_LIMIT, true)
             }
 
-            // if user is close to bottom (within 100px) -> enable auto-scroll to bottom
-            if (scrollHeight - scrollTop <= clientHeight + 100) {
-                setShouldScrollToBottom(true)
-            } else {
-                setShouldScrollToBottom(false)
-            }
+            // check if user has scrolled up from the bottom
+            const isAtBottom = scrollHeight - scrollTop - clientHeight < 1
+            userScrolledUp.current = !isAtBottom
         }
     }
 
@@ -343,19 +358,19 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                 const newScrollHeight = chatContainerRef.current.scrollHeight
                 chatContainerRef.current.scrollTop = newScrollHeight - scrollHeightBeforePrepend.current
                 scrollHeightBeforePrepend.current = null
-            } else if (shouldScrollToBottom) {
+            } else if (!userScrolledUp.current) {
                 chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
             }
         }
-    }, [messages, shouldScrollToBottom])
+    }, [messages])
 
     // when switching to another chat -> always jump to the latest message at bottom
     useEffect(() => {
         if (chatContainerRef.current && chat) {
+            userScrolledUp.current = false // reset scroll lock
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-            setShouldScrollToBottom(true) // enable auto-scroll for subsequent messages
         }
-    }, [chat])
+    }, [chat?.['chat-id']])
 
     // show error screen
     if (error) return <ErrorScreenComponent errorMessage={error}/>

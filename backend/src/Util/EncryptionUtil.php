@@ -83,8 +83,7 @@ class EncryptionUtil
         if ($decryptedData === false) {
             $this->errorManager->handleError(
                 message: 'Decryption failed',
-                code: Response::HTTP_INTERNAL_SERVER_ERROR,
-                exceptionMessage: 'Decryption error'
+                code: Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
 

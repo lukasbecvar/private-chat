@@ -109,7 +109,7 @@ class ChatManager
                 'last-message' => [
                     'sender-name' => $lastMessage?->getSender()->getUsername(),
                     'message-timestamp' => $lastMessage?->getTimestamp()->format('Y-m-d H:i:s'),
-                    'message' => $this->encryptionUtil->decryptAes($lastMessage?->getMessage() ?? '')
+                    'message' => $lastMessage?->getMessage() !== null ? $this->encryptionUtil->decryptAes($lastMessage->getMessage()) : null
                 ]
             ];
         }
