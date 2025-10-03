@@ -31,7 +31,7 @@ class ErrorController extends AbstractController
      *
      * @return JsonResponse Return error message as json response
      */
-    #[Tag(name: "Error")]
+    #[Tag(name: 'Error')]
     #[Security(name: null)]
     #[Parameter(name: 'code', in: 'query', description: 'Error code', required: true)]
     #[Response(
@@ -82,7 +82,7 @@ class ErrorController extends AbstractController
      *
      * @return JsonResponse Return not found error message as json response
      */
-    #[Tag(name: "Error")]
+    #[Tag(name: 'Error')]
     #[Security(name: null)]
     #[Response(
         response: JsonResponse::HTTP_OK,

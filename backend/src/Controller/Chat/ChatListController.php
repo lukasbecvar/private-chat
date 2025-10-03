@@ -62,8 +62,8 @@ class ChatListController extends AbstractController
         description: 'The user not found message',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "The unauthorized message"
+                'status' => 'error',
+                'message' => 'The unauthorized message'
             ]
         )
     )]

@@ -40,7 +40,7 @@ class UserInfoController extends AbstractController
      *
      * @return JsonResponse The user info response
      */
-    #[Tag(name: "User")]
+    #[Tag(name: 'User')]
     #[Response(
         response: JsonResponse::HTTP_OK,
         description: 'The user data (self)',
@@ -71,8 +71,8 @@ class UserInfoController extends AbstractController
         description: 'The user not found message',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "The unauthorized message"
+                'status' => 'error',
+                'message' => 'The unauthorized message'
             ]
         )
     )]
@@ -81,8 +81,8 @@ class UserInfoController extends AbstractController
         description: 'The user not found message',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "The user not found"
+                'status' => 'error',
+                'message' => 'The user not found'
             ]
         )
     )]

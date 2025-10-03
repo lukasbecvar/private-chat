@@ -41,7 +41,7 @@ class SecurityController extends AbstractController
      *
      * @return JsonResponse The logout status response
      */
-    #[Tag(name: "Auth")]
+    #[Tag(name: 'Auth')]
     #[Response(
         response: JsonResponse::HTTP_OK,
         description: 'The logout successful message',

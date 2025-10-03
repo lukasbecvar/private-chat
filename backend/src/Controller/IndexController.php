@@ -33,7 +33,7 @@ class IndexController extends AbstractController
      *
      * @return JsonResponse Return backend status as json response
      */
-    #[Tag(name: "Index")]
+    #[Tag(name: 'Index')]
     #[Security(name: null)]
     #[Response(
         response: JsonResponse::HTTP_OK,

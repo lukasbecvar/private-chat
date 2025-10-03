@@ -74,9 +74,18 @@ class PrivateChatMessageFixtures extends Fixture implements DependentFixtureInte
                     // generate unique timestamp
                     $timestamp = $faker->dateTimeBetween('-1 year', 'now');
 
+                    // alternate sender and receiver so conversation looks realistic
+                    if ($m % 2 === 0) {
+                        $from = $sender;
+                        $to   = $receiver;
+                    } else {
+                        $from = $receiver;
+                        $to   = $sender;
+                    }
+
                     // set message properties
-                    $message->setSender($sender)
-                            ->setReceiver($receiver)
+                    $message->setSender($from)
+                            ->setReceiver($to)
                             ->setMessage($this->encryptionUtil->encryptAes($faker->sentence()))
                             ->setTimestamp($timestamp)
                             ->setChatId($chatId);

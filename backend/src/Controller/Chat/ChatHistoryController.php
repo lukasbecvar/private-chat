@@ -70,8 +70,8 @@ class ChatHistoryController extends AbstractController
         description: 'The user not found message',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "The unauthorized message"
+                'status' => 'error',
+                'message' => 'The unauthorized message'
             ]
         )
     )]
@@ -80,8 +80,8 @@ class ChatHistoryController extends AbstractController
         description: 'The chat id is missing',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "Missing required parameter: chat_id"
+                'status' => 'error',
+                'message' => 'Missing required parameter: chat_id'
             ]
         )
     )]
@@ -90,8 +90,8 @@ class ChatHistoryController extends AbstractController
         description: 'The chat not found message',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "This chat is empty"
+                'status' => 'error',
+                'message' => 'This chat is empty'
             ]
         )
     )]
@@ -100,8 +100,8 @@ class ChatHistoryController extends AbstractController
         description: 'The user is not allowed to access this chat',
         content: new JsonContent(
             example: [
-                "status" => "error",
-                "message" => "You are not allowed to access this chat"
+                'status' => 'error',
+                'message' => 'You are not allowed to access this chat'
             ]
         )
     )]
