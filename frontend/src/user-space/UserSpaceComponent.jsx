@@ -78,11 +78,11 @@ export default function UserSpaceComponent() {
         const isDesktop = window.innerWidth >= 768;
 
         setSelectedChat(prevSelectedChat => {
-            const newVersionOfSelectedChat = prevSelectedChat ? chats.find(c => c['chat-id'] === prevSelectedChat['chat-id']) : null;
+            const selectedChat = prevSelectedChat ? chats.find(c => c['chat-id'] === prevSelectedChat['chat-id']) : null;
 
             // return it to preserve selection
-            if (newVersionOfSelectedChat) {
-                return newVersionOfSelectedChat;
+            if (selectedChat) {
+                return prevSelectedChat;
             }
 
             // select first chat automatically when chat list loads

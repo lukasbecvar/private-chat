@@ -207,7 +207,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         }
 
         fetchInitialChatHistory()
-    }, [chat?.['chat-id'], DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT, onChatLoaded])
+    }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT, onChatLoaded])
 
     // send message to chat
     const handleSendMessage = async (message) => {
@@ -370,7 +370,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
             userScrolledUp.current = false // reset scroll lock
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
         }
-    }, [chat?.['chat-id']])
+    }, [chat])
 
     // show error screen
     if (error) return <ErrorScreenComponent errorMessage={error}/>
