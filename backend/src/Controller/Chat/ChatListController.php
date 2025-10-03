@@ -4,7 +4,6 @@ namespace App\Controller\Chat;
 
 use OpenApi\Attributes\Tag;
 use App\Manager\ChatManager;
-use App\Util\EncryptionUtil;
 use OpenApi\Attributes\Items;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
@@ -24,12 +23,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ChatListController extends AbstractController
 {
     private ChatManager $chatManager;
-    private EncryptionUtil $encryptionUtil;
 
-    public function __construct(ChatManager $chatManager, EncryptionUtil $encryptionUtil)
+    public function __construct(ChatManager $chatManager)
     {
         $this->chatManager = $chatManager;
-        $this->encryptionUtil = $encryptionUtil;
     }
 
     /**
@@ -88,11 +85,6 @@ class ChatListController extends AbstractController
 
         // get available chats list
         $chatList = $this->chatManager->getAvailableChatsList($currentUserId);
-
-        // decrypt last chat messages
-        foreach ($chatList as &$chat) {
-            $chat['last-message']['message'] = $this->encryptionUtil->decryptAes($chat['last-message']['message']);
-        }
 
         // return chat list
         return $this->json([

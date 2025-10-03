@@ -2,11 +2,9 @@
 
 namespace App\Controller\Chat;
 
-use App\DTO\MessageDTO;
 use OpenApi\Attributes\Tag;
 use App\Manager\ChatManager;
 use App\Manager\UserManager;
-use App\Util\EncryptionUtil;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
 use OpenApi\Attributes\JsonContent;
@@ -15,7 +13,6 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -29,19 +26,11 @@ class SendMessageController extends AbstractController
 {
     private ChatManager $chatManager;
     private UserManager $userManager;
-    private ValidatorInterface $validator;
-    private EncryptionUtil $encryptionUtil;
 
-    public function __construct(
-        ChatManager $chatManager,
-        UserManager $userManager,
-        ValidatorInterface $validator,
-        EncryptionUtil $encryptionUtil
-    ) {
-        $this->validator = $validator;
+    public function __construct(ChatManager $chatManager, UserManager $userManager)
+    {
         $this->userManager = $userManager;
         $this->chatManager = $chatManager;
-        $this->encryptionUtil = $encryptionUtil;
     }
 
     /**
@@ -139,24 +128,6 @@ class SendMessageController extends AbstractController
                 'message' => 'You are not allowed to access this chat because receiver user status is: ' . $receiverStatus
             ], JsonResponse::HTTP_FORBIDDEN);
         }
-
-        // init message dto
-        $messageObj = new MessageDTO();
-        $messageObj->message = $message;
-
-        // validate message dto
-        $errors = $this->validator->validate($messageObj);
-        if (count($errors) > 0) {
-            foreach ($errors as $error) {
-                return $this->json([
-                    'status' => 'error',
-                    'message' => $error->getMessage()
-                ], JsonResponse::HTTP_BAD_REQUEST);
-            }
-        }
-
-        // encrypt message
-        $message = $this->encryptionUtil->encryptAes($message);
 
         // save message to chat
         $this->chatManager->saveMessageToChat($user->getId(), (int)$receiverId, $message);

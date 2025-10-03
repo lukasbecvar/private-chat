@@ -5,11 +5,14 @@ namespace App\Manager;
 use DateTime;
 use Exception;
 use App\Util\ChatUtil;
+use App\DTO\MessageDTO;
+use App\Util\EncryptionUtil;
 use App\Entity\PrivateChatMessage;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PrivateChatMessageRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class ChatManager
@@ -23,6 +26,8 @@ class ChatManager
     private ChatUtil $chatUtil;
     private UserManager $userManager;
     private ErrorManager $errorManager;
+    private ValidatorInterface $validator;
+    private EncryptionUtil $encryptionUtil;
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
     private PrivateChatMessageRepository $privateChatMessageRepository;
@@ -31,14 +36,18 @@ class ChatManager
         ChatUtil $chatUtil,
         UserManager $userManager,
         ErrorManager $errorManager,
+        ValidatorInterface $validator,
+        EncryptionUtil $encryptionUtil,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager,
         PrivateChatMessageRepository $privateChatMessageRepository
     ) {
         $this->chatUtil = $chatUtil;
+        $this->validator = $validator;
         $this->userManager = $userManager;
         $this->errorManager = $errorManager;
         $this->entityManager = $entityManager;
+        $this->encryptionUtil = $encryptionUtil;
         $this->userRepository = $userRepository;
         $this->privateChatMessageRepository = $privateChatMessageRepository;
     }
@@ -100,7 +109,7 @@ class ChatManager
                 'last-message' => [
                     'message-timestamp' => $lastMessage?->getTimestamp()->format('Y-m-d H:i:s'),
                     'sender-name' => $lastMessage?->getSender()->getUsername(),
-                    'message' => $lastMessage?->getMessage()
+                    'message' => $this->encryptionUtil->decryptAes($lastMessage?->getMessage() ?? '')
                 ]
             ];
         }
@@ -172,11 +181,25 @@ class ChatManager
      * @param int|null $offset Optional offset for pagination
      * @param int|null $afterId Optional id of the last message in the previous page
      *
-     * @return \App\Entity\PrivateChatMessage[]
+     * @return array<array<string, mixed>> The formatted chat history
      */
     public function getChatHistory(string $chatId, ?int $limit = null, ?int $offset = null, ?int $afterId = null): array
     {
-        return $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset, $afterId);
+        $formattedMessages = [];
+
+        $messages = $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset, $afterId);
+
+        foreach ($messages as &$message) {
+            $formattedMessages[] = [
+                'id' => $message->getId(),
+                'sender' => $message->getSender()->getId(),
+                'receiver' => $message->getReceiver()->getId(),
+                'timestamp' => $message->getTimestamp()->format('Y-m-d H:i:s'),
+                'message' => $this->encryptionUtil->decryptAes($message->getMessage() ?? '')
+            ];
+        }
+
+        return $formattedMessages;
     }
 
     /**
@@ -202,6 +225,24 @@ class ChatManager
      */
     public function saveMessageToChat(int $senderId, int $receiverId, string $message): void
     {
+        // init message dto
+        $messageDTO = new MessageDTO();
+        $messageDTO->message = $message;
+
+        // validate message dto
+        $errors = $this->validator->validate($messageDTO);
+        if (count($errors) > 0) {
+            foreach ($errors as $error) {
+                $this->errorManager->handleError(
+                    message: $error->getMessage(),
+                    code: JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        // encrypt message
+        $message = $this->encryptionUtil->encryptAes($message);
+
         // generate chat id
         $chatId = $this->chatUtil->generateChatId($senderId, $receiverId);
 

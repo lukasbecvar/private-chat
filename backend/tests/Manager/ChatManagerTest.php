@@ -4,6 +4,7 @@ namespace App\Tests\Manager;
 
 use App\Entity\User;
 use App\Util\ChatUtil;
+use App\Util\EncryptionUtil;
 use App\Manager\ChatManager;
 use App\Manager\UserManager;
 use App\Manager\ErrorManager;
@@ -13,6 +14,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Repository\PrivateChatMessageRepository;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class ChatManagerTest
@@ -27,6 +29,8 @@ class ChatManagerTest extends TestCase
     private ChatUtil & MockObject $chatUtilMock;
     private UserManager & MockObject $userManagerMock;
     private ErrorManager & MockObject $errorManagerMock;
+    private ValidatorInterface & MockObject $validatorMock;
+    private EncryptionUtil & MockObject $encryptionUtilMock;
     private UserRepository & MockObject $userRepositoryMock;
     private EntityManagerInterface & MockObject $entityManagerMock;
     private PrivateChatMessageRepository & MockObject $privateChatMessageRepositoryMock;
@@ -37,15 +41,20 @@ class ChatManagerTest extends TestCase
         $this->chatUtilMock = $this->createMock(ChatUtil::class);
         $this->userManagerMock = $this->createMock(UserManager::class);
         $this->errorManagerMock = $this->createMock(ErrorManager::class);
+        $this->validatorMock = $this->createMock(ValidatorInterface::class);
+        $this->encryptionUtilMock = $this->createMock(EncryptionUtil::class);
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->privateChatMessageRepositoryMock = $this->createMock(PrivateChatMessageRepository::class);
+
 
         // create chat manager instance
         $this->chatManager = new ChatManager(
             $this->chatUtilMock,
             $this->userManagerMock,
             $this->errorManagerMock,
+            $this->validatorMock,
+            $this->encryptionUtilMock,
             $this->userRepositoryMock,
             $this->entityManagerMock,
             $this->privateChatMessageRepositoryMock

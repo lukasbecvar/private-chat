@@ -27,7 +27,7 @@ when@dev:
 
             # include security components
             security:
-                - XApiToken: []     # API Access Token (validate request)
+                - XApiToken: [] # API Access Token (validate request)
 
             # static docs
             paths:
