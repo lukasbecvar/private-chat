@@ -13,6 +13,7 @@ describe('NavbarElement', () => {
         status: 'active'
     }
 
+    // test render user info
     it('renders user info correctly', () => {
         render(<NavbarElement userData={mockUserData}/>)
 
@@ -21,6 +22,7 @@ describe('NavbarElement', () => {
         expect(screen.getByText('(active)')).toBeInTheDocument()
     })
 
+    // test render logout button
     it('renders logout button', () => {
         render(<NavbarElement userData={mockUserData}/>)
 

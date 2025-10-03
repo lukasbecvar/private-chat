@@ -81,15 +81,15 @@ export default function UserSpaceComponent() {
     }, [])
 
     // show loading screen
-    if (loading) return <Loading />
+    if (loading) return <Loading/>
 
     // show error screen
-    if (error) return <ErrorScreenComponent errorMessage={error} />
+    if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     return (
         <div className="h-screen flex flex-col bg-gray-800">
             {/* nav-bar */}
-            <NavbarElement userData={userData} />
+            <NavbarElement userData={userData}/>
 
             {/* chat layout */}
             <div className="flex flex-grow overflow-hidden">
@@ -98,10 +98,10 @@ export default function UserSpaceComponent() {
                 </div>
                 <div className={`w-full md:w-3/4 ${selectedChat || isChatListLoading ? 'flex' : 'hidden'} md:flex flex-col items-center justify-center`} data-testid="chat-component">
                     {isChatListLoading ? (
-                        <Loading />
+                        <Loading/>
                     ) : (
                         <>
-                            {chatLoading && <Loading />}
+                            {chatLoading && <Loading/>}
                             <div style={{ display: chatLoading ? 'none' : 'block', height: '100%', width: '100%' }}>
                                 <ChatComponent
                                     chat={selectedChat}

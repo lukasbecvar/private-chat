@@ -57,17 +57,22 @@ const mockCurrentUser = {
 }
 
 describe('ChatListComponent', () => {
+
+    // reset fetch mock before test
     beforeEach(() => {
         fetch.mockClear()
     })
 
+    // test render loading component
     it('shows loading indicator initially', () => {
         fetch.mockImplementation(() => new Promise(() => {}))
-        render(<ChatListComponent />)
+        render(<ChatListComponent/>)
 
+        // expect loading
         expect(screen.getByTestId('bouncing-loader')).toBeInTheDocument()
     })
 
+    // test render chat list on successful fetch
     it('renders chat list on successful fetch', async () => {
         // mock fetch response
         fetch.mockResolvedValue({
@@ -75,14 +80,17 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
-        render(<ChatListComponent />)
+        // render chat list component
+        render(<ChatListComponent/>)
 
+        // wait for chat list to be displayed
         await waitFor(() => {
             expect(screen.getByText('Alice')).toBeInTheDocument()
             expect(screen.getByText('Bob')).toBeInTheDocument()
         })
     })
 
+    // test render error message if fetch fails
     it('displays an error message if fetch fails', async () => {
         // mock fetch response
         fetch.mockResolvedValue({
@@ -90,13 +98,16 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'error', message: 'Failed to fetch' })
         })
 
-        render(<ChatListComponent />)
+        // render chat list component
+        render(<ChatListComponent/>)
 
+        // wait for error message to be displayed
         await waitFor(() => {
             expect(screen.getByText('Error: Failed to fetch')).toBeInTheDocument()
         })
     })
 
+    // test select chat when clicking on
     it('calls onSelectChat when a chat is clicked', async () => {
         const onSelectChat = vi.fn()
         
@@ -106,15 +117,19 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
-        render(<ChatListComponent onSelectChat={onSelectChat} />)
+        // render chat list component
+        render(<ChatListComponent onSelectChat={onSelectChat}/>)
 
+        // wait for chat to be selected
         await waitFor(() => {
             fireEvent.click(screen.getByText('Alice'))
         })
 
+        // expect onSelectChat to be called
         expect(onSelectChat).toHaveBeenCalledWith(expect.objectContaining({ username: 'Alice' }))
     })
 
+    // test call onChatListLoad when chat list is loaded
     it('calls onChatListLoad when chat list is loaded', async () => {
         const onChatListLoad = vi.fn()
         
@@ -124,8 +139,10 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
-        render(<ChatListComponent onChatListLoad={onChatListLoad} />)
+        // render chat list component
+        render(<ChatListComponent onChatListLoad={onChatListLoad}/>)
 
+        // wait for onChatListLoad to be called
         await waitFor(() => {
             expect(onChatListLoad).toHaveBeenCalledWith(
                 expect.arrayContaining([
@@ -135,6 +152,7 @@ describe('ChatListComponent', () => {
         })
     })
 
+    // test search filter the chat list
     it('filters the chat list based on the search term', async () => {
         // mock fetch response
         fetch.mockResolvedValue({
@@ -142,20 +160,27 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
+        // render chat list component
         render(<ChatListComponent/>)
 
+        // wait for chat list to be displayed
         await waitFor(() => {
             expect(screen.getByText('Alice')).toBeInTheDocument()
             expect(screen.getByText('Bob')).toBeInTheDocument()
         })
 
+        // search Alice in chat list
         const searchInput = screen.getByPlaceholderText('Search username...')
         fireEvent.change(searchInput, { target: { value: 'Alice' } })
 
+        // expect Alice to be displayed
         expect(screen.getByText('Alice')).toBeInTheDocument()
+        
+        // expect Bob to be hidden
         expect(screen.queryByText('Bob')).not.toBeInTheDocument()
     })
 
+    // test last message for current user
     it('displays "You" for last message sent by current user', async () => {
         
         // mock fetch response
@@ -164,14 +189,17 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
-        render(<ChatListComponent currentUser={mockCurrentUser} />)
+        // render chat list component
+        render(<ChatListComponent currentUser={mockCurrentUser}/>)
 
+        // wait for last message to be displayed
         await waitFor(() => {
             const bobChat = screen.getByText('Bob').closest('.flex.items-center')
             expect(bobChat).toHaveTextContent('You: See you soon')
         })
     })
 
+    // test last message prefix for last message not sent by current user
     it('displays sender name for last message not sent by current user', async () => {
         
         // mock fetch response
@@ -180,14 +208,17 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
-        render(<ChatListComponent currentUser={mockCurrentUser} />)
+        // render chat list component
+        render(<ChatListComponent currentUser={mockCurrentUser}/>)
 
+        // wait for last message to be displayed
         await waitFor(() => {
             const aliceChat = screen.getAllByText('Alice')[0].closest('.flex.items-center')
             expect(aliceChat).toHaveTextContent('Alice: Hi there!')
         })
     })
 
+    // test highlight selected chat
     it('highlights the selected chat', async () => {
         // mock fetch response
         fetch.mockResolvedValue({
@@ -197,8 +228,10 @@ describe('ChatListComponent', () => {
 
         const selectedChat = mockChats[0]
 
-        render(<ChatListComponent selectedChat={selectedChat} />)
+        // render chat list component
+        render(<ChatListComponent selectedChat={selectedChat}/>)
 
+        // wait for chat to be highlighted
         await waitFor(() => {
             const bobChat = screen.getByText('Bob').closest('.flex.items-center')
             const aliceChat = screen.getByText('Alice').closest('.flex.items-center')
@@ -208,6 +241,7 @@ describe('ChatListComponent', () => {
         })
     })
 
+    // test admin username with red color
     it('renders admin username with red color', async () => {
         // mock fetch response
         fetch.mockResolvedValue({
@@ -215,8 +249,10 @@ describe('ChatListComponent', () => {
             json: async () => ({ status: 'success', data: mockChats })
         })
 
-        render(<ChatListComponent />)
+        // render chat list component
+        render(<ChatListComponent/>)
 
+        // wait for admin username to be displayed
         await waitFor(() => {
             const aliceUsername = screen.getByText('Alice')
             const bobUsername = screen.getByText('Bob')

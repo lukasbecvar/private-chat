@@ -67,6 +67,7 @@ describe('UserSpaceComponent', () => {
         vi.clearAllMocks()
     })
 
+    // setup fetch mock
     beforeEach(() => {
         vi.resetAllMocks()
         global.fetch = vi.fn().mockResolvedValue({
@@ -75,52 +76,69 @@ describe('UserSpaceComponent', () => {
         })
     })
 
+    // test render loading component
     it('shows loading initially', () => {
         fetch.mockImplementation(() => new Promise(() => {}))
-        render(<UserSpaceComponent />)
+        
+        // render user space component
+        render(<UserSpaceComponent/>)
+        
+        // expect loading
         expect(screen.getByText(/Loading.../i)).toBeInTheDocument()
     })
 
+    // test render error screen component if fetch returns error
     it('renders ErrorScreenComponent if fetch returns error', async () => {
         fetch.mockResolvedValue({
             ok: false,
             json: async () => ({ message: 'Unauthorized' })
         })
 
-        render(<UserSpaceComponent />)
+        // render user space component
+        render(<UserSpaceComponent/>)
+
+        // expect error screen
         expect(await screen.findByText(/Error: Unauthorized/i)).toBeInTheDocument()
     })
 
+    // test render error screen component if fetch throws
     it('renders generic error if fetch throws', async () => {
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
         fetch.mockRejectedValue(new Error('Network fail'))
 
-        render(<UserSpaceComponent />)
+        // render user space component
+        render(<UserSpaceComponent/>)
 
+        // expect error screen
         expect(await screen.findByText(/Error: Error fetching user info/i)).toBeInTheDocument()
         expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error fetching user info'))
         consoleSpy.mockRestore()
     })
 
+    // test select first chat automatically when chat list loads
     it('selects first chat automatically when chat list loads', async () => {
         fetch.mockResolvedValue({
             ok: true,
             json: async () => ({ status: 'success', data: { username: 'JohnDoe' } })
         })
 
-        render(<UserSpaceComponent />)
+        // render user space component
+        render(<UserSpaceComponent/>)
+
+        // expect Chat 1 to be selected
         expect(await screen.findByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
     })
 
+    // test switch to another chat on selection
     it('switches to another chat on selection', async () => {
-        render(<UserSpaceComponent />)
+        render(<UserSpaceComponent/>)
 
         // wait for Chat 1 to appear
         await waitFor(() => {
             expect(screen.getByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
         })
 
-        // Click to select Chat 2
+        // click to select Chat 2
         fireEvent.click(screen.getByText('Select Chat 2'))
 
         // wait for Chat 2
@@ -129,8 +147,9 @@ describe('UserSpaceComponent', () => {
         })
     })
 
+    // test show chat list and hide chat component on back button click (mobile view)
     it('shows chat list and hides chat component on back button click (mobile view)', async () => {
-        const { container } = render(<UserSpaceComponent />)
+        const { container } = render(<UserSpaceComponent/>)
 
         // wait until chat is rendered
         await waitFor(() => {
@@ -140,14 +159,14 @@ describe('UserSpaceComponent', () => {
         const chatListComponentContainer = container.querySelector('[data-testid="chat-list"]')
         const chatComponentContainer = container.querySelector('[data-testid="chat-component"]')
 
-        // Check initial state: list hidden, chat visible
+        // check initial state: list hidden, chat visible
         expect(chatListComponentContainer).toHaveClass('hidden')
         expect(chatComponentContainer).not.toHaveClass('hidden')
 
-        // Click back
+        // click back
         fireEvent.click(await screen.findByText('Back'))
 
-        // After back: list visible, chat hidden
+        // after back: list visible, chat hidden
         await waitFor(() => {
             expect(chatListComponentContainer).not.toHaveClass('hidden')
             expect(chatComponentContainer).toHaveClass('hidden')

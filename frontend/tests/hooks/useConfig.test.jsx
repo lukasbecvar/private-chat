@@ -4,6 +4,7 @@ import { useConfig } from '../../src/hooks/useConfig'
 import { ConfigContext } from '../../src/ConfigProvider'
 
 describe('useConfig hook', () => {
+    // test hook returns values from config
     it('returns values from ConfigContext', () => {
         // mock config values
         const mockConfig = {

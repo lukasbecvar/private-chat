@@ -358,7 +358,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
     }, [chat])
 
     // show error screen
-    if (error) return <ErrorScreenComponent errorMessage={error} />
+    if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     // show info when chat is not selected
     if (!chat) {
@@ -373,7 +373,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
             <div className="flex items-center p-1.5 border-b border-gray-700">
                 <button className="md:hidden mr-4 text-white" onClick={onBack} aria-label="Back">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                 </button>
                 <img
@@ -386,8 +386,8 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
             <div ref={chatContainerRef} className="flex-1 p-3 overflow-y-auto" onScroll={handleScroll}>
                 {/* loading elements */}
-                {isFetchingMoreMessages && <BouncingLoader />}
-                {messagesLoading && <BouncingLoader />}
+                {isFetchingMoreMessages && <BouncingLoader/>}
+                {messagesLoading && <BouncingLoader/>}
 
                 {/* error message */}
                 {messagesError && (

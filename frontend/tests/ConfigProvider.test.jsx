@@ -18,6 +18,7 @@ describe('ConfigProvider', () => {
         vi.clearAllMocks()
     })
 
+    // test render loading component
     it('shows loading initially', () => {
         fetch.mockImplementation(() => new Promise(() => { }))
         render(
@@ -30,6 +31,7 @@ describe('ConfigProvider', () => {
         expect(screen.getByText(/Loading.../i)).toBeInTheDocument()
     })
 
+    // test render children when config is loaded
     it('renders children when config is loaded', async () => {
         const mockConfig = { API_URL: 'http://mock-api', DEV_MODE: true }
         fetch.mockResolvedValue({
@@ -55,6 +57,7 @@ describe('ConfigProvider', () => {
         expect(contextValue.getConfigValue('API_URL')).toBe('http://mock-api')
     })
 
+    // test render error screen component if fetch returns error
     it('renders error screen if fetch fails', async () => {
         fetch.mockRejectedValue(new Error('Network fail'))
         render(
@@ -67,6 +70,7 @@ describe('ConfigProvider', () => {
         expect(await screen.findByText(/Error: Configuration file load error: Network fail/i)).toBeInTheDocument()
     })
 
+    // test render error screen component if fetch returns non-ok response
     it('renders error screen if fetch returns non-ok response', async () => {
         fetch.mockResolvedValue({
             ok: false,

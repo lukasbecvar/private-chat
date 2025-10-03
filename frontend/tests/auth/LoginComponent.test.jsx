@@ -24,13 +24,13 @@ vi.mock('../../src/sub-components/LoadingComponent', () => ({
 describe('LoginComponent', () => {
     let onLoginSuccess
 
+    // reset fetch mock before test
     beforeEach(() => {
         onLoginSuccess = vi.fn()
-        
-        // reset fetch mock before each test
         globalThis.fetch = vi.fn()
     })
 
+    // test render login component
     it('renders expected elements', () => {
         render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
 
@@ -40,6 +40,7 @@ describe('LoginComponent', () => {
         expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
     })
 
+    // test error messages
     it('shows error if username is empty', async () => {
         render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
         fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
@@ -48,6 +49,7 @@ describe('LoginComponent', () => {
         expect(await screen.findByText('Username cannot be empty.')).toBeInTheDocument()
     })
 
+    // test error messages
     it('shows error if password is empty', async () => {
         render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
         fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'user' } })
@@ -57,6 +59,7 @@ describe('LoginComponent', () => {
         expect(await screen.findByText('Password cannot be empty.')).toBeInTheDocument()
     })
 
+    // test error messages
     it('shows error if login fails', async () => {
         // mock failed fetch response
         fetch.mockResolvedValueOnce({
@@ -74,6 +77,7 @@ describe('LoginComponent', () => {
         expect(onLoginSuccess).not.toHaveBeenCalled()
     })
 
+    // test successful login
     it('calls onLoginSuccess if login succeeds', async () => {
         // mock successful fetch response
         fetch.mockResolvedValueOnce({ ok: true })
@@ -88,6 +92,7 @@ describe('LoginComponent', () => {
         })
     })
 
+    // test loading component while waiting for API
     it('shows loading component while waiting for API', async () => {
         let resolveFetch
         fetch.mockImplementationOnce(() => new Promise(res => { resolveFetch = res }))

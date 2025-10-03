@@ -60,7 +60,7 @@ class LogStatusUpdateCommandTest extends TestCase
         // execute command
         $exitCode = $this->commandTester->execute([
             '--id' => 'all',
-            '--status' => 'new',
+            '--status' => 'new'
         ]);
 
         // get command output
@@ -80,7 +80,7 @@ class LogStatusUpdateCommandTest extends TestCase
     {
         // execute command
         $exitCode = $this->commandTester->execute([
-            '--id' => 'invalid',
+            '--id' => 'invalid'
         ]);
 
         // assert response
@@ -99,7 +99,7 @@ class LogStatusUpdateCommandTest extends TestCase
 
         // execute command
         $exitCode = $this->commandTester->execute([
-            '--id' => 'all',
+            '--id' => 'all'
         ]);
 
         // get command output
@@ -123,7 +123,7 @@ class LogStatusUpdateCommandTest extends TestCase
         // execute command
         $exitCode = $this->commandTester->execute([
             '--id' => '123',
-            '--status' => 'processed',
+            '--status' => 'processed'
         ]);
 
         // get command output

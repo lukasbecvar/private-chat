@@ -46,17 +46,23 @@ const mockMessages = [
 ]
 
 describe('ChatComponent', () => {
+
+    // reset fetch mock before test
     beforeEach(() => {
         fetch.mockClear()
     })
 
+    // test render default message when chat is not selected
     it('renders "Select a chat" message when no chat is provided', () => {
-        render(<ChatComponent chat={null} onBack={() => {}} />)
+        render(<ChatComponent chat={null} onBack={() => {}}/>)
 
+        // expect message
         expect(screen.getByText('Select a chat to start messaging')).toBeInTheDocument()
     })
 
+    // test render loading when fetching history
     it('shows loading indicator initially and then displays messages', async () => {
+        // mock history fetch
         fetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({ status: 'success', 'messages-count': mockMessages.length })
@@ -65,29 +71,36 @@ describe('ChatComponent', () => {
             json: async () => ({ status: 'success', data: mockMessages })
         })
 
-        render(<ChatComponent chat={mockChat} onBack={() => {}} />)
+        // render chat component
+        render(<ChatComponent chat={mockChat} onBack={() => {}}/>)
 
+        // expect loading
         expect(screen.getByTestId('bouncing-loader')).toBeInTheDocument()
 
+        // wait for messages to be displayed
         await waitFor(() => {
             expect(screen.getByText('Hello')).toBeInTheDocument()
             expect(screen.getByText('Hi there!')).toBeInTheDocument()
         })
     })
 
+    // test render error message if fetching history fails
     it('displays an error message if fetching history fails', async () => {
         fetch.mockResolvedValue({
             ok: false,
             json: async () => ({ status: 'error', message: 'Failed to fetch' })
         })
 
-        render(<ChatComponent chat={mockChat} onBack={() => {}} />)
+        // render chat component
+        render(<ChatComponent chat={mockChat} onBack={() => {}}/>)
 
+        // wait for error message to be displayed
         await waitFor(() => {
             expect(screen.getByText('Error: Error fetching chat history: Failed to fetch')).toBeInTheDocument()
         })
     })
 
+    // test send message when user types and clicks send
     it('sends a message when user types and clicks send', async () => {
         // mock initial history fetch
         fetch.mockResolvedValueOnce({
@@ -111,7 +124,8 @@ describe('ChatComponent', () => {
             json: async () => ({ status: 'success', data: [sentMessage] })
         })
 
-        render(<ChatComponent chat={mockChat} onBack={() => {}} />)
+        // render chat component
+        render(<ChatComponent chat={mockChat} onBack={() => {}}/>)
 
         const input = screen.getByPlaceholderText('Type a message...')
         const sendButton = screen.getByTestId('send-button')
@@ -122,6 +136,7 @@ describe('ChatComponent', () => {
         // expect send button to be disabled while sending
         expect(sendButton).toBeDisabled()
 
+        // wait for message to be sent
         await waitFor(() => {
             expect(fetch).toHaveBeenCalledWith(
                 'http://mock-api/api/chat/send',
@@ -135,20 +150,24 @@ describe('ChatComponent', () => {
             )
         })
         
+        // wait for message to be displayed
         await waitFor(() => {
             expect(screen.getByText('Test message')).toBeInTheDocument()
         })
 
+        // expect input to be empty
         expect(input.value).toBe('')
     })
 
+    // test handle back button click
     it('handles back button click', () => {
         const onBack = vi.fn()
-        render(<ChatComponent chat={mockChat} onBack={onBack} />)
+        render(<ChatComponent chat={mockChat} onBack={onBack}/>)
         
         const backButton = screen.getByRole('button', { name: /back/i })
         fireEvent.click(backButton)
 
+        // expect onBack to be called
         expect(onBack).toHaveBeenCalledTimes(1)
     })
 })

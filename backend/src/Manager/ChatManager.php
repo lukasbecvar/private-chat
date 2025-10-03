@@ -107,8 +107,8 @@ class ChatManager
                 'username' => $username,
                 'profile-picture' => $profilePic,
                 'last-message' => [
-                    'message-timestamp' => $lastMessage?->getTimestamp()->format('Y-m-d H:i:s'),
                     'sender-name' => $lastMessage?->getSender()->getUsername(),
+                    'message-timestamp' => $lastMessage?->getTimestamp()->format('Y-m-d H:i:s'),
                     'message' => $this->encryptionUtil->decryptAes($lastMessage?->getMessage() ?? '')
                 ]
             ];
@@ -189,6 +189,7 @@ class ChatManager
 
         $messages = $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset, $afterId);
 
+        // format messages
         foreach ($messages as &$message) {
             $formattedMessages[] = [
                 'id' => $message->getId(),

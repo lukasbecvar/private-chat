@@ -13,6 +13,7 @@ describe('TimestampFormatUtil', () => {
         vi.restoreAllMocks()
     })
 
+    // test format today timestamps
     it('formats timestamps from today correctly', () => {
         const fixedNow = new RealDate('2025-09-24T15:30:00')
         class MockDate extends RealDate {
@@ -30,6 +31,7 @@ describe('TimestampFormatUtil', () => {
         expect(result).toBe('08:15')
     })
 
+    // test format yesterday timestamps
     it('formats timestamps from yesterday correctly', () => {
         const fixedNow = new RealDate('2025-09-24T15:30:00')
         class MockDate extends RealDate {
@@ -47,6 +49,7 @@ describe('TimestampFormatUtil', () => {
         expect(result).toBe('Yesterday at 20:45')
     })
 
+    // test format older timestamps
     it('formats older timestamps correctly', () => {
         const fixedNow = new RealDate('2025-09-24T15:30:00')
         class MockDate extends RealDate {

@@ -135,7 +135,7 @@ class LogoutControllerTest extends CustomTestCase
         $this->client->request('POST', '/api/auth/logout', [], [], [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_API_TOKEN' => $_ENV['API_TOKEN'],
-            'HTTP_COOKIE' => 'BEARER=' . $bearerCookie->getValue(),
+            'HTTP_COOKIE' => 'BEARER=' . $bearerCookie->getValue()
         ]);
 
         /** @var array<mixed> $responseData */

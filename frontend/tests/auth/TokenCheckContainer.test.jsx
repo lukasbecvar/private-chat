@@ -34,10 +34,12 @@ globalThis.fetch = vi.fn()
 
 describe('TokenCheckContainer', () => {
 
+    // reset mocks
     afterEach(() => {
         vi.clearAllMocks()
     })
 
+    // test render loading component
     it('shows loading initially', async () => {
         // simulate fetch never resolves → loading
         fetch.mockImplementation(() => new Promise(() => { }))
@@ -51,6 +53,7 @@ describe('TokenCheckContainer', () => {
         expect(screen.getByText(/Loading.../i)).toBeInTheDocument()
     })
 
+    // test render children if user is authenticated
     it('renders children if authenticated', async () => {
         fetch.mockResolvedValue({
             ok: true
@@ -65,6 +68,7 @@ describe('TokenCheckContainer', () => {
         expect(await screen.findByText('Child Content')).toBeInTheDocument()
     })
 
+    // test render login component if unauthenticated
     it('renders LoginComponent if unauthenticated', async () => {
         fetch.mockResolvedValue({
             ok: false,
@@ -81,6 +85,7 @@ describe('TokenCheckContainer', () => {
         expect(await screen.findByText(/Sign in to your account/i)).toBeInTheDocument()
     })
 
+    // test render error screen if server returns error message
     it('renders ErrorScreenComponent if server returns error message', async () => {
         fetch.mockResolvedValue({
             ok: false,
@@ -97,6 +102,7 @@ describe('TokenCheckContainer', () => {
         expect(await screen.findByText(/Server failed/i)).toBeInTheDocument()
     })
 
+    // test render error screen if fetch throws
     it('renders generic error if fetch throws', async () => {
         fetch.mockRejectedValue(new Error('Network fail'))
         render(

@@ -22,11 +22,14 @@ vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
 }))
 
 describe('LogoutComponent', () => {
+    
+    // reset mocks
     beforeEach(() => {
         globalThis.fetch = vi.fn()
         vi.restoreAllMocks()
     })
 
+    // test render logout component
     it('renders logout button', () => {
         render(<LogoutComponent/>)
 
@@ -34,6 +37,7 @@ describe('LogoutComponent', () => {
         expect(screen.getByTestId('logout-button')).toBeInTheDocument()
     })
 
+    // test disable logout button
     it('disable logout button while loading', () => {
         // mock fetch to never resolve
         global.fetch = vi.fn(() => new Promise(() => {}))
@@ -45,6 +49,7 @@ describe('LogoutComponent', () => {
         expect(screen.getByTestId('logout-button')).toBeDisabled()
     })
 
+    // test logout on click
     it('calls reload on successful logout', async () => {
         const originalLocation = window.location
         delete window.location
@@ -60,6 +65,7 @@ describe('LogoutComponent', () => {
         window.location = originalLocation
     })
 
+    // test error screen on logout failure
     it('shows error screen if logout fails with message', async () => {
         fetch.mockResolvedValueOnce({
             ok: false,
@@ -75,6 +81,7 @@ describe('LogoutComponent', () => {
         )
     })
 
+    // test error screen on logout failure
     it('shows generic error screen if logout fails without message', async () => {
         fetch.mockResolvedValueOnce({
             ok: false,

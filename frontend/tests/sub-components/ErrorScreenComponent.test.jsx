@@ -4,17 +4,18 @@ import ErrorScreenComponent from '../../src/sub-components/ErrorScreenComponent'
 
 describe('ErrorScreenComponent', () => {
     let originalLocation
-
+    
+    // mock reload function
     beforeEach(() => {
         originalLocation = window.location
         delete window.location
         window.location = { reload: vi.fn() }
     })
-
     afterEach(() => {
         window.location = originalLocation
     })
 
+    // test render error screen component
     it('renders the error message', () => {
         render(<ErrorScreenComponent errorMessage="Test error"/>)
         
@@ -22,6 +23,7 @@ describe('ErrorScreenComponent', () => {
         expect(screen.getByText('Test error')).toBeInTheDocument()
     })
 
+    // test reload app when clicking reload button
     it('calls reload when clicking reload button', () => {
         render(<ErrorScreenComponent errorMessage="Test error"/>)
 

@@ -2,7 +2,6 @@
 
 # ROADMAP
 ## Version 1.0
-- [ ] Complete version audit and refactoring
 - [ ] Simple readme documentation
 - [ ] Deep testing
 

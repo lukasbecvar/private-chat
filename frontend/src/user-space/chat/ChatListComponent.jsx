@@ -78,7 +78,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
 
     // show error screen
     if (error) {
-        return <ErrorScreenComponent errorMessage={error} />
+        return <ErrorScreenComponent errorMessage={error}/>
     }
 
     // filter chats based on search term

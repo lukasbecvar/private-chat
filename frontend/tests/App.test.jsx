@@ -34,6 +34,7 @@ describe('App', () => {
         vi.clearAllMocks()
     })
 
+    // test render app with all required containers
     it('renders the app with all containers', () => {
         render(<App/>)
 

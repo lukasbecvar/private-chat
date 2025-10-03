@@ -44,7 +44,7 @@ class LoginEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AuthenticationSuccessEvent::class => 'onSecurityAuthenticationSuccess',
+            AuthenticationSuccessEvent::class => 'onSecurityAuthenticationSuccess'
         ];
     }
 
