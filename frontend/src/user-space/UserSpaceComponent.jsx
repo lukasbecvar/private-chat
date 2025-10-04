@@ -111,7 +111,7 @@ export default function UserSpaceComponent() {
                 <div className={`w-full md:w-1/4 ${selectedChat ? 'hidden' : 'flex'} md:flex flex-col`} data-testid="chat-list">
                     <ChatListComponent onSelectChat={handleSelectChat} currentUser={userData} onChatListLoad={handleChatListLoad} selectedChat={selectedChat} onChatListLoaded={onChatListLoaded}/>
                 </div>
-                <div className={`w-full md:w-3/4 ${selectedChat || isChatListLoading ? 'flex' : 'hidden'} md:flex flex-col items-center justify-center`} data-testid="chat-component">
+                <div className={`w-full md:w-3/4 ${selectedChat || isChatListLoading ? 'flex' : 'hidden'} md:flex flex-col items-center justify-center`} data-testid="chat-component-wrapper">
                     {isChatListLoading ? (
                         <Loading/>
                     ) : (

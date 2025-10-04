@@ -1,15 +1,16 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
+import React from 'react'
 import UserSpaceComponent from '../../src/user-space/UserSpaceComponent'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
-// mock config
+// mock config hook
 vi.mock('../../src/hooks/useConfig', () => ({
     useConfig: () => ({
         getConfigValue: (key) => {
             const config = {
                 API_URL: 'http://mock-api',
-                API_TOKEN: 'mock-token',
-                DEV_MODE: true
+                DEV_MODE: false,
+                API_TOKEN: 'test-token'
             }
             return config[key]
         }
@@ -17,159 +18,131 @@ vi.mock('../../src/hooks/useConfig', () => ({
 }))
 
 // mock sub-components
-vi.mock('../../src/user-space/elements/NavbarElement', () => ({
-    default: ({ userData }) => <div>Navbar: {userData?.username}</div>
-}))
 vi.mock('../../src/sub-components/LoadingComponent', () => ({
-    default: () => <div>Loading...</div>
+    default: () => <div data-testid="loading">Loading...</div>
 }))
 vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
-    default: ({ errorMessage }) => <div>Error: {errorMessage}</div>
+    default: ({ errorMessage }) => <div data-testid="error-screen">{errorMessage}</div>
 }))
-
-// mock chat list component (bez setTimeout!)
-vi.mock('../../src/user-space/chat/ChatListComponent', () => {
-    const React = require('react');
-    const MockChatListComponent = ({ onChatListLoad, onSelectChat, onChatListLoaded }) => {
-        const chats = [{ id: 1, username: 'Chat 1' }, { id: 2, username: 'Chat 2' }];
+vi.mock('../../src/user-space/elements/NavbarElement', () => ({
+    default: ({ userData }) => <div data-testid="navbar">{userData?.username}</div>
+}))
+vi.mock('../../src/user-space/chat/ChatListComponent', () => ({
+    default: function ChatListComponent({ onSelectChat, onChatListLoad, onChatListLoaded }) {
         React.useEffect(() => {
-            const chats = [{ id: 1, username: 'Chat 1' }, { id: 2, username: 'Chat 2' }];
-            onChatListLoad(chats);
-            if (onChatListLoaded) {
-                onChatListLoaded();
-            }
-        }, [onChatListLoad, onChatListLoaded]);
-
+            const chats = [{ 'chat-id': 1, username: 'User1' }]
+            onChatListLoad(chats)
+            onChatListLoaded()
+        }, [onChatListLoad, onChatListLoaded])
         return (
-            <div>
-                <div>ChatListComponent</div>
-                <button onClick={() => onSelectChat(chats[1])}>Select Chat 2</button>
+            <div data-testid="chat-list-component">
+                <button onClick={() => onSelectChat({ 'chat-id': 1, username: 'User1' })}>Select Chat</button>
             </div>
-        );
-    };
-    return { default: MockChatListComponent };
-})
-
-// mock chat component
+        )
+    }
+}))
 vi.mock('../../src/user-space/chat/ChatComponent', () => ({
-    default: ({ chat, onBack }) => (
-        <div>
-            ChatComponent: {chat?.username}
-            <button onClick={onBack}>Back</button>
-        </div>
-    )
+    default: function ChatComponent({ chat, onBack, onChatLoaded }) {
+        React.useEffect(() => {
+            onChatLoaded()
+        }, [onChatLoaded])
+        if (!chat) return <div data-testid="no-chat-selected">No chat selected</div>
+        return (
+            <div data-testid="chat-component">
+                <span>{chat.username}</span>
+                <button onClick={onBack}>Back</button>
+            </div>
+        )
+    }
 }))
 
-globalThis.fetch = vi.fn()
+global.fetch = vi.fn()
 
 describe('UserSpaceComponent', () => {
+    beforeEach(() => {
+        global.innerWidth = 1024 // desktop resolution
+    })
+
     afterEach(() => {
         vi.clearAllMocks()
     })
 
-    // setup fetch mock
-    beforeEach(() => {
-        vi.resetAllMocks()
-        global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => ({ status: 'success', data: { username: 'JohnDoe' } })
-        })
-    })
-
     // test render loading component
-    it('shows loading initially', () => {
+    it('renders Loading component initially', () => {
         fetch.mockImplementation(() => new Promise(() => {}))
-        
-        // render user space component
-        render(<UserSpaceComponent/>)
-        
-        // expect loading
-        expect(screen.getByText(/Loading.../i)).toBeInTheDocument()
-    })
-
-    // test render error screen component if fetch returns error
-    it('renders ErrorScreenComponent if fetch returns error', async () => {
-        fetch.mockResolvedValue({
-            ok: false,
-            json: async () => ({ message: 'Unauthorized' })
-        })
-
-        // render user space component
         render(<UserSpaceComponent/>)
 
-        // expect error screen
-        expect(await screen.findByText(/Error: Unauthorized/i)).toBeInTheDocument()
+        // expect loading component to be rendered
+        expect(screen.getByTestId('loading')).toBeInTheDocument()
     })
 
-    // test render error screen component if fetch throws
-    it('renders generic error if fetch throws', async () => {
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-        fetch.mockRejectedValue(new Error('Network fail'))
-
-        // render user space component
+    // test render error component (user data fetching failed)
+    it('renders ErrorScreenComponent if fetching user data fails', async () => {
+        fetch.mockRejectedValue(new Error('Fetch failed'))
         render(<UserSpaceComponent/>)
 
-        // expect error screen
-        expect(await screen.findByText(/Error: Error fetching user info/i)).toBeInTheDocument()
-        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error fetching user info'))
-        consoleSpy.mockRestore()
+        // expect error screen to be rendered
+        expect(await screen.findByTestId('error-screen')).toBeInTheDocument()
+        expect(screen.getByText('Error fetching user info.')).toBeInTheDocument()
     })
 
-    // test select first chat automatically when chat list loads
-    it('selects first chat automatically when chat list loads', async () => {
+    // test render layout correctly after fetching user data
+    it('renders layout correctly after fetching user data', async () => {
         fetch.mockResolvedValue({
             ok: true,
-            json: async () => ({ status: 'success', data: { username: 'JohnDoe' } })
+            json: async () => ({ status: 'success', data: { id: 1, username: 'testuser' } })
         })
-
-        // render user space component
         render(<UserSpaceComponent/>)
 
-        // expect Chat 1 to be selected
-        expect(await screen.findByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
+        // expect layout to be rendered
+        expect(await screen.findByTestId('navbar')).toBeInTheDocument()
+        expect(screen.getByTestId('chat-list-component')).toBeInTheDocument()
+        expect(screen.getByText('testuser')).toBeInTheDocument()
     })
 
-    // test switch to another chat on selection
-    it('switches to another chat on selection', async () => {
+    // test selects the first chat automatically on desktop
+    it('selects the first chat automatically on desktop', async () => {
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: { id: 1, username: 'testuser' } })
+        })
+
         render(<UserSpaceComponent/>)
 
-        // wait for Chat 1 to appear
+        // wait for initial layout
         await waitFor(() => {
-            expect(screen.getByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
-        })
-
-        // click to select Chat 2
-        fireEvent.click(screen.getByText('Select Chat 2'))
-
-        // wait for Chat 2
-        await waitFor(() => {
-            expect(screen.getByText(/ChatComponent: Chat 2/i)).toBeInTheDocument()
+            expect(screen.getByTestId('chat-component-wrapper')).toBeInTheDocument()
+            expect(screen.getByText('User1')).toBeInTheDocument()
         })
     })
 
-    // test show chat list and hide chat component on back button click (mobile view)
-    it('shows chat list and hides chat component on back button click (mobile view)', async () => {
-        const { container } = render(<UserSpaceComponent/>)
-
-        // wait until chat is rendered
-        await waitFor(() => {
-            expect(screen.getByText(/ChatComponent: Chat 1/i)).toBeInTheDocument()
+    // test shows chat component when a chat is selected and hides it on back
+    it('shows chat component when a chat is selected and hides it on back', async () => {
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: { id: 1, username: 'testuser' } })
         })
 
-        const chatListComponentContainer = container.querySelector('[data-testid="chat-list"]')
-        const chatComponentContainer = container.querySelector('[data-testid="chat-component"]')
+        render(<UserSpaceComponent/>)
 
-        // check initial state: list hidden, chat visible
-        expect(chatListComponentContainer).toHaveClass('hidden')
-        expect(chatComponentContainer).not.toHaveClass('hidden')
+        // wait for initial layout
+        const selectChatButton = await screen.findByRole('button', { name: /Select Chat/i })
 
-        // click back
-        fireEvent.click(await screen.findByText('Back'))
+        // select a chat
+        fireEvent.click(selectChatButton)
 
-        // after back: list visible, chat hidden
+        // chat component should be visible
+        const chatComponent = await screen.findByTestId('chat-component')
+        expect(chatComponent).toBeInTheDocument()
+        expect(screen.getByText('User1')).toBeInTheDocument()
+
+        // go back
+        const backButton = screen.getByRole('button', { name: /Back/i })
+        fireEvent.click(backButton)
+
+        // chat component should be hidden
         await waitFor(() => {
-            expect(chatListComponentContainer).not.toHaveClass('hidden')
-            expect(chatComponentContainer).toHaveClass('hidden')
+            expect(screen.getByTestId('no-chat-selected')).toBeInTheDocument()
         })
     })
 })

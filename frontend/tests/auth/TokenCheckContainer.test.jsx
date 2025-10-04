@@ -1,117 +1,122 @@
-import { render, screen } from '@testing-library/react'
-import { vi, afterEach, describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import TokenCheckContainer from '../../src/auth/TokenCheckContainer'
 
-// mock app config
+// mock config hook
 vi.mock('../../src/hooks/useConfig', () => ({
     useConfig: () => ({
         getConfigValue: (key) => {
             const config = {
                 API_URL: 'http://mock-api',
-                API_TOKEN: 'mock-token',
-                DEV_MODE: true
+                DEV_MODE: false,
+                API_TOKEN: 'test-token'
             }
             return config[key]
         }
     })
 }))
 
-// mock app components
+// mock sub-components
 vi.mock('../../src/auth/LoginComponent', () => ({
-    default: () => <div>Sign in to your account</div>
+    default: function LoginComponent({ onLoginSuccess }) {
+        return (
+            <div data-testid="login-component">
+                <button onClick={onLoginSuccess}>Login</button>
+            </div>
+        )
+    }
 }))
-
 vi.mock('../../src/sub-components/LoadingComponent', () => ({
-    default: () => <div>Loading...</div>
+    default: () => <div data-testid="loading">Loading...</div>
 }))
-
 vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
-    default: ({ errorMessage }) => <div>{errorMessage}</div>
+    default: ({ errorMessage }) => <div data-testid="error-screen">{errorMessage}</div>
 }))
 
-// mock fetch
-globalThis.fetch = vi.fn()
+global.fetch = vi.fn()
 
 describe('TokenCheckContainer', () => {
-
-    // reset mocks
     afterEach(() => {
         vi.clearAllMocks()
     })
 
     // test render loading component
-    it('shows loading initially', async () => {
-        // simulate fetch never resolves → loading
-        fetch.mockImplementation(() => new Promise(() => { }))
-        render(
-            <TokenCheckContainer>
-                <div>Child Content</div>
-            </TokenCheckContainer>
-        )
-
-        // expect loading
-        expect(screen.getByText(/Loading.../i)).toBeInTheDocument()
+    it('renders Loading component initially', () => {
+        fetch.mockImplementation(() => new Promise(() => {}))
+        render(<TokenCheckContainer><div>Children</div></TokenCheckContainer>)
+        
+        // expect loading component to be rendered
+        expect(screen.getByTestId('loading')).toBeInTheDocument()
     })
 
-    // test render children if user is authenticated
-    it('renders children if authenticated', async () => {
-        fetch.mockResolvedValue({
-            ok: true
-        })
-        render(
-            <TokenCheckContainer>
-                <div>Child Content</div>
-            </TokenCheckContainer>
-        )
-
-        // expect children
-        expect(await screen.findByText('Child Content')).toBeInTheDocument()
-    })
-
-    // test render login component if unauthenticated
-    it('renders LoginComponent if unauthenticated', async () => {
+    // test render error component (aunthenticated)
+    it('renders LoginComponent when user is unauthenticated (401)', async () => {
         fetch.mockResolvedValue({
             ok: false,
             status: 401,
             json: async () => ({ message: 'Unauthorized' })
         })
-        render(
-            <TokenCheckContainer>
-                <div>Child Content</div>
-            </TokenCheckContainer>
-        )
-
-        // expect login component
-        expect(await screen.findByText(/Sign in to your account/i)).toBeInTheDocument()
+        render(<TokenCheckContainer><div>Children</div></TokenCheckContainer>)
+        
+        // expect login component to be rendered
+        expect(await screen.findByTestId('login-component')).toBeInTheDocument()
     })
 
-    // test render error screen if server returns error message
-    it('renders ErrorScreenComponent if server returns error message', async () => {
+    // test render children (authenticated)
+    it('renders children when user is authenticated', async () => {
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ username: 'testuser' })
+        })
+        render(<TokenCheckContainer><div>Children</div></TokenCheckContainer>)
+        
+        // expect children to be rendered
+        expect(await screen.findByText('Children')).toBeInTheDocument()
+    })
+
+    // test render error component (API error)
+    it('renders ErrorScreenComponent on API error (non-401)', async () => {
         fetch.mockResolvedValue({
             ok: false,
             status: 500,
-            json: async () => ({ message: 'Server failed' })
+            json: async () => ({ message: 'Server Error' })
         })
-        render(
-            <TokenCheckContainer>
-                <div>Child Content</div>
-            </TokenCheckContainer>
-        )
-
-        // expect error screen
-        expect(await screen.findByText(/Server failed/i)).toBeInTheDocument()
+        render(<TokenCheckContainer><div>Children</div></TokenCheckContainer>)
+        
+        // expect error screen to be rendered
+        expect(await screen.findByTestId('error-screen')).toBeInTheDocument()
+        expect(screen.getByText('Server Error')).toBeInTheDocument()
     })
 
-    // test render error screen if fetch throws
-    it('renders generic error if fetch throws', async () => {
-        fetch.mockRejectedValue(new Error('Network fail'))
-        render(
-            <TokenCheckContainer>
-                <div>Child Content</div>
-            </TokenCheckContainer>
-        )
+    // test render error component (network error)
+    it('renders ErrorScreenComponent on network error', async () => {
+        fetch.mockRejectedValue(new Error('Network Error'))
+        render(<TokenCheckContainer><div>Children</div></TokenCheckContainer>)
+        
+        // expect error screen to be rendered
+        expect(await screen.findByTestId('error-screen')).toBeInTheDocument()
+        expect(screen.getByText('Network Error')).toBeInTheDocument()
+    })
 
-        // expect error screen
-        expect(await screen.findByText(/Network fail/i)).toBeInTheDocument()
+    // test transition from unauthenticated to authenticated view on successful login
+    it('transitions from login to authenticated view on successful login', async () => {
+        // initial state: unauthenticated
+        fetch.mockResolvedValueOnce({
+            ok: false,
+            status: 401,
+            json: async () => ({ message: 'Unauthorized' })
+        })
+
+        render(<TokenCheckContainer><div>Children</div></TokenCheckContainer>)
+
+        // wait for login component to appear
+        const loginButton = await screen.findByRole('button', { name: /Login/i })
+        expect(screen.getByTestId('login-component')).toBeInTheDocument()
+
+        // simulate successful login
+        fireEvent.click(loginButton)
+
+        // now the component should show children
+        expect(await screen.findByText('Children')).toBeInTheDocument()
     })
 })
