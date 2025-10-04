@@ -43,7 +43,26 @@ The backend is built on Symfony as REST API.
 ### Development
 For development setup only start script ``docker-start-dev.sh``
 ### Production
-TODO: add production installation instructions
+* bare-metal
+    Setup PHP and compatible web server
+    Setup MySQL
+    Setup Redis
+    Setup JWT keys
+    Create database with command ``php bin/console doctrine:database:create``
+    Migrate database with command ``php bin/console doctrine:migrations:migrate``
+* docker
+    For docker deployment use this example [docker-compose.yml](.github/assets/docker-compose.example.yml) and this command for setup:
+    ```bash
+        docker-compose run php bash -c "
+            php bin/console doctrine:database:create --if-not-exists &&
+            php bin/console doctrine:database:create --if-not-exists --env=test &&
+            php bin/console doctrine:migrations:migrate --no-interaction &&
+            php bin/console doctrine:migrations:migrate --no-interaction --env=test &&
+            php bin/console doctrine:fixtures:load --no-interaction &&
+            php bin/console doctrine:fixtures:load --no-interaction --env=test
+        "
+        docker-compose run php ./bin/console lexik:jwt:generate-keypair
+    ```
 
 # Configuration
 ### Environment variables
