@@ -184,3 +184,4 @@ This software is licensed under the [MIT license](LICENSE).
         - [ ] Ban user
         - [ ] Delete user
         - [ ] New user registration
+- [ ] PWA app support
