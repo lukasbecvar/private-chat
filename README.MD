@@ -139,6 +139,7 @@ Contributions are welcome! Please fork this repository and submit pull requests 
 This software is licensed under the [MIT license](LICENSE). 
 
 # ToDo-List
+- [ ] Complete source code audit and refactoring
 - [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Global chat for all users
 - [ ] hyperlink handling support
