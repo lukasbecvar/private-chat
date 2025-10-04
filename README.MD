@@ -52,7 +52,7 @@ For development setup only start script ``docker-start-dev.sh``
     Create database with command ``php bin/console doctrine:database:create``
     Migrate database with command ``php bin/console doctrine:migrations:migrate``
 * Docker setup:
-    For docker deployment use this example [docker-compose.yml](.github/assets/docker-compose.example.yml) and this command for setup:
+    For docker deployment use this example [docker-compose.yml](.github/assets/stack-example/docker-compose.example.yml) and this command for setup:
     ```bash
         docker-compose run php bash -c "
             php bin/console doctrine:database:create --if-not-exists &&
@@ -64,6 +64,7 @@ For development setup only start script ``docker-start-dev.sh``
         "
         docker-compose run php ./bin/console lexik:jwt:generate-keypair
     ```
+    Configuration files example can be found in [.github/assets/stack-example/configs](.github/assets/stack-example/configs).
 
 # Configuration
 ### Environment variables
