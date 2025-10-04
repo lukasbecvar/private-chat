@@ -43,14 +43,14 @@ The backend is built on Symfony as REST API.
 ### Development
 For development setup only start script ``docker-start-dev.sh``
 ### Production
-* bare-metal
+* Bare-metal
     Setup PHP and compatible web server
     Setup MySQL
     Setup Redis
     Setup JWT keys
     Create database with command ``php bin/console doctrine:database:create``
     Migrate database with command ``php bin/console doctrine:migrations:migrate``
-* docker
+* Docker
     For docker deployment use this example [docker-compose.yml](.github/assets/docker-compose.example.yml) and this command for setup:
     ```bash
         docker-compose run php bash -c "
