@@ -11,7 +11,7 @@ import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
 // import fontawesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faPaperPlane, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 
 export default function ChatComponent({ chat, onBack, onChatLoaded }) {
     // get config
@@ -154,6 +154,13 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                 // get response data
                 const countData = await countRes.json()
 
+                // handle maintenance mode
+                if (countRes.status === 503) {
+                    if (DEV_MODE) console.error('Error fetching chat history: ' + countData.message)
+                    setError(countData.message || 'Failed to fetch chat history')
+                    return
+                }
+
                 // check if response was successful
                 if (!countRes.ok || countData.status !== 'success') {
                     if (countRes.status === 404) {
@@ -181,6 +188,13 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
                 // get response data
                 const messagesData = await messagesRes.json()
+
+                // handle maintenance mode
+                if (messagesRes.status === 503) {
+                    if (DEV_MODE) console.error('Error fetching chat history: ' + messagesData.message)
+                    setError(messagesData.message || 'Failed to fetch chat history.')
+                    return
+                }
 
                 // check if response was successful
                 if (messagesRes.ok && messagesData.status === 'success') {
@@ -252,9 +266,31 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                 }, 0)
             } else {
                 if (DEV_MODE) console.error('Error sending message: ' + data.message)
+                
+                // add failed message to chat history
+                const temporaryId = Date.now()
+                const failedMessage = {
+                    id: temporaryId,
+                    message: trimmedMessage,
+                    sender: null,
+                    timestamp: new Date().toISOString(),
+                    error: data.message || 'Failed to send message.'
+                }
+                setMessages(prevMessages => [...prevMessages, failedMessage])
             }
         } catch (error) {
             if (DEV_MODE) console.error('Error sending message: ' + error.message)
+            
+            // add failed message to chat history
+            const temporaryId = Date.now()
+            const failedMessage = {
+                id: temporaryId,
+                message: trimmedMessage,
+                sender: null,
+                timestamp: new Date().toISOString(),
+                error: error.message || 'Failed to send message.'
+            }
+            setMessages(prevMessages => [...prevMessages, failedMessage])
         } finally {
             setIsSending(false)
         }
@@ -268,7 +304,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
         }
         isPollingRef.current = true
 
-        const lastPermanentMessage = [...messagesRef.current].reverse().find(msg => msg.id)
+        const lastPermanentMessage = [...messagesRef.current].reverse().find(msg => msg.id && !msg.error)
         const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0
 
         try {
@@ -283,6 +319,13 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
 
             // get response data
             const data = await res.json()
+
+            // handle maintenance mode
+            if (res.status === 503) {
+                if (DEV_MODE) console.error('Error polling for new messages: ' + data.message)
+                setError(data.message || 'Failed to fetch chat history')
+                return
+            }
 
             // check if response was successful
             if (res.ok && data.status === 'success' && data.data.length > 0) {
@@ -414,7 +457,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                     const nextMessage = messages[index + 1]
                     const showImage = !nextMessage || nextMessage.sender !== message.sender
 
-                    const isCurrentUser = message.sender !== chat['user-id']
+                    const isCurrentUser = message.sender === null || message.sender !== chat['user-id']
                     const profilePicture = chat['profile-picture']
 
                     const previousMessage = messages[index - 1]
@@ -435,8 +478,18 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                                         src={profilePicture === 'nonset-default' ? defaultProfileImage : profilePicture}
                                     />
                                 )}
-                                <div className={`p-3 rounded-lg max-w-xs md:max-w-xl break-words whitespace-pre-wrap ${isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
-                                    {message.message}
+                                <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
+                                    <div className="inline-block max-w-xs md:max-w-xl">
+                                        <div className={`p-3 break-words whitespace-pre-wrap ${isCurrentUser ? (message.error ? 'bg-blue-800' : 'bg-blue-700') : (message.error ? 'bg-gray-800' : 'bg-gray-700')} ${isCurrentUser ? 'text-white' : 'text-gray-300'} ${message.error ? 'rounded-t-lg' : 'rounded-lg'}`}>
+                                            {message.message}
+                                        </div>
+                                        {message.error && (
+                                            <div className={`p-3 break-words whitespace-pre-wrap bg-red-800 text-red-200 rounded-b-lg text-xs flex items-center`}>
+                                                <FontAwesomeIcon icon={faExclamationTriangle} className="mr-2" />
+                                                {message.error}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

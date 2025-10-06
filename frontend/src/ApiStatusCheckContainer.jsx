@@ -55,7 +55,7 @@ export default function ApiStatusCheckContainer({ children }) {
     if (loading) return <Loading/>
     
     // show error screen
-    if (errorMessage) return <ErrorScreenComponent errorMessage={errorMessage}/>
+    if (errorMessage) return <ErrorScreenComponent errorMessage={errorMessage} noNavbarOffset={true}/>
 
     return <>{children}</>
 }

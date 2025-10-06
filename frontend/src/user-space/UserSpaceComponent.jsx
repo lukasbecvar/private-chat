@@ -3,12 +3,12 @@ import { useConfig } from '../hooks/useConfig'
 
 // import sub-components
 import Loading from '../sub-components/LoadingComponent'
+import ChatListComponent from './chat/ChatListComponent'
 import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
 
 // import app components
 import ChatComponent from './chat/ChatComponent'
 import NavbarElement from './elements/NavbarElement'
-import ChatListComponent from './chat/ChatListComponent'
 
 export default function UserSpaceComponent() {
     // get config values

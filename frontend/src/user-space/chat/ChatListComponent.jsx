@@ -38,7 +38,13 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
 
             const data = await res.json()
 
+            // return if server is unavailable
+            if (res.status === 503) {
+                return
+            }
+
             if (res.ok && data.status === 'success') {
+                setError(null)
                 const transformedChats = data.data.map(chat => ({
                     ...chat,
                     lastMessage: chat['last-message']
@@ -70,7 +76,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
         fetchChatList(false)
 
         // set up interval for polling
-        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME)
+        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME * 10)
 
         // clean up interval on component unmount
         return () => clearInterval(intervalId)
@@ -90,9 +96,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     }
 
     // show error screen
-    if (error) {
-        return <ErrorScreenComponent errorMessage={error}/>
-    }
+    if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     // filter chats based on search term
     const filteredChats = chats.filter(chat =>
@@ -101,7 +105,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
 
     // render chat list
     return (
-        <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full">
+        <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full" id="chat-list">
             {/* search bar */}
             <div className="p-0.5 border-b border-gray-700">
                 <input
