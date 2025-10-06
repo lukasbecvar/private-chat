@@ -140,6 +140,7 @@ This software is licensed under the [MIT license](LICENSE).
 
 # ToDo-List
 - [ ] Complete source code audit and refactoring
+    - [ ] Split chat component into smaller components (message input, message list)
 - [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Global chat for all users
 - [ ] hyperlink handling support
