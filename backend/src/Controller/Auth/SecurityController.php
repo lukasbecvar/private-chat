@@ -3,6 +3,7 @@
 namespace App\Controller\Auth;
 
 use Exception;
+use App\Util\CookieUtil;
 use OpenApi\Attributes\Tag;
 use App\Manager\AuthManager;
 use App\Manager\ErrorManager;
@@ -24,11 +25,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class SecurityController extends AbstractController
 {
+    private CookieUtil $cookieUtil;
     private AuthManager $authManager;
     private ErrorManager $errorManager;
 
-    public function __construct(AuthManager $authManager, ErrorManager $errorManager)
+    public function __construct(CookieUtil $cookieUtil, AuthManager $authManager, ErrorManager $errorManager)
     {
+        $this->cookieUtil = $cookieUtil;
         $this->authManager = $authManager;
         $this->errorManager = $errorManager;
     }
@@ -81,6 +84,9 @@ class SecurityController extends AbstractController
         try {
             // invalidate token auth token
             $this->authManager->logout($authToken, $security);
+
+            // unset auth token cookie
+            $this->cookieUtil->unset('BEARER');
 
             // return success response
             return $this->json([

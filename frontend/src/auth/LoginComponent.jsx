@@ -73,7 +73,7 @@ export default function LoginComponent({ onLoginSuccess }) {
     if (loading) return <Loading/>
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen auth-component" onKeyDown={handleKeyDown}>
+        <div className="flex flex-col items-center justify-center h-screen auth-component p-2" onKeyDown={handleKeyDown}>
             <div className="w-full max-w-md">
                 <div className="bg-white/10 backdrop-blur-lg shadow-lg rounded-lg p-8 space-y-6 border border-gray-600 flex flex-col items-center">
                     <h2 className="text-center text-3xl font-extrabold text-white">

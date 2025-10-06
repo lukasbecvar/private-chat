@@ -55,7 +55,7 @@ export default function TokenCheckContainer({ children }) {
                 }
             } catch (err) {
                 if (DEV_MODE) console.error('Error to verify user status: ' + err.message)
-                setMessage(err.message)
+                setMessage('User status verification error: ' + err.message)
                 setStatus('error')
             }
         }

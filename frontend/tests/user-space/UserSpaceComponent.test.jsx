@@ -145,4 +145,39 @@ describe('UserSpaceComponent', () => {
             expect(screen.getByTestId('no-chat-selected')).toBeInTheDocument()
         })
     })
+
+    // test responsive behavior on mobile
+    it('hides chat list and shows chat component on mobile when a chat is selected', async () => {
+        global.innerWidth = 500 // mobile resolution
+
+        fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ status: 'success', data: { id: 1, username: 'testuser' } })
+        })
+
+        render(<UserSpaceComponent/>)
+
+        // wait for the initial loading to complete
+        await waitFor(() => {
+            expect(screen.getByTestId('chat-list-component')).toBeInTheDocument()
+        })
+
+        const chatList = screen.getByTestId('chat-list')
+        const chatComponentWrapper = screen.getByTestId('chat-component-wrapper')
+
+        // after load, on mobile, list is visible and chat component is hidden
+        expect(chatList).not.toHaveClass('hidden')
+        expect(chatComponentWrapper).toHaveClass('hidden')
+
+        // select a chat
+        const selectChatButton = screen.getByRole('button', { name: /Select Chat/i })
+        fireEvent.click(selectChatButton)
+
+        // after selection, chat list is hidden and chat component is visible
+        await waitFor(() => {
+            expect(chatList).toHaveClass('hidden')
+            expect(chatComponentWrapper).not.toHaveClass('hidden')
+            expect(screen.getByTestId('chat-component')).toBeInTheDocument()
+        })
+    })
 })

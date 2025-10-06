@@ -252,11 +252,9 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
                 }, 0)
             } else {
                 if (DEV_MODE) console.error('Error sending message: ' + data.message)
-                setError(data.message)
             }
         } catch (error) {
             if (DEV_MODE) console.error('Error sending message: ' + error.message)
-            setError('Error sending message: ' + error.message)
         } finally {
             setIsSending(false)
         }

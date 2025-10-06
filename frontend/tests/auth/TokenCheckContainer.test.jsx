@@ -95,7 +95,7 @@ describe('TokenCheckContainer', () => {
         
         // expect error screen to be rendered
         expect(await screen.findByTestId('error-screen')).toBeInTheDocument()
-        expect(screen.getByText('Network Error')).toBeInTheDocument()
+        expect(screen.getByText('User status verification error: Network Error')).toBeInTheDocument()
     })
 
     // test transition from unauthenticated to authenticated view on successful login

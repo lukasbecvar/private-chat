@@ -92,6 +92,21 @@ describe('LoginComponent', () => {
         })
     })
 
+    // test network error
+    it('shows network error if fetch fails', async () => {
+        // mock failed fetch response
+        fetch.mockRejectedValueOnce(new Error('Network error'))
+
+        render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
+        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'user' } })
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass' } })
+        fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
+
+        // expect error message
+        expect(await screen.findByText('Error logging in.')).toBeInTheDocument()
+        expect(onLoginSuccess).not.toHaveBeenCalled()
+    })
+
     // test loading component while waiting for API
     it('shows loading component while waiting for API', async () => {
         let resolveFetch

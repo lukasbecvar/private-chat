@@ -159,6 +159,46 @@ describe('ChatComponent', () => {
         expect(input.value).toBe('')
     })
 
+    // test display error if sending message fails
+    it('displays an error indication if sending a message fails', async () => {
+        // mock initial history fetch
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ status: 'success', 'messages-count': 0 })
+        }).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ status: 'success', data: [] })
+        })
+
+        // mock failed send message fetch
+        fetch.mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ status: 'error', message: 'Send failed' })
+        })
+
+        render(<ChatComponent chat={mockChat} onBack={() => {}}/>)
+
+        // wait for component to load
+        await waitFor(() => {
+            expect(screen.queryByTestId('bouncing-loader')).not.toBeInTheDocument()
+        })
+
+        const input = screen.getByPlaceholderText('Type a message...')
+        const sendButton = screen.getByTestId('send-button')
+
+        // send message
+        fireEvent.change(input, { target: { value: 'Failed message' } })
+        fireEvent.click(sendButton)
+
+        // wait for api call to finish
+        await waitFor(() => {
+            expect(sendButton).not.toBeDisabled()
+        })
+
+        // expect input to still contain the failed message
+        expect(input.value).toBe('Failed message')
+    })
+
     // test handle back button click
     it('handles back button click', () => {
         const onBack = vi.fn()
