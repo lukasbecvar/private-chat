@@ -7,7 +7,7 @@ then
 fi
 
 # generate jwk key
-if [ ! -d 'config/jwt/' ]
+if [ ! -d 'token-keypair/' ]
 then
     docker-compose run php ./bin/console lexik:jwt:generate-keypair
 fi

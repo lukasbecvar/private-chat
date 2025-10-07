@@ -98,8 +98,8 @@ The environment variables are loaded from .env file. You can create .env file in
 | REDIS_USER | Redis user | default |
 | REDIS_PASSWORD | Redis password | redis_test_password |
 | JWT_TOKEN_TTL | JWT token ttl | 2629536 |
-| JWT_SECRET_KEY | JWT secret key | %kernel.project_dir%/config/jwt/private.pem |
-| JWT_PUBLIC_KEY | JWT public key | %kernel.project_dir%/config/jwt/public.pem |
+| JWT_PUBLIC_KEY | JWT public key | %kernel.project_dir%/token-keypair/public.pem |
+| JWT_SECRET_KEY | JWT secret key | %kernel.project_dir%/token-keypair/private.pem |
 | JWT_PASSPHRASE | JWT passphrase | f82fdd5f4644df4ba8fe9d600c5026abc7d7e97cb4413607073d9fc03aa85ba4 |
 ### Frontend configuration
 | Variable | Description | Example value |

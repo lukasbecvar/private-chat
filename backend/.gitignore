@@ -2,7 +2,7 @@
 .env.prod
 
 # jwt key
-config/jwt
+token-keypair/
 
 # UI assets
 public/bundles/
