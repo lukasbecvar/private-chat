@@ -76,7 +76,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
         fetchChatList(false)
 
         // set up interval for polling
-        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME * 10)
+        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME)
 
         // clean up interval on component unmount
         return () => clearInterval(intervalId)

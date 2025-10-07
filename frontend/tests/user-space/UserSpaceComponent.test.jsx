@@ -159,7 +159,7 @@ describe('UserSpaceComponent', () => {
 
         // wait for the initial loading to complete
         await waitFor(() => {
-            expect(screen.getByTestId('chat-list-component')).toBeInTheDocument()
+            expect(screen.getByTestId('no-chat-selected')).toBeInTheDocument()
         })
 
         const chatList = screen.getByTestId('chat-list')
