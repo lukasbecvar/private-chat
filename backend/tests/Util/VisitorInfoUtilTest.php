@@ -40,9 +40,9 @@ class VisitorInfoUtilTest extends TestCase
      */
     public function testGetIpAddress(): void
     {
+        $_SERVER['REMOTE_ADDR'] = '192.168.1.3';
         $_SERVER['HTTP_CLIENT_IP'] = '192.168.1.1';
         $_SERVER['HTTP_X_FORWARDED_FOR'] = '192.168.1.2';
-        $_SERVER['REMOTE_ADDR'] = '192.168.1.3';
 
         // test test ip from HTTP
         $ip = $this->visitorInfoUtil->getIP();

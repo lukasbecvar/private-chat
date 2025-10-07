@@ -90,6 +90,7 @@ class SendMessageController extends AbstractController
         /** @var \App\Entity\User|null $user */
         $user = $security->getUser();
 
+        // check if logged user exists
         if (!$user?->getId()) {
             return $this->json([
                 'status' => 'error',

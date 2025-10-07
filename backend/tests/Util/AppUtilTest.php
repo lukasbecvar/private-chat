@@ -183,7 +183,13 @@ class AppUtilTest extends TestCase
      */
     public function testGetEncryptionPassword(): void
     {
+        // simulate env variable
         $_ENV['APP_SECRET'] = 'test-password';
-        $this->assertSame('test-password', $this->appUtil->getEncryptionPassword());
+
+        // call tested method
+        $result = $this->appUtil->getEncryptionPassword();
+
+        // assert result
+        $this->assertSame('test-password', $result);
     }
 }

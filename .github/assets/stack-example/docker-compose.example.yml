@@ -11,13 +11,13 @@ services:
         image: mysql:8.0.43
         container_name: private_chat_mysql
         restart: always
+        mem_limit: 1g
         environment:
             - MYSQL_ROOT_PASSWORD=root
         volumes:
             - ./configs/mysql/mysqld.conf:/etc/mysql/mysql.conf.d/mysqld.cnf
             - ./data/mysql/data:/var/lib/mysql
             - ./data/mysql/logs:/var/log
-        mem_limit: 1g
         ports:
             - "3306:3306"
         networks:
@@ -29,19 +29,20 @@ services:
         container_name: private_chat_redis
         restart: always
         mem_limit: 1g
-        ports:
-            - "6379:6379"
-        command: ["redis-server", "--requirepass", "redis_test_password"]
         volumes:
             - ./data/redis:/data
+        ports:
+            - "6379:6379"
         networks:
             - main
+        command: ["redis-server", "--requirepass", "redis_test_password"]
 
     # backend server
     php:
         image: ghcr.io/lukasbecvar/private-chat-backend:latest
         container_name: private_chat_backend
         restart: always
+        mem_limit: 1g
         depends_on:
             - mysql
             - redis
@@ -85,24 +86,23 @@ services:
             # data directories
             - ./data/api-server/token-keypair:/var/www/token-keypair
             - ./data/api-server/log:/var/log
-        mem_limit: 1g
         ports:
             - "1337:80"
         networks:
             - main
 
-    # frontend
+    # frontend server
     node:
         image: ghcr.io/lukasbecvar/private-chat-frontend:latest
-        restart: always
         container_name: private_chat_frontend
+        restart: always
+        mem_limit: 1g
         depends_on:
             - mysql
             - redis
             - php
         volumes:
             - ./configs/frontend/config.json:/usr/share/nginx/html/config.json
-        mem_limit: 1g
         ports:
             - "80:80"
         networks:

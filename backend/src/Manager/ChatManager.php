@@ -187,6 +187,7 @@ class ChatManager
     {
         $formattedMessages = [];
 
+        // get messages
         $messages = $this->privateChatMessageRepository->getChatHistoryByChatId($chatId, $limit, $offset, $afterId);
 
         // format messages
