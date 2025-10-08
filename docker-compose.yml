@@ -21,13 +21,13 @@ services:
         image: mysql:8.0.43
         container_name: private_chat_mysql
         restart: always
+        mem_limit: 1g
         environment:
             - MYSQL_ROOT_PASSWORD=root
         volumes:
             - ./backend/.docker/config/mysqld.conf:/etc/mysql/mysql.conf.d/mysqld.cnf
             - ./services-data/mysql-database:/var/lib/mysql
             - ./services-data/log:/var/log
-        mem_limit: 1g
         ports:
             - "3306:3306"
         networks:
@@ -39,13 +39,13 @@ services:
         container_name: private_chat_redis
         restart: always
         mem_limit: 1g
-        ports:
-            - "6379:6379"
-        command: ["redis-server", "--requirepass", "redis_test_password"]
         volumes:
             - ./services-data/redis-data:/data
+        ports:
+            - "6379:6379"
         networks:
             - main
+        command: ["redis-server", "--requirepass", "redis_test_password"]
 
     # backend server container
     php:
@@ -54,6 +54,7 @@ services:
             dockerfile: ./backend/.docker/Dockerfile.dev
         container_name: private_chat_backend
         restart: always
+        mem_limit: 1g
         depends_on:
             - mysql
             - redis
@@ -65,7 +66,6 @@ services:
             - ./backend/.docker/config/php.ini:/usr/local/etc/php/php.ini
             - ./services-data/log:/var/log
             - ./backend/:/var/www
-        mem_limit: 1g
         ports:
             - "1337:80"
         networks:
@@ -77,13 +77,13 @@ services:
         restart: always
         container_name: private_chat_frontend
         working_dir: /app
+        mem_limit: 1g
         depends_on:
             - mysql
             - redis
             - php
         volumes:
             - ./frontend:/app
-        mem_limit: 1g
         ports:
             - "80:80"
         networks:

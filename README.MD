@@ -139,10 +139,6 @@ Contributions are welcome! Please fork this repository and submit pull requests 
 This software is licensed under the [MIT license](LICENSE). 
 
 # ToDo-List
-- [ ] Complete source code audit and refactoring
-    - [X] Split chat component into smaller components (message input, message list)
-    - [X] Complete Backend audit
-    - [ ] Complete Frontend audit
 - [ ] API version check (check if backend version is compatible with frontend version)
 - [ ] Global chat for all users
 - [ ] hyperlink handling support
