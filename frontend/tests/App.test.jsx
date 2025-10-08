@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, vi, afterEach, expect } from 'vitest'
 
-// import main app component
+// import tested component
 import App from '../src/App'
 
 // mock react-dom/client

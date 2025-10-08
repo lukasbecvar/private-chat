@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+
+// import tested component
 import TokenCheckContainer from '../../src/auth/TokenCheckContainer'
 
 // mock config hook
@@ -36,6 +38,7 @@ vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
 global.fetch = vi.fn()
 
 describe('TokenCheckContainer', () => {
+    // reset mocks before test
     afterEach(() => {
         vi.clearAllMocks()
     })
@@ -49,7 +52,7 @@ describe('TokenCheckContainer', () => {
         expect(screen.getByTestId('loading')).toBeInTheDocument()
     })
 
-    // test render error component (aunthenticated)
+    // test render error component (unauthenticated)
     it('renders LoginComponent when user is unauthenticated (401)', async () => {
         fetch.mockResolvedValue({
             ok: false,

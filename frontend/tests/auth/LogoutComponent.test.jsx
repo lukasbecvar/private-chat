@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+// import tested component
 import LogoutComponent from '../../src/auth/LogoutComponent.jsx'
 
 // mock app config
@@ -22,8 +24,7 @@ vi.mock('../../src/sub-components/ErrorScreenComponent', () => ({
 }))
 
 describe('LogoutComponent', () => {
-    
-    // reset mocks
+    // reset mocks before test
     beforeEach(() => {
         globalThis.fetch = vi.fn()
         vi.restoreAllMocks()
@@ -37,7 +38,7 @@ describe('LogoutComponent', () => {
         expect(screen.getByTestId('logout-button')).toBeInTheDocument()
     })
 
-    // test disable logout button
+    // test disable logout button while loading
     it('disable logout button while loading', () => {
         // mock fetch to never resolve
         global.fetch = vi.fn(() => new Promise(() => {}))
@@ -49,7 +50,7 @@ describe('LogoutComponent', () => {
         expect(screen.getByTestId('logout-button')).toBeDisabled()
     })
 
-    // test logout on click
+    // test sucessful logout process
     it('calls reload on successful logout', async () => {
         const originalLocation = window.location
         delete window.location
@@ -67,8 +68,9 @@ describe('LogoutComponent', () => {
 
     // test error screen on logout failure
     it('shows error screen if logout fails with message', async () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
+        // mock logout failure
         fetch.mockResolvedValueOnce({
             ok: false,
             json: async () => ({ message: 'Logout failed due to server error' })
@@ -78,16 +80,14 @@ describe('LogoutComponent', () => {
         fireEvent.click(screen.getByTestId('logout-button'))
 
         // expect error screen
-        expect(await screen.findByTestId('error-screen')).toHaveTextContent(
-            'Logout failed due to server error'
-        )
+        expect(await screen.findByTestId('error-screen')).toHaveTextContent('Logout failed due to server error')
 
-        consoleErrorSpy.mockRestore();
+        consoleErrorSpy.mockRestore()
     })
 
     // test error screen on logout failure
     it('shows generic error screen if logout fails without message', async () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         fetch.mockResolvedValueOnce({
             ok: false,
@@ -100,6 +100,6 @@ describe('LogoutComponent', () => {
         // expect error screen
         expect(await screen.findByTestId('error-screen')).toHaveTextContent('Logout failed')
 
-        consoleErrorSpy.mockRestore();
+        consoleErrorSpy.mockRestore()
     })
 })

@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+// import tested component
 import ErrorScreenComponent from '../../src/sub-components/ErrorScreenComponent'
 
 describe('ErrorScreenComponent', () => {

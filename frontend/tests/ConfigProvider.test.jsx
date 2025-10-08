@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
+
+// import tested component
 import { ConfigProvider, ConfigContext } from '../src/ConfigProvider'
 
 // mock sub-components

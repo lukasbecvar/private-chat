@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+
+// import tested component
 import NavbarElement from '../../../src/user-space/elements/NavbarElement'
 
 // mock logout component
@@ -9,8 +11,8 @@ vi.mock('../../../src/auth/LogoutComponent', () => ({
 
 describe('NavbarElement', () => {
     const mockUserData = {
-        username: 'JohnDoe',
-        status: 'active'
+        status: 'active',
+        username: 'JohnDoe'
     }
 
     // test render user info

@@ -2,9 +2,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 
-// import messages list component
+// import tested component
 import MessagesListComponent from '../../../src/user-space/chat/MessagesListComponent'
 
+// mock config hook
 vi.mock('../../../src/hooks/useConfig', () => ({
     useConfig: () => ({
         getConfigValue: (key) => {
@@ -20,10 +21,12 @@ vi.mock('../../../src/hooks/useConfig', () => ({
     })
 }))
 
+// mock loading component
 vi.mock('../../../src/sub-components/BouncingLoader', () => ({
     default: () => <div data-testid="bouncing-loader">Loading...</div>
 }))
 
+// mock time formating util
 vi.mock('../../../src/utils/TimestampFormatUtil', () => ({
     TimestampFormatUtil: (ts) => new Date(ts).toLocaleString()
 }))
@@ -31,9 +34,9 @@ vi.mock('../../../src/utils/TimestampFormatUtil', () => ({
 global.fetch = vi.fn()
 
 const mockChat = {
+    username: 'JohnDoe',
     'chat-id': 'chat-123',
     'user-id': 'user-456',
-    username: 'JohnDoe',
     'profile-picture': 'nonset-default'
 }
 
@@ -60,6 +63,7 @@ describe('MessagesListComponent', () => {
         const setMessages = vi.fn()
         render(<MessagesListComponent chat={mockChat} messages={[]} setMessages={setMessages}/>)
 
+        // expect loading component to be displayed
         expect(screen.getByTestId('bouncing-loader')).toBeInTheDocument()
 
         // wait for messages to be displayed

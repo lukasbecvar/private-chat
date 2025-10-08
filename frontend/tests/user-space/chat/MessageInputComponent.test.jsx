@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
-// import new message input component
+// import tested component
 import MessageInputComponent from '../../../src/user-space/chat/MessageInputComponent'
 
+// mock config hook
 vi.mock('../../../src/hooks/useConfig', () => ({
     useConfig: () => ({
         getConfigValue: (key) => {
@@ -17,18 +18,18 @@ vi.mock('../../../src/hooks/useConfig', () => ({
     })
 }))
 
-global.fetch = vi.fn();
-
 const mockChat = {
     'user-id': 'user-456'
 }
 
+global.fetch = vi.fn()
+
 describe('MessageInputComponent', () => {
     beforeEach(() => {
-        fetch.mockClear();
-    });
+        fetch.mockClear()
+    })
 
-    // test sends message when user clicks send button
+    // test send message when user types and clicks send
     it('sends a message when user types and clicks send', async () => {
         fetch.mockResolvedValueOnce({
             ok: true,
@@ -84,8 +85,8 @@ describe('MessageInputComponent', () => {
 
         render(<MessageInputComponent chat={mockChat} onMessageSent={onMessageSent} setMessages={setMessages}/>)
 
-        const input = screen.getByPlaceholderText('Type a message...');
-        const sendButton = screen.getByTestId('send-button');
+        const input = screen.getByPlaceholderText('Type a message...')
+        const sendButton = screen.getByTestId('send-button')
 
         fireEvent.change(input, { target: { value: 'Failed message' } })
         fireEvent.click(sendButton)
@@ -96,9 +97,9 @@ describe('MessageInputComponent', () => {
         })
 
         // expect input clear
-        expect(input.value).toBe('');
+        expect(input.value).toBe('')
         
         // expect set error message
-        expect(setMessages).toHaveBeenCalledWith(expect.any(Function));
+        expect(setMessages).toHaveBeenCalledWith(expect.any(Function))
     })
 })

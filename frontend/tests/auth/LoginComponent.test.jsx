@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+// include tested component
 import LoginComponent from '../../src/auth/LoginComponent.jsx'
 
 // mock app config
@@ -30,6 +32,24 @@ describe('LoginComponent', () => {
         globalThis.fetch = vi.fn()
     })
 
+    // test loading component while waiting for API
+    it('shows loading component while waiting for API', async () => {
+        let resolveFetch
+        fetch.mockImplementationOnce(() => new Promise(res => { resolveFetch = res }))
+
+        render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
+        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'user' } })
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass' } })
+        fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
+
+        // expect loading component
+        expect(screen.getByTestId('loading')).toBeInTheDocument()
+
+        // resolve fetch
+        resolveFetch({ ok: true })
+        await waitFor(() => expect(onLoginSuccess).toHaveBeenCalled())
+    })
+
     // test render login component
     it('renders expected elements', () => {
         render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
@@ -40,7 +60,7 @@ describe('LoginComponent', () => {
         expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
     })
 
-    // test error messages
+    // test render login error message
     it('shows error if username is empty', async () => {
         render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
         fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
@@ -49,7 +69,7 @@ describe('LoginComponent', () => {
         expect(await screen.findByText('Username cannot be empty.')).toBeInTheDocument()
     })
 
-    // test error messages
+    // test render login error message
     it('shows error if password is empty', async () => {
         render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
         fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'user' } })
@@ -59,7 +79,7 @@ describe('LoginComponent', () => {
         expect(await screen.findByText('Password cannot be empty.')).toBeInTheDocument()
     })
 
-    // test error messages
+    // test render login error message
     it('shows error if login fails', async () => {
         // mock failed fetch response
         fetch.mockResolvedValueOnce({
@@ -77,7 +97,7 @@ describe('LoginComponent', () => {
         expect(onLoginSuccess).not.toHaveBeenCalled()
     })
 
-    // test successful login
+    // test successful login process
     it('calls onLoginSuccess if login succeeds', async () => {
         // mock successful fetch response
         fetch.mockResolvedValueOnce({ ok: true })
@@ -87,12 +107,13 @@ describe('LoginComponent', () => {
         fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass' } })
         fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
 
+        // expect login success call
         await waitFor(() => {
             expect(onLoginSuccess).toHaveBeenCalled()
         })
     })
 
-    // test network error
+    // test render network error message
     it('shows network error if fetch fails', async () => {
         // mock failed fetch response
         fetch.mockRejectedValueOnce(new Error('Network error'))
@@ -105,23 +126,5 @@ describe('LoginComponent', () => {
         // expect error message
         expect(await screen.findByText('Error logging in.')).toBeInTheDocument()
         expect(onLoginSuccess).not.toHaveBeenCalled()
-    })
-
-    // test loading component while waiting for API
-    it('shows loading component while waiting for API', async () => {
-        let resolveFetch
-        fetch.mockImplementationOnce(() => new Promise(res => { resolveFetch = res }))
-
-        render(<LoginComponent onLoginSuccess={onLoginSuccess}/>)
-        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'user' } })
-        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass' } })
-        fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
-
-        // expect loading component
-        expect(screen.getByTestId('loading')).toBeInTheDocument()
-
-        // resolve fetch
-        resolveFetch({ ok: true })
-        await waitFor(() => expect(onLoginSuccess).toHaveBeenCalled())
     })
 })

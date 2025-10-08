@@ -1,7 +1,9 @@
 import React from 'react'
-import UserSpaceComponent from '../../src/user-space/UserSpaceComponent'
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+
+// import tested component
+import UserSpaceComponent from '../../src/user-space/UserSpaceComponent'
 
 // mock config hook
 vi.mock('../../src/hooks/useConfig', () => ({
@@ -165,7 +167,7 @@ describe('UserSpaceComponent', () => {
         const chatList = screen.getByTestId('chat-list')
         const chatComponentWrapper = screen.getByTestId('chat-component-wrapper')
 
-        // after load, on mobile, list is visible and chat component is hidden
+        // after load on mobile list is visible and chat component is hidden
         expect(chatList).not.toHaveClass('hidden')
         expect(chatComponentWrapper).toHaveClass('hidden')
 
@@ -173,7 +175,7 @@ describe('UserSpaceComponent', () => {
         const selectChatButton = screen.getByRole('button', { name: /Select Chat/i })
         fireEvent.click(selectChatButton)
 
-        // after selection, chat list is hidden and chat component is visible
+        // after selection chat list is hidden and chat component is visible
         await waitFor(() => {
             expect(chatList).toHaveClass('hidden')
             expect(chatComponentWrapper).not.toHaveClass('hidden')

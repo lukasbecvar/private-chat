@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useConfig } from '../../src/hooks/useConfig'
+
+// import tested config hook
 import { ConfigContext } from '../../src/ConfigProvider'
 
 describe('useConfig hook', () => {

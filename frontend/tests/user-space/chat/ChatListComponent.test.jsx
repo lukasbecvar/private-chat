@@ -1,6 +1,8 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+// import tested component
 import ChatListComponent from '../../../src/user-space/chat/ChatListComponent'
 
 // mock config
@@ -57,7 +59,6 @@ const mockCurrentUser = {
 }
 
 describe('ChatListComponent', () => {
-
     // reset fetch mock before test
     beforeEach(() => {
         fetch.mockClear()
@@ -66,9 +67,9 @@ describe('ChatListComponent', () => {
     // test render loading component
     it('shows loading indicator initially', () => {
         fetch.mockImplementation(() => new Promise(() => {}))
-        render(<ChatListComponent onChatListLoaded={() => {}} />)
+        render(<ChatListComponent onChatListLoaded={() => {}}/>)
 
-        // expect loading
+        // expect loading component
         expect(screen.getByTestId('bouncing-loader')).toBeInTheDocument()
     })
 
@@ -182,7 +183,6 @@ describe('ChatListComponent', () => {
 
     // test last message for current user
     it('displays "You" for last message sent by current user', async () => {
-        
         // mock fetch response
         fetch.mockResolvedValue({
             ok: true,
@@ -201,7 +201,6 @@ describe('ChatListComponent', () => {
 
     // test last message prefix for last message not sent by current user
     it('displays sender name for last message not sent by current user', async () => {
-        
         // mock fetch response
         fetch.mockResolvedValue({
             ok: true,

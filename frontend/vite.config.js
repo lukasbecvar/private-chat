@@ -9,8 +9,8 @@ export default defineConfig({
         port: 80
     },
     test: {
-        reporters: 'verbose',
         globals: true,
+        reporters: 'verbose',
         environment: 'jsdom',
         setupFiles: './tests/setupTests.js',
         include: ['tests/**/*.test.jsx']

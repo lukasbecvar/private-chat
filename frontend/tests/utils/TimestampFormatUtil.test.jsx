@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+// import tested util
 import { TimestampFormatUtil } from '../../src/utils/TimestampFormatUtil'
 
 describe('TimestampFormatUtil', () => {
@@ -25,9 +27,10 @@ describe('TimestampFormatUtil', () => {
             }
         }
         globalThis.Date = MockDate
-
         const timestamp = new RealDate('2025-09-24T08:15:00').getTime()
         const result = TimestampFormatUtil(timestamp)
+        
+        // expect result
         expect(result).toBe('08:15')
     })
 
@@ -43,9 +46,10 @@ describe('TimestampFormatUtil', () => {
             }
         }
         globalThis.Date = MockDate
-
         const timestamp = new RealDate('2025-09-23T20:45:00').getTime()
         const result = TimestampFormatUtil(timestamp)
+        
+        // expect result
         expect(result).toBe('Yesterday at 20:45')
     })
 
@@ -61,9 +65,10 @@ describe('TimestampFormatUtil', () => {
             }
         }
         globalThis.Date = MockDate
-
         const timestamp = new RealDate('2025-09-20T10:05:00').getTime()
         const result = TimestampFormatUtil(timestamp)
+        
+        // test result
         expect(result).toBe('20/09/2025 10:05')
     })
 })
