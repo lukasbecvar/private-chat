@@ -17,6 +17,7 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
     // poll new messages on message sent
     const handleMessageSent = () => {
         if (messageListRef.current) {
+            messageListRef.current.resetUserScrolledUp()
             messageListRef.current.pollNewMessages()
         }
     }

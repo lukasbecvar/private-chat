@@ -301,6 +301,9 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
 
     useImperativeHandle(ref, () => ({
         pollNewMessages,
+        resetUserScrolledUp: () => {
+            userScrolledUp.current = false
+        },
     }))
 
     return (
