@@ -66,7 +66,7 @@ describe('ChatListComponent', () => {
     // test render loading component
     it('shows loading indicator initially', () => {
         fetch.mockImplementation(() => new Promise(() => {}))
-        render(<ChatListComponent/>)
+        render(<ChatListComponent onChatListLoaded={() => {}} />)
 
         // expect loading
         expect(screen.getByTestId('bouncing-loader')).toBeInTheDocument()

@@ -75,24 +75,24 @@ export default function UserSpaceComponent() {
 
     // handle chat list load
     const handleChatListLoad = useCallback((chats) => {
-        const isDesktop = window.innerWidth >= 768;
+        const isDesktop = window.innerWidth >= 768
 
         setSelectedChat(prevSelectedChat => {
-            const selectedChat = prevSelectedChat ? chats.find(c => c['chat-id'] === prevSelectedChat['chat-id']) : null;
+            const selectedChat = prevSelectedChat ? chats.find(c => c['chat-id'] === prevSelectedChat['chat-id']) : null
 
             // return it to preserve selection
             if (selectedChat) {
-                return prevSelectedChat;
+                return prevSelectedChat
             }
 
             // select first chat automatically when chat list loads
             if (isDesktop && chats.length > 0) {
-                return chats[0];
+                return chats[0]
             }
 
             // return null (chat not being selected)
-            return null;
-        });
+            return null
+        })
     }, [])
 
     // show loading screen

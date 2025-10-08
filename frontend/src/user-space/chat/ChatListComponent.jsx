@@ -14,7 +14,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
     const API_URL = getConfigValue('API_URL')
     const DEV_MODE = getConfigValue('DEV_MODE')
     const API_TOKEN = getConfigValue('API_TOKEN')
-    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME')
+    const CHAT_POLLING_TIME_MS = getConfigValue('CHAT_POLLING_TIME_MS')
 
     // states
     const [chats, setChats] = useState([])
@@ -24,6 +24,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
 
     // fetch chat list from API
     const fetchChatList = useCallback(async (isPolling = false) => {
+        // enable loading when chat list is fetching
         if (!isPolling) {
             setLoading(true)
         }
@@ -36,6 +37,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                 }
             })
 
+            // get response data
             const data = await res.json()
 
             // return if server is unavailable
@@ -43,6 +45,7 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                 return
             }
 
+            // check if chat list was fetched successfully
             if (res.ok && data.status === 'success') {
                 setError(null)
                 const transformedChats = data.data.map(chat => ({
@@ -54,11 +57,11 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                     onChatListLoad(transformedChats)
                 }
             } else {
-                if (DEV_MODE) console.error('Error fetching chat list: ' + data.message)
+                if (DEV_MODE) console.error(`Error fetching chat list: ${data.message}`)
                 setError(data.message || 'Failed to fetch chat list')
             }
         } catch (err) {
-            if (DEV_MODE) console.error('Error fetching chat list: ' + err.message)
+            if (DEV_MODE) console.error(`Error fetching chat list: ${err.message}`)
             setError('Error fetching chat list.')
         } finally {
             if (!isPolling) {
@@ -76,17 +79,18 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
         fetchChatList(false)
 
         // set up interval for polling
-        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME)
+        const intervalId = setInterval(() => fetchChatList(true), CHAT_POLLING_TIME_MS)
 
         // clean up interval on component unmount
         return () => clearInterval(intervalId)
-    }, [fetchChatList, CHAT_POLLING_TIME])
+    }, [fetchChatList, CHAT_POLLING_TIME_MS])
 
-    // show loading screen
-    if (loading && !onChatListLoaded) {
-        return <BouncingLoader/>
-    }
+    // filter chats based on search term
+    const filteredChats = chats.filter(chat =>
+        chat.username.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
+    // show loading when chat list is fetching
     if (loading && onChatListLoaded) {
         return (
             <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full flex items-center justify-center">
@@ -97,11 +101,6 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
 
     // show error screen
     if (error) return <ErrorScreenComponent errorMessage={error}/>
-
-    // filter chats based on search term
-    const filteredChats = chats.filter(chat =>
-        chat.username.toLowerCase().includes(searchTerm.toLowerCase())
-    )
 
     // render chat list
     return (

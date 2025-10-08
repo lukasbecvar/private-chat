@@ -3,7 +3,7 @@ import { useConfig } from '../hooks/useConfig'
 
 // import app components
 import LoginComponent from './LoginComponent'
-import Loading from '../sub-components/LoadingComponent'
+import LoadingComponent from '../sub-components/LoadingComponent'
 import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
 
 export default function TokenCheckContainer({ children }) {
@@ -35,12 +35,12 @@ export default function TokenCheckContainer({ children }) {
                     return
                 }
 
-                // handle errors
+                // get data from error response
                 let errorData = null
                 try {
                     errorData = await res.json()
                 } catch (e) {
-                    if (DEV_MODE) console.error('Error to get error data from response: ' + e.message)
+                    if (DEV_MODE) console.error(`Error to get error data from response: ${e.message}`)
                     setMessage('An unexpected error occurred on the server.')
                     setStatus('error')
                     return
@@ -52,9 +52,10 @@ export default function TokenCheckContainer({ children }) {
                 } else {
                     setStatus('error')
                     setMessage(errorData.message || 'An unknown error occurred.')
+                    if (DEV_MODE) console.error(`User status verification error: ${errorData.message}`)
                 }
             } catch (err) {
-                if (DEV_MODE) console.error('Error to verify user status: ' + err.message)
+                if (DEV_MODE) console.error(`Error to verify user status: ${err.message}`)
                 setMessage('User status verification error: ' + err.message)
                 setStatus('error')
             }
@@ -65,7 +66,7 @@ export default function TokenCheckContainer({ children }) {
 
 
     // show loading screen
-    if (status === 'checking') return <Loading/>
+    if (status === 'checking') return <LoadingComponent/>
 
     // show auth component
     if (status === 'unauthenticated') {
@@ -81,7 +82,7 @@ export default function TokenCheckContainer({ children }) {
     // show error screen
     if (status === 'error') return <ErrorScreenComponent errorMessage={message}/>
 
-    // show children if user is authenticated
+    // show children component if user is authenticated and all checks passed and verified
     if (status === 'authenticated') return <main>{children}</main>
 
     return null

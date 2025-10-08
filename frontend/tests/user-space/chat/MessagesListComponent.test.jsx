@@ -13,7 +13,7 @@ vi.mock('../../../src/hooks/useConfig', () => ({
                 API_TOKEN: 'mock-token',
                 DEV_MODE: false,
                 CHAT_LIMIT: 20,
-                CHAT_POLLING_TIME: 5000
+                CHAT_POLLING_TIME_MS: 5000
             }
             return config[key]
         }

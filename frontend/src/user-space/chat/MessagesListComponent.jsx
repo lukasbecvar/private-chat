@@ -21,7 +21,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
     const DEV_MODE = getConfigValue('DEV_MODE')
     const API_TOKEN = getConfigValue('API_TOKEN')
     const CHAT_LIMIT = getConfigValue('CHAT_LIMIT')
-    const CHAT_POLLING_TIME = getConfigValue('CHAT_POLLING_TIME')
+    const CHAT_POLLING_TIME_MS = getConfigValue('CHAT_POLLING_TIME_MS')
 
     // states
     const [messagesError, setMessagesError] = useState(null)
@@ -45,6 +45,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                 return
             }
 
+            // enable loading indicator
             setMessagesError(null)
             setMessagesLoading(true)
             setHasMoreMessages(true)
@@ -58,29 +59,34 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     }
                 })
 
+                // get messages count
                 const countData = await countRes.json()
 
+                // check maintenance mode status
                 if (countRes.status === 503) {
-                    if (DEV_MODE) console.error('Error fetching chat history: ' + countData.message)
+                    if (DEV_MODE) console.error(`Error fetching chat history: ${countData.message}`)
                     setMessagesError(countData.message || 'Failed to fetch chat history')
                     return
                 }
 
+                // check if count data response is successful
                 if (!countRes.ok || countData.status !== 'success') {
                     if (countRes.status === 404) {
                         setMessages([])
                         setMessagesError("This chat is empty \n You can start messaging by sending a message!")
                     } else {
-                        if (DEV_MODE) console.error('Error fetching chat history: ' + countData.message)
+                        if (DEV_MODE) console.error(`Error fetching chat history: ${countData.message}`)
                         setMessagesError('Error fetching chat history: ' + countData.message)
                     }
                     return
                 }
 
+                // calculate initial limit and offset
                 const initialLimit = CHAT_LIMIT
                 const totalCount = countData['messages-count']
                 const initialOffset = Math.max(0, totalCount - initialLimit)
 
+                // get messages
                 const messagesRes = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${initialLimit}&offset=${initialOffset}`, {
                     credentials: 'include',
                     headers: {
@@ -89,14 +95,17 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     }
                 })
 
+                // get messages data from response
                 const messagesData = await messagesRes.json()
 
+                // check maintenance mode status
                 if (messagesRes.status === 503) {
-                    if (DEV_MODE) console.error('Error fetching chat history: ' + messagesData.message)
+                    if (DEV_MODE) console.error(`Error fetching chat history: ${messagesData.message}`)
                     setMessagesError(messagesData.message || 'Failed to fetch chat history.')
                     return
                 }
 
+                // check if messages data response is successful
                 if (messagesRes.ok && messagesData.status === 'success') {
                     const messagesToDisplay = messagesData.data?.sort((a, b) => a.id - b.id) || []
                     setMessages(messagesToDisplay)
@@ -106,11 +115,11 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     }
                     if (DEV_MODE) console.log(`[ChatComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${totalCount}`)
                 } else {
-                    if (DEV_MODE) console.error('Error fetching chat history: ' + messagesData.message)
+                    if (DEV_MODE) console.error(`Error fetching chat history: ${messagesData.message}`)
                     setMessagesError('Error fetching chat history: ' + messagesData.message)
                 }
             } catch (err) {
-                if (DEV_MODE) console.error('Error fetching chat history: ' + err.message)
+                if (DEV_MODE) console.error(`Error fetching chat history: ${err.message}`)
                 setMessagesError('Error fetching chat history: ' + err.message)
             } finally {
                 setMessagesLoading(false)
@@ -123,7 +132,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
         fetchInitialChatHistory()
     }, [chat, DEV_MODE, API_TOKEN, API_URL, CHAT_LIMIT, onChatLoaded, setMessages])
 
-    // fetch chat history
+    // fetch chat history (scroll to top for load old messages)
     const fetchChatHistory = async (offset, limit = CHAT_LIMIT, prepend = false, showLoadingIndicator = true) => {
         if (!chat || isFetchingMoreMessages) return
 
@@ -141,8 +150,10 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
         }
 
         try {
+            // log info to console
             if (DEV_MODE) console.log(`Fetching chat history for chat_id: ${chat['chat-id']}, limit: ${limit}, offset: ${offset}`)
 
+            // fetch chat history
             let url = `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${limit}&offset=${offset}`
             const res = await fetch(url, {
                 credentials: 'include',
@@ -152,8 +163,10 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                 }
             })
 
+            // get data from response
             const data = await res.json()
 
+            // check if response is successful
             if (res.ok && data.status === 'success') {
                 if (DEV_MODE) {
                     console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`)
@@ -181,12 +194,12 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     setMessagesError("This chat is empty \n You can start messaging by sending a message!")
                 } else {
                     setMessagesError(data.message || 'Failed to fetch chat history')
-                    if (DEV_MODE) console.error('Error fetching chat history: ' + data.message)
+                    if (DEV_MODE) console.error(`Error fetching chat history: ${data.message}`)
                 }
             }
         } catch (err) {
             setMessagesError('Error fetching chat history.')
-            if (DEV_MODE) console.error('Error fetching chat history: ' + err.message)
+            if (DEV_MODE) console.error(`Error fetching chat history: ${err.message}`)
         } finally {
             if (!prepend && showLoadingIndicator) {
                 setMessagesLoading(false)
@@ -202,11 +215,11 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
             return
         }
         isPollingRef.current = true
-
         const lastPermanentMessage = [...messagesRef.current].reverse().find(msg => msg.id && !msg.error)
         const lastMessageId = lastPermanentMessage ? lastPermanentMessage.id : 0
 
         try {
+            // fetch new messages
             const res = await fetch(`${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&after_id=${lastMessageId}`, {
                 credentials: 'include',
                 headers: {
@@ -215,17 +228,21 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                 }
             })
 
+            // get data from response
             const data = await res.json()
 
+            // check maintenance mode status
             if (res.status === 503) {
-                if (DEV_MODE) console.error('Error polling for new messages: ' + data.message)
+                if (DEV_MODE) console.error(`Error polling for new messages: ${data.message}`)
                 setMessagesError(data.message || 'Failed to fetch chat history')
                 return
             }
 
+            // check if response is successful
             if (res.ok && data.status === 'success' && data.data.length > 0) {
                 if (DEV_MODE) console.log('[ChatComponent] Polling for new messages...')
 
+                // check if user has scrolled up
                 if (chatContainerRef.current) {
                     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
                     const isAtBottom = scrollHeight - scrollTop - clientHeight < 1
@@ -234,6 +251,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     }
                 }
 
+                // add new messages to the end of the list
                 const newMessages = data.data.reverse()
                 setMessages(prevMessages => {
                     const existingMessageIds = new Set(prevMessages.map(msg => msg.id))
@@ -250,22 +268,24 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                 })
             }
         } catch (err) {
-            if (DEV_MODE) console.error('Error polling for new messages: ' + err.message)
+            if (DEV_MODE) console.error(`Error polling for new messages: ${err.message}`)
             setMessagesError('Polling for new messages failed: ' + err.message)
         } finally {
             isPollingRef.current = false
         }
     }, [chat, API_URL, API_TOKEN, DEV_MODE, setMessages])
 
+    // poll new messages loop
     useEffect(() => {
         if (!chat) {
             return
         }
 
-        const intervalId = setInterval(pollNewMessages, CHAT_POLLING_TIME)
+        const intervalId = setInterval(pollNewMessages, CHAT_POLLING_TIME_MS)
         return () => clearInterval(intervalId)
-    }, [chat, pollNewMessages, CHAT_POLLING_TIME])
+    }, [chat, pollNewMessages, CHAT_POLLING_TIME_MS])
 
+    // handle scroll event
     const handleScroll = () => {
         if (chatContainerRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
@@ -306,17 +326,20 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
         },
     }))
 
+    // render messages list
     return (
         <div ref={chatContainerRef} className="flex-1 p-3 overflow-y-auto" onScroll={handleScroll}>
             {isFetchingMoreMessages && <BouncingLoader/>}
             {messagesLoading && <BouncingLoader/>}
 
+            {/* render error message */}
             {messagesError && (
                 <div className="text-red-500 text-center whitespace-pre-line mt-10">
                     {messagesError}
                 </div>
             )}
 
+            {/* render messages */}
             {messages && messages.map((message, index) => {
                 const nextMessage = messages[index + 1]
                 const showImage = !nextMessage || nextMessage.sender !== message.sender

@@ -39,8 +39,10 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
                 })
             })
 
+            // get response data
             const data = await res.json()
 
+            // check if message was sent successfully
             if (res.ok && data.status === 'success') {
                 onMessageSent()
                 setNewMessage('')
@@ -50,25 +52,25 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
                     }
                 }, 100)
             } else {
-                if (DEV_MODE) console.error('Error sending message: ' + data.message)
+                if (DEV_MODE) console.error(`Error sending message: ${data.message}`)
                 const temporaryId = Date.now()
                 const failedMessage = {
+                    sender: null,
                     id: temporaryId,
                     message: trimmedMessage,
-                    sender: null,
                     timestamp: new Date().toISOString(),
-                    error: data.message || 'Failed to send message.',
+                    error: data.message || 'Failed to send message.'
                 }
                 setMessages(prevMessages => [...prevMessages, failedMessage])
                 setNewMessage('')
             }
         } catch (error) {
-            if (DEV_MODE) console.error('Error sending message: ' + error.message)
+            if (DEV_MODE) console.error(`Error sending message: ${error.message}`)
             const temporaryId = Date.now()
             const failedMessage = {
+                sender: null,
                 id: temporaryId,
                 message: trimmedMessage,
-                sender: null,
                 timestamp: new Date().toISOString(),
                 error: error.message || 'Failed to send message.'
             }
@@ -79,6 +81,7 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
         }
     }
 
+    // return message input box
     return (
         <div className="p-0.5 bg-gray-800 border-t border-gray-700">
             <div className="relative">

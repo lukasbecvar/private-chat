@@ -67,6 +67,8 @@ describe('LogoutComponent', () => {
 
     // test error screen on logout failure
     it('shows error screen if logout fails with message', async () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
         fetch.mockResolvedValueOnce({
             ok: false,
             json: async () => ({ message: 'Logout failed due to server error' })
@@ -79,10 +81,14 @@ describe('LogoutComponent', () => {
         expect(await screen.findByTestId('error-screen')).toHaveTextContent(
             'Logout failed due to server error'
         )
+
+        consoleErrorSpy.mockRestore();
     })
 
     // test error screen on logout failure
     it('shows generic error screen if logout fails without message', async () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
         fetch.mockResolvedValueOnce({
             ok: false,
             json: async () => ({})
@@ -93,5 +99,7 @@ describe('LogoutComponent', () => {
 
         // expect error screen
         expect(await screen.findByTestId('error-screen')).toHaveTextContent('Logout failed')
+
+        consoleErrorSpy.mockRestore();
     })
 })

@@ -19,6 +19,7 @@ export default function LogoutComponent() {
 
     // user logout process
     const handleLogout = async () => {
+        // default process state
         setLoading(true)
         setError(null)
 
@@ -35,10 +36,14 @@ export default function LogoutComponent() {
             // check if logout was successful
             if (!res.ok) {
                 try {
+                    // get response data
                     const data = await res.json()
+
+                    // handle error
+                    if (DEV_MODE) console.error(`Logout error: ${data.message}`)
                     setError(data.message || 'Logout failed')
                 } catch (e) {
-                    if (DEV_MODE) console.error('Error to get error data from response: ' + e.message)
+                    if (DEV_MODE) console.error(`Error to get error data from response: ${e.message}`)
                     setError('Logout failed.')
                 }
             }

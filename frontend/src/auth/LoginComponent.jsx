@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useConfig } from '../hooks/useConfig'
-import Loading from '../sub-components/LoadingComponent'
+import LoadingComponent from '../sub-components/LoadingComponent'
 
 export default function LoginComponent({ onLoginSuccess }) {
     // get config values
@@ -17,7 +17,7 @@ export default function LoginComponent({ onLoginSuccess }) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    // submit login form on enter key
+    // submit login form on press enter
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             handleLogin()
@@ -39,8 +39,10 @@ export default function LoginComponent({ onLoginSuccess }) {
             return
         }
 
+        // default process state
         setLoading(true)
         setError(null)
+
         try {
             const res = await fetch(`${API_URL}/api/auth/login`, {
                 method: 'POST',
@@ -56,13 +58,16 @@ export default function LoginComponent({ onLoginSuccess }) {
             if (res.ok) {
                 onLoginSuccess()
             } else {
+                // get response message
                 const data = await res.json()
                 let message = data.message || data.error || 'Login failed'
-                setError(message)
+                
+                // handle error
                 if (DEV_MODE) console.error(`Login error: ${message}`)
+                setError(message)
             }
         } catch (err) {
-            if (DEV_MODE) console.error('Error logging in: ' + err.message)
+            if (DEV_MODE) console.error(`Error logging in: ${err.message}`)
             setError('Error logging in.')
         } finally {
             setLoading(false)
@@ -70,7 +75,7 @@ export default function LoginComponent({ onLoginSuccess }) {
     }
 
     // show loading screen
-    if (loading) return <Loading/>
+    if (loading) return <LoadingComponent/>
 
     return (
         <div className="flex flex-col items-center justify-center h-screen auth-component p-2" onKeyDown={handleKeyDown}>

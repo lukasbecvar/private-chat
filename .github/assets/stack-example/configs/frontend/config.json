@@ -1,7 +1,7 @@
 {
     "DEV_MODE": true,
     "CHAT_LIMIT": 20,
-    "CHAT_POLLING_TIME": 1000,
+    "CHAT_POLLING_TIME_MS": 1000,
     "API_TIMEOUT_SEC": 5,
     "API_TOKEN": "1234",
     "API_URL": "http://localhost:1337"

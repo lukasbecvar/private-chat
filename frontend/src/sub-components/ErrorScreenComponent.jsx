@@ -1,6 +1,6 @@
 export default function ErrorScreenComponent({ errorMessage, noNavbarOffset = false }) {
     
-    // function to reload the page
+    // function to reload app
     function handleReload() {
         window.location.reload()
     }

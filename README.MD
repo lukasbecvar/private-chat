@@ -106,7 +106,7 @@ The environment variables are loaded from .env file. You can create .env file in
 | --- | --- | --- |
 | DEV_MODE | Enable development mode (true/false) | true |
 | CHAT_LIMIT | Chat limit | 20 |
-| CHAT_POLLING_TIME | Chat polling time (ms) | 1000 |
+| CHAT_POLLING_TIME_MS | Chat polling time (ms) | 1000 |
 | API_TIMEOUT_SEC | API timeout (sec) | 5 |
 | API_TOKEN | API access token | 1234 |
 | API_URL | API url | http://localhost:1337 |
