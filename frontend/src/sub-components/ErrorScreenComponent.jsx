@@ -1,4 +1,4 @@
-export default function ErrorScreenComponent({ errorMessage, noNavbarOffset = false }) {
+export default function ErrorScreenComponent({ errorMessage }) {
     
     // function to reload app
     function handleReload() {
@@ -6,7 +6,7 @@ export default function ErrorScreenComponent({ errorMessage, noNavbarOffset = fa
     }
 
     return (
-        <center className={`flex flex-col items-center justify-center h-screen text-4xl p-4 ${noNavbarOffset ? '' : 'mt-[-80px]'}`}>
+        <center className="flex flex-col items-center justify-center h-screen text-4xl">
             {/* error message */}
             <div className="text-white">{errorMessage}</div>
             

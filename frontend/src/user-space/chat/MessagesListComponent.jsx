@@ -11,6 +11,9 @@ import { TimestampFormatUtil } from '../../utils/TimestampFormatUtil'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 
+// import error screen component
+import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent'
+
 // import default profile image asset
 import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
@@ -24,6 +27,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
     const CHAT_POLLING_TIME_MS = getConfigValue('CHAT_POLLING_TIME_MS')
 
     // states
+    const [error, setError] = useState(null)
     const [messagesError, setMessagesError] = useState(null)
     const [hasMoreMessages, setHasMoreMessages] = useState(true)
     const [messagesLoading, setMessagesLoading] = useState(false)
@@ -234,7 +238,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
             // check maintenance mode status
             if (res.status === 503) {
                 if (DEV_MODE) console.error(`Error polling for new messages: ${data.message}`)
-                setMessagesError(data.message || 'Failed to fetch chat history')
+                setError(data.message || 'Failed to fetch chat history')
                 return
             }
 
@@ -269,7 +273,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
             }
         } catch (err) {
             if (DEV_MODE) console.error(`Error polling for new messages: ${err.message}`)
-            setMessagesError('Polling for new messages failed: ' + err.message)
+            setError('Polling for new messages failed: ' + err.message)
         } finally {
             isPollingRef.current = false
         }
@@ -325,6 +329,9 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
             userScrolledUp.current = false
         },
     }))
+
+    // show error screen
+    if (error) return <ErrorScreenComponent errorMessage={error} noNavbarOffset={true}/>
 
     // render messages list
     return (

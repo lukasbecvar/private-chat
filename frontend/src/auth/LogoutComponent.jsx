@@ -3,8 +3,8 @@ import { useConfig } from '../hooks/useConfig'
 import ErrorScreenComponent from '../sub-components/ErrorScreenComponent'
 
 // import fontawesome
-import { faSignOut } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSignOut, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 export default function LogoutComponent() {
     // get config values
@@ -62,7 +62,11 @@ export default function LogoutComponent() {
     return (
         <button className="bg-red-500 hover:bg-red-400 text-white font-extrabold text-base py-1 px-2 rounded focus:outline-none focus:shadow-outline"
             onClick={handleLogout} disabled={loading} data-testid="logout-button">
-            <FontAwesomeIcon icon={faSignOut}/>
+            {loading ? (
+                <FontAwesomeIcon icon={faSpinner} spin/>
+            ) : (
+                <FontAwesomeIcon icon={faSignOut}/>
+            )}
         </button>
     )
 }
