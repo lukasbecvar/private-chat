@@ -102,7 +102,7 @@ export default function UserSpaceComponent() {
     if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     return (
-        <div className="h-screen flex flex-col bg-gray-800">
+        <div className="h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800">
             {/* nav-bar */}
             <NavbarElement userData={userData}/>
 

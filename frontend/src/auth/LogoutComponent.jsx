@@ -60,7 +60,7 @@ export default function LogoutComponent() {
     if (error) return <ErrorScreenComponent errorMessage={error}/>
 
     return (
-        <button className="bg-red-500 hover:bg-red-400 text-white font-extrabold text-base py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+        <button className="bg-red-500 hover:bg-red-400 text-white font-bold text-base py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-colors duration-300"
             onClick={handleLogout} disabled={loading} data-testid="logout-button">
             {loading ? (
                 <FontAwesomeIcon icon={faSpinner} spin/>

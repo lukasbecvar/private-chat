@@ -21,7 +21,7 @@ describe('NavbarElement', () => {
 
         // expect user info
         expect(screen.getByText('JohnDoe')).toBeInTheDocument()
-        expect(screen.getByText('(active)')).toBeInTheDocument()
+        expect(screen.getByText('active')).toBeInTheDocument()
     })
 
     // test render logout button

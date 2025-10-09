@@ -360,7 +360,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                 return (
                     <div key={message.id}>
                         {showTimestamp && (
-                            <div className="text-center text-gray-500 text-xs my-2">
+                            <div className="text-center text-gray-500 text-xs my-4">
                                 {TimestampFormatUtil(message.timestamp)}
                             </div>
                         )}
@@ -373,12 +373,21 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                                 />
                             )}
                             <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'} ${!isCurrentUser && !showImage ? 'ml-8' : ''}`}>
-                                <div className="inline-block max-w-xs md:max-w-xl">
-                                    <div className={`p-3 break-words whitespace-pre-wrap ${isCurrentUser ? (message.error ? 'bg-blue-800' : 'bg-blue-700') : (message.error ? 'bg-gray-800' : 'bg-gray-700')} ${isCurrentUser ? 'text-white' : 'text-gray-300'} ${message.error ? 'rounded-t-lg' : 'rounded-lg'}`}>
-                                        {message.message}
-                                    </div>
+                                <div className="inline-block max-w-xs md:max-w-2xl">
+                                <div
+                                    className={`p-3 break-words whitespace-pre-wrap 
+                                        ${isCurrentUser 
+                                            ? (message.error ? 'bg-red-800/80' : 'bg-blue-600') 
+                                            : (message.error ? 'bg-red-800/80' : 'bg-gray-700/60')
+                                        } 
+                                        ${isCurrentUser ? 'text-white' : 'text-gray-200'}
+                                        ${message.error ? 'rounded-t-lg' : 'rounded-2xl'}
+                                    `}
+                                    >
+                                    {message.message}
+                                </div>
                                     {message.error && (
-                                        <div className={`p-3 break-words whitespace-pre-wrap bg-red-800 text-red-200 rounded-b-lg text-xs flex items-center`}>
+                                        <div className={`p-2 break-words whitespace-pre-wrap bg-red-800/50 text-red-200 rounded-b-lg text-xs flex items-center`}>
                                             <FontAwesomeIcon icon={faExclamationTriangle} className="mr-2"/>
                                             {message.error}
                                         </div>

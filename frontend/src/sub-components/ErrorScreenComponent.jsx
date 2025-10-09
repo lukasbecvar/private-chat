@@ -1,3 +1,6 @@
+import { faRedo } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
 export default function ErrorScreenComponent({ errorMessage }) {
     
     // function to reload app
@@ -23,10 +26,7 @@ export default function ErrorScreenComponent({ errorMessage }) {
                 "
                 onClick={handleReload}
             >
-                <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.0001 10.4311C20.0001 15.6422 15.6422 20.0001 10.4311 20.0001C5.21999 20.0001 0.862061 15.6422 0.862061 10.4311C0.862061 5.21999 5.21999 0.862061 10.4311 0.862061C13.5362 0.862061 16.2958 2.37983 18.0001 4.76206" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M18.0001 1V4.76206H14.238" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <FontAwesomeIcon icon={faRedo} className="w-6 h-6 mr-3"/>
                 <span className="relative">Reload</span>
             </button>
         </center>

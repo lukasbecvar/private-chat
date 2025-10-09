@@ -5,6 +5,10 @@ import MessagesListComponent from './MessagesListComponent'
 import MessageInputComponent from './MessageInputComponent'
 import ErrorScreenComponent from '../../sub-components/ErrorScreenComponent'
 
+// import fontawesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+
 // import default profile image asset
 import defaultProfileImage from '../../assets/images/default-profile-image.png'
 
@@ -29,19 +33,17 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
     if (!chat) return <div className="w-full md:w-2/2 mt-10 flex items-center justify-center text-2xl text-gray-400">Select a chat to start messaging</div>
 
     return (
-        <div className="flex flex-col bg-gray-800 h-full">
-            <div className="flex items-center p-1.5 border-b border-gray-700">
+        <div className="flex flex-col bg-gray-800/70 h-full">
+            <div className="flex items-center p-1.5 border-b border-gray-700/50 shadow-sm">
                 <button className="md:hidden mr-4 text-white" onClick={onBack} aria-label="Back">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
+                    <FontAwesomeIcon icon={faChevronLeft} className="h-6 w-6 mt-1"/>
                 </button>
                 <img
                     alt={chat.username}
-                    className="w-8 h-8 rounded-full mr-3 border border-gray-400/50"
+                    className="w-8 h-8 rounded-full mr-3 border-2 border-gray-600"
                     src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
                 />
-                <h3 className="text-white font-bold">{chat.username}</h3>
+                <h3 className="text-white font-semibold text-lg">{chat.username}</h3>
             </div>
 
             {/* chat messages list */}

@@ -104,15 +104,15 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
 
     // render chat list
     return (
-        <div className="bg-gray-800 border-r border-gray-700 overflow-y-auto h-full" id="chat-list">
+        <div className="bg-gray-800/70 border-r border-gray-700/50 overflow-y-auto h-full" id="chat-list">
             {/* search bar */}
-            <div className="p-0.5 border-b border-gray-700">
+            <div className="p-[2px] border-b border-gray-700/50">
                 <input
                     type="text"
                     value={searchTerm}
                     placeholder="Search username..."
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full p-2 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 bg-gray-700/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-colors duration-300"
                 />
             </div>
 
@@ -121,11 +121,10 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                 <div
                     key={chat['chat-id']}
                     onClick={() => onSelectChat(chat)}
-                    className={`flex items-center p-3 cursor-pointer border-b border-gray-700 ${selectedChat && selectedChat['chat-id'] === chat['chat-id'] ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-                >
+                    className={`flex items-center p-3 cursor-pointer border-b border-gray-700/50 transition-colors duration-200 ${selectedChat && selectedChat['chat-id'] === chat['chat-id'] ? 'bg-blue-600/50' : 'hover:bg-gray-700/50'}`}>
                     <img
                         alt={chat.username}
-                        className="w-12 h-12 rounded-full mr-4 flex-shrink-0 border border-gray-400/50"
+                        className="w-12 h-12 rounded-full mr-4 flex-shrink-0"
                         src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
                     />
                     <div className="flex-1 min-w-0">

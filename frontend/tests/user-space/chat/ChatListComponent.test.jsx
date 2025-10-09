@@ -235,8 +235,9 @@ describe('ChatListComponent', () => {
             const bobChat = screen.getByText('Bob').closest('.flex.items-center')
             const aliceChat = screen.getByText('Alice').closest('.flex.items-center')
 
-            expect(aliceChat).toHaveClass('bg-gray-700')
-            expect(bobChat).not.toHaveClass('bg-gray-700')
+            // expect alice to be highlighted
+            expect(aliceChat).toHaveClass('bg-blue-600/50')
+            expect(bobChat).not.toHaveClass('bg-blue-600/50')
         })
     })
 

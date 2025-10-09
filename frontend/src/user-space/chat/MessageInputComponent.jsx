@@ -1,6 +1,9 @@
 import { useState, useRef } from 'react'
 import { useConfig } from '../../hooks/useConfig'
 
+// import bouncing loader
+import BouncingLoader from '../../sub-components/BouncingLoader'
+
 // import fontawesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
@@ -83,7 +86,7 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
 
     // return message input box
     return (
-        <div className="p-0.5 bg-gray-800 border-t border-gray-700">
+        <div className="p-[2px] bg-gray-800/70 border-t border-gray-700/50 backdrop-blur-sm">
             <div className="relative">
                 <input
                     type="text"
@@ -93,15 +96,15 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
                     placeholder="Type a message..."
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(newMessage)}
-                    className="w-full bg-gray-700 text-white py-2 px-2 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-gray-700/60 text-white py-3 px-2 pr-12 focus:outline-none transition-colors duration-300"
                 />
                 <button
                     disabled={isSending}
                     data-testid="send-button"
                     onClick={() => handleSendMessage(newMessage)}
-                    className="absolute right-0 top-0 h-full px-3 text-blue-500 hover:text-blue-400 disabled:opacity-50"
+                    className="absolute right-0 top-0 h-full px-4 text-blue-500 hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
                 >
-                    {isSending ? '...' : <FontAwesomeIcon icon={faPaperPlane}/>}
+                    {isSending ? <BouncingLoader/> : <FontAwesomeIcon icon={faPaperPlane}/>}
                 </button>
             </div>
         </div>
