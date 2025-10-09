@@ -140,12 +140,12 @@ This software is licensed under the [MIT license](LICENSE).
 
 # ToDo-List
 - [ ] API version check (check if backend version is compatible with frontend version)
+- [ ] User online/offline status (show online status in chat list)
 - [ ] Global chat for all users
-- [ ] hyperlink handling support
+- [ ] hyperlink support
 - [ ] Ban system (non active status)
     - [ ] Command for ban/unban user
     - [ ] Show banned status in user list and chat list
-- [ ] User online/offline status (show online status in chat list)
 - [ ] Account settings
     - [ ] Change profile picture (only for self)
     - [ ] Change username (only for self)
@@ -158,6 +158,11 @@ This software is licensed under the [MIT license](LICENSE).
             - [ ] Role
             - [ ] Registered time
             - [ ] Last login time
+- [ ] Chat info view
+    - [ ] Chat name
+    - [ ] Chatters list
+    - [ ] Messages count
+    - [ ] Last message time
 - [ ] File sharing
     - [ ] Image viewer
     - [ ] Video player
