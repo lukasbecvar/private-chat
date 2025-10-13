@@ -118,7 +118,7 @@ export default function LoginComponent({ onLoginSuccess }) {
 
                     {/* form submit button */}
                     <button
-                        className="relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 group"
+                        className="relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 group"
                         onClick={handleLogin} disabled={loading}
                         type="button"
                     >
