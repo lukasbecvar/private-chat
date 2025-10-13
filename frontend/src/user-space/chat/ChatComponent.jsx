@@ -35,12 +35,12 @@ export default function ChatComponent({ chat, onBack, onChatLoaded }) {
     return (
         <div className="flex flex-col bg-gray-800/70 h-full">
             <div className="flex items-center p-1.5 border-b border-gray-700/50 shadow-sm">
-                <button className="md:hidden mr-4 text-white" onClick={onBack} aria-label="Back">
+                <button className="md:hidden mr-1 text-white" onClick={onBack} aria-label="Back">
                     <FontAwesomeIcon icon={faChevronLeft} className="h-6 w-6 mt-1"/>
                 </button>
                 <img
                     alt={chat.username}
-                    className="w-8 h-8 rounded-full mr-3 border-2 border-gray-600"
+                    className="w-8 h-8 rounded-full mr-2 border-2 border-gray-600"
                     src={chat['profile-picture'] === 'nonset-default' ? defaultProfileImage : chat['profile-picture']}
                 />
                 <h3 className="text-white font-semibold text-lg">{chat.username}</h3>
