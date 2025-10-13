@@ -2,6 +2,8 @@
 
 namespace App\Util;
 
+use Exception;
+use InvalidArgumentException;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,6 +24,23 @@ class AppUtil
     {
         $this->requestStack = $requestStack;
         $this->kernelInterface = $kernelInterface;
+    }
+
+    /**
+     * Generate random key
+     *
+     * @param int $length The key length
+     *
+     * @return string The generated key
+     */
+    public function generateKey(int $length = 16): string
+    {
+        // check if length is valid
+        if ($length < 1) {
+            throw new InvalidArgumentException('Length must be greater than 0.');
+        }
+
+        return bin2hex(random_bytes($length));
     }
 
     /**
@@ -161,5 +180,68 @@ class AppUtil
     public function getEncryptionPassword(): string
     {
         return $this->getEnvValue('APP_SECRET');
+    }
+
+    /**
+     * Update environment variable value
+     *
+     * @param string $key The environment variable key
+     * @param string $value The environment variable value
+     *
+     * @throws Exception If the environment variable update fails
+     */
+    public function updateEnvValue(string $key, string $value): void
+    {
+        // get base .env file
+        $mainEnvFile = $this->getAppRootDir() . '/.env';
+
+        // chec if .env file exists
+        if (!file_exists($mainEnvFile)) {
+            throw new Exception('.env file not found');
+        }
+
+        // load base .env file content
+        $mainEnvContent = file_get_contents($mainEnvFile);
+        if ($mainEnvContent === false) {
+            throw new Exception('Failed to read .env file');
+        }
+
+        // load current environment name
+        if (preg_match('/^APP_ENV=(\w+)$/m', $mainEnvContent, $matches)) {
+            $env = $matches[1];
+        } else {
+            throw new Exception('APP_ENV not found in .env file');
+        }
+
+        // get current environment file
+        $envFile = $this->getAppRootDir() . '/.env.' . $env;
+
+        // check if current environment file exists
+        if (!file_exists($envFile)) {
+            throw new Exception(".env.$env file not found");
+        }
+
+        // get current environment content
+        $envContent = file_get_contents($envFile);
+
+        // check if current environment loaded correctly
+        if ($envContent === false) {
+            throw new Exception("Failed to read .env.$env file");
+        }
+
+        try {
+            if (preg_match('/^' . $key . '=.*/m', $envContent, $matches)) {
+                $newEnvContent = preg_replace('/^' . $key . '=.*/m', "$key=$value", $envContent);
+
+                // write new content to environment file
+                if (file_put_contents($envFile, $newEnvContent) === false) {
+                    throw new Exception('Failed to write to .env ' . $env . ' file');
+                }
+            } else {
+                throw new Exception($key . ' not found in .env file');
+            }
+        } catch (Exception $e) {
+            throw new Exception('Error to update environment variable: ' . $e->getMessage());
+        }
     }
 }

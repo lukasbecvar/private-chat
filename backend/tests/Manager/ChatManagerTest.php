@@ -14,6 +14,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Repository\PrivateChatMessageRepository;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -212,5 +213,51 @@ class ChatManagerTest extends TestCase
 
         // call tested method
         $this->chatManager->saveMessageToChat(1, 2, 'message');
+    }
+
+    /**
+     * Test re-encrypt chat messages
+     *
+     * @return void
+     */
+    public function testReEncryptChatMessages(): void
+    {
+        // prepare fake messages
+        $message1 = $this->createMock(PrivateChatMessage::class);
+        $message1->method('getId')->willReturn(101);
+        $message1->method('getMessage')->willReturn('encrypted_old_1');
+        $message1->expects($this->once())->method('setMessage')->with('encrypted_new_1');
+        $message2 = $this->createMock(PrivateChatMessage::class);
+        $message2->method('getId')->willReturn(102);
+        $message2->method('getMessage')->willReturn('encrypted_old_2');
+        $message2->expects($this->once())->method('setMessage')->with('encrypted_new_2');
+
+        // repository returns fake messages
+        $this->privateChatMessageRepositoryMock->method('findAll')->willReturn([$message1, $message2]);
+
+        // mock decryption method
+        $this->encryptionUtilMock->method('decryptAes')->willReturnCallback(fn($encryptedData) => match ($encryptedData) {
+            'encrypted_old_1' => 'decrypted_1',
+            'encrypted_old_2' => 'decrypted_2',
+            default => null,
+        });
+
+        // mock encryption method
+        $this->encryptionUtilMock->method('encryptAes')->willReturnCallback(fn($plainText, $key) => match ($plainText) {
+            'decrypted_1' => 'encrypted_new_1',
+            'decrypted_2' => 'encrypted_new_2',
+            default => null,
+        });
+
+        // expect entity manager calls
+        $this->entityManagerMock->expects($this->exactly(2))->method('persist');
+        $this->entityManagerMock->expects($this->once())->method('flush');
+
+        // mock console output
+        $ioMock = $this->createMock(SymfonyStyle::class);
+        $ioMock->method('writeln');
+
+        // call tested method
+        $this->chatManager->reEncryptChatMessages('old_pass', 'new_pass', $ioMock);
     }
 }

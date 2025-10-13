@@ -11,6 +11,7 @@ use App\Entity\PrivateChatMessage;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PrivateChatMessageRepository;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -273,5 +274,52 @@ class ChatManager
                 exceptionMessage: $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Re-encrypt all chat messages for rotate encryption password
+     *
+     * @param string $oldEncryptionPassword The old encryption password
+     * @param string $newEncryptionPassword The new encryption password
+     * @param SymfonyStyle $io The console output
+     *
+     * @return void
+     */
+    public function reEncryptChatMessages(string $oldEncryptionPassword, string $newEncryptionPassword, SymfonyStyle $io): void
+    {
+        // get all chat messages
+        $messages = $this->privateChatMessageRepository->findAll();
+
+        // re-encrypt messages
+        foreach ($messages as $message) {
+            $chatMessage = $message->getMessage();
+            if ($chatMessage === null) {
+                $io->writeln('Skipping message: ' . $message->getId());
+                continue;
+            } else {
+                $io->writeln('Re-encrypting message: ' . $message->getId());
+            }
+
+            // decrypt message
+            $decryptedMessage = $this->encryptionUtil->decryptAes(encryptedData: $chatMessage, key: $oldEncryptionPassword);
+            if ($decryptedMessage === null) {
+                $this->errorManager->handleError(
+                    message: 'Error to decrypt message',
+                    code: JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+                );
+            }
+
+            // re-encrypt message
+            $reEncryptedMessage = $this->encryptionUtil->encryptAes(plainText: $decryptedMessage, key: $newEncryptionPassword);
+
+            // update message
+            $message->setMessage($reEncryptedMessage);
+
+            // persist message update
+            $this->entityManager->persist($message);
+        }
+
+        // flush changes
+        $this->entityManager->flush();
     }
 }

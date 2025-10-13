@@ -28,13 +28,16 @@ class EncryptionUtil
      *
      * @param string $plainText The plain text to encrypt
      * @param string $method The encryption method (default: AES-128-CBC)
+     * @param string|null $key The encryption key (default: APP_SECRET)
      *
      * @return string The base64-encoded encrypted string
      */
-    public function encryptAes(string $plainText, string $method = 'AES-128-CBC'): string
+    public function encryptAes(string $plainText, string $method = 'AES-128-CBC', ?string $key = null): string
     {
-        // encryption password
-        $key = $this->appUtil->getEncryptionPassword();
+        // default encryption key
+        if ($key === null) {
+            $key = $this->appUtil->getEnvValue('APP_SECRET');
+        }
 
         // derive fixed-size key using PBKDF2 with SHA-256
         $derivedKey = hash_pbkdf2('sha256', $key, '', 10000, 32);
@@ -56,13 +59,16 @@ class EncryptionUtil
      *
      * @param string $encryptedData The base64-encoded encrypted string
      * @param string $method The encryption method (default: AES-128-CBC)
+     * @param string|null $key The encryption key (default: APP_SECRET)
      *
      * @return string|null The decrypted string or null on error
      */
-    public function decryptAes(string $encryptedData, string $method = 'AES-128-CBC'): ?string
+    public function decryptAes(string $encryptedData, string $method = 'AES-128-CBC', ?string $key = null): ?string
     {
-        // decryption password
-        $key = $this->appUtil->getEncryptionPassword();
+        // default encryption key
+        if ($key === null) {
+            $key = $this->appUtil->getEnvValue('APP_SECRET');
+        }
 
         // derive fixed-size key using PBKDF2 with SHA-256
         $derivedKey = hash_pbkdf2('sha256', $key, '', 10000, 32);
