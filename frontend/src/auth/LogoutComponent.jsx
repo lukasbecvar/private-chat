@@ -40,15 +40,15 @@ export default function LogoutComponent() {
                     const data = await res.json()
 
                     // handle error
-                    if (DEV_MODE) console.error(`Logout error: ${data.message}`)
+                    if (DEV_MODE) console.error(`[LogoutComponent]: Logout error: ${data.message}`)
                     setError(data.message || 'Logout failed')
                 } catch (e) {
-                    if (DEV_MODE) console.error(`Error to get error data from response: ${e.message}`)
+                    if (DEV_MODE) console.error(`[LogoutComponent]: Error to get error data from response: ${e.message}`)
                     setError('Logout failed.')
                 }
             }
         } catch (err) {
-            if (DEV_MODE) console.error('Error logging out: ' + err.message)
+            if (DEV_MODE) console.error('[LogoutComponent]: Error logging out: ' + err.message)
             setError('Logout failed.')
         } finally {
             // reload the page if logout was successful

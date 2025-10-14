@@ -67,11 +67,11 @@ export default function LoginComponent({ onLoginSuccess }) {
                 let message = data.message || data.error || 'Login failed'
                 
                 // handle error
-                if (DEV_MODE) console.error(`Login error: ${message}`)
+                if (DEV_MODE) console.error(`[LoginComponent]: Login error: ${message}`)
                 setError(message)
             }
         } catch (err) {
-            if (DEV_MODE) console.error(`Error logging in: ${err.message}`)
+            if (DEV_MODE) console.error(`[LoginComponent]: Error logging in: ${err.message}`)
             setError('Error logging in.')
         } finally {
             setLoading(false)

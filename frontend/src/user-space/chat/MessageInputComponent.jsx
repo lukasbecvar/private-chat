@@ -55,7 +55,7 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
                     }
                 }, 100)
             } else {
-                if (DEV_MODE) console.error(`Error sending message: ${data.message}`)
+                if (DEV_MODE) console.error(`[MessageInputComponent]: Error sending message: ${data.message}`)
                 const temporaryId = Date.now()
                 const failedMessage = {
                     sender: null,
@@ -68,7 +68,7 @@ export default function MessageInputComponent({ chat, onMessageSent, setMessages
                 setNewMessage('')
             }
         } catch (error) {
-            if (DEV_MODE) console.error(`Error sending message: ${error.message}`)
+            if (DEV_MODE) console.error(`[MessageInputComponent]: Error sending message: ${error.message}`)
             const temporaryId = Date.now()
             const failedMessage = {
                 sender: null,

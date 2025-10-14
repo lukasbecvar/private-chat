@@ -63,7 +63,7 @@ export default function UserSpaceComponent() {
                     setError(data.message || 'Failed to fetch user info')
                 }
             } catch (err) {
-                if (DEV_MODE) console.error('Error fetching user info: ' + err.message)
+                if (DEV_MODE) console.error('[UserSpaceComponent]: Error fetching user info: ' + err.message)
                 setError('Error fetching user info.')
             } finally {
                 setLoading(false)

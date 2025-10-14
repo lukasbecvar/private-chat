@@ -21,7 +21,7 @@ export const ConfigProvider = ({ children }) => {
             })
             .then(cfg => setConfig(cfg))
             .catch(err => {
-                console.error('Failed to load config.json', err)
+                console.error('[ConfigProvider]: Failed to load config.json', err)
                 setError(err)
             })
     }, [])

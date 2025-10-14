@@ -57,11 +57,11 @@ export default function ChatListComponent({ onSelectChat, currentUser, onChatLis
                     onChatListLoad(transformedChats)
                 }
             } else {
-                if (DEV_MODE) console.error(`Error fetching chat list: ${data.message}`)
+                if (DEV_MODE) console.error(`[ChatListComponent]: Error fetching chat list: ${data.message}`)
                 setError(data.message || 'Failed to fetch chat list')
             }
         } catch (err) {
-            if (DEV_MODE) console.error(`Error fetching chat list: ${err.message}`)
+            if (DEV_MODE) console.error(`[ChatListComponent]: Error fetching chat list: ${err.message}`)
             setError('Error fetching chat list.')
         } finally {
             if (!isPolling) {

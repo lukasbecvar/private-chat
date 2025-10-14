@@ -68,7 +68,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
 
                 // check maintenance mode status
                 if (countRes.status === 503) {
-                    if (DEV_MODE) console.error(`Error fetching chat history: ${countData.message}`)
+                    if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${countData.message}`)
                     setMessagesError(countData.message || 'Failed to fetch chat history')
                     return
                 }
@@ -79,7 +79,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                         setMessages([])
                         setMessagesError("This chat is empty \n You can start messaging by sending a message!")
                     } else {
-                        if (DEV_MODE) console.error(`Error fetching chat history: ${countData.message}`)
+                        if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${countData.message}`)
                         setMessagesError('Error fetching chat history: ' + countData.message)
                     }
                     return
@@ -104,7 +104,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
 
                 // check maintenance mode status
                 if (messagesRes.status === 503) {
-                    if (DEV_MODE) console.error(`Error fetching chat history: ${messagesData.message}`)
+                    if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${messagesData.message}`)
                     setMessagesError(messagesData.message || 'Failed to fetch chat history.')
                     return
                 }
@@ -117,13 +117,13 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     if (initialOffset === 0) {
                         setHasMoreMessages(false)
                     }
-                    if (DEV_MODE) console.log(`[ChatComponent] Initial messages displayed: ${messagesToDisplay.length}. Total count: ${totalCount}`)
+                    if (DEV_MODE) console.log(`[ChatComponent]: Initial messages displayed: ${messagesToDisplay.length}. Total count: ${totalCount}`)
                 } else {
-                    if (DEV_MODE) console.error(`Error fetching chat history: ${messagesData.message}`)
+                    if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${messagesData.message}`)
                     setMessagesError('Error fetching chat history: ' + messagesData.message)
                 }
             } catch (err) {
-                if (DEV_MODE) console.error(`Error fetching chat history: ${err.message}`)
+                if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${err.message}`)
                 setMessagesError('Error fetching chat history: ' + err.message)
             } finally {
                 setMessagesLoading(false)
@@ -155,7 +155,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
 
         try {
             // log info to console
-            if (DEV_MODE) console.log(`Fetching chat history for chat_id: ${chat['chat-id']}, limit: ${limit}, offset: ${offset}`)
+            if (DEV_MODE) console.log(`[ChatComponent]: Fetching chat history for chat_id: ${chat['chat-id']}, limit: ${limit}, offset: ${offset}`)
 
             // fetch chat history
             let url = `${API_URL}/api/chat/history?chat_id=${chat['chat-id']}&limit=${limit}&offset=${offset}`
@@ -173,7 +173,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
             // check if response is successful
             if (res.ok && data.status === 'success') {
                 if (DEV_MODE) {
-                    console.log(`Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`)
+                    console.log(`[ChatComponent]: Received ${data.data.length} messages. IDs: ${data.data.length > 0 ? `${data.data[0].id} - ${data.data[data.data.length - 1].id}` : 'N/A'}`)
                 }
                 if (data.data.length < limit || offset === 0) {
                     setHasMoreMessages(false)
@@ -183,7 +183,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                         const existingMessageIds = new Set(prevMessages.map(msg => msg.id))
                         const newUniqueMessages = data.data.filter(msg => !existingMessageIds.has(msg.id))
                         const newMessages = [...newUniqueMessages, ...prevMessages]
-                        if (DEV_MODE) console.log(`[ChatComponent] Total messages on page: ${newMessages.length}`)
+                        if (DEV_MODE) console.log(`[ChatComponent]: Total messages on page: ${newMessages.length}`)
                         return newMessages
                     })
                 } else {
@@ -198,12 +198,12 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     setMessagesError("This chat is empty \n You can start messaging by sending a message!")
                 } else {
                     setMessagesError(data.message || 'Failed to fetch chat history')
-                    if (DEV_MODE) console.error(`Error fetching chat history: ${data.message}`)
+                    if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${data.message}`)
                 }
             }
         } catch (err) {
             setMessagesError('Error fetching chat history.')
-            if (DEV_MODE) console.error(`Error fetching chat history: ${err.message}`)
+            if (DEV_MODE) console.error(`[ChatComponent]: Error fetching chat history: ${err.message}`)
         } finally {
             if (!prepend && showLoadingIndicator) {
                 setMessagesLoading(false)
@@ -237,14 +237,14 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
 
             // check maintenance mode status
             if (res.status === 503) {
-                if (DEV_MODE) console.error(`Error polling for new messages: ${data.message}`)
+                if (DEV_MODE) console.error(`[ChatComponent]: Error polling for new messages: ${data.message}`)
                 setError(data.message || 'Failed to fetch chat history')
                 return
             }
 
             // check if response is successful
             if (res.ok && data.status === 'success' && data.data.length > 0) {
-                if (DEV_MODE) console.log('[ChatComponent] Polling for new messages...')
+                if (DEV_MODE) console.log('[ChatComponent]: Polling for new messages...')
 
                 // check if user has scrolled up
                 if (chatContainerRef.current) {
@@ -263,8 +263,8 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                     if (uniqueNewMessages.length > 0) {
                         const updatedMessages = [...prevMessages, ...uniqueNewMessages]
                         if (DEV_MODE) {
-                            console.log(`[ChatComponent] Polled ${uniqueNewMessages.length} new messages.`)
-                            console.log(`[ChatComponent] Total messages on page: ${updatedMessages.length}`)
+                            console.log(`[ChatComponent]: Polled ${uniqueNewMessages.length} new messages.`)
+                            console.log(`[ChatComponent]: Total messages on page: ${updatedMessages.length}`)
                         }
                         return updatedMessages
                     }
@@ -272,7 +272,7 @@ const MessagesListComponent = forwardRef(({ chat, onChatLoaded, messages, setMes
                 })
             }
         } catch (err) {
-            if (DEV_MODE) console.error(`Error polling for new messages: ${err.message}`)
+            if (DEV_MODE) console.error(`[ChatComponent]: Error polling for new messages: ${err.message}`)
             setError('Polling for new messages failed: ' + err.message)
         } finally {
             isPollingRef.current = false

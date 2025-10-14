@@ -38,13 +38,13 @@ export default function ApiStatusCheckContainer({ children }) {
                 if (!res.ok || data.status !== 'success') {
                     const msg = data.message || 'Unknown API error'
                     setErrorMessage(msg)
-                    if (DEV_MODE) console.error(`API Error at ${API_URL}: ${msg}`)
+                    if (DEV_MODE) console.error(`[APIStatusCheck]: API Error at ${API_URL}: ${msg}`)
                 } else {
                     setErrorMessage(null)
                 }
             } catch (e) {
                 setErrorMessage('Unable to connect to the server. Please try again later.')
-                if (DEV_MODE) console.error(`Error connecting to API: ${API_URL}`, e.message)
+                if (DEV_MODE) console.error(`[APIStatusCheck]: Error connecting to API: ${API_URL}`, e.message)
             }
             setLoading(false)
         }
