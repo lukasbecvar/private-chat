@@ -18,6 +18,7 @@ export default function ApiStatusCheckContainer({ children }) {
         // get config values
         const API_URL = getConfigValue('API_URL')
         const DEV_MODE = getConfigValue('DEV_MODE')
+        const API_VERSION = getConfigValue('API_VERSION')
         const API_TIMEOUT_SEC = getConfigValue('API_TIMEOUT_SEC')
 
         // api fetch method
@@ -40,7 +41,11 @@ export default function ApiStatusCheckContainer({ children }) {
                     setErrorMessage(msg)
                     if (DEV_MODE) console.error(`[APIStatusCheck]: API Error at ${API_URL}: ${msg}`)
                 } else {
-                    setErrorMessage(null)
+                    if (data.version !== API_VERSION) {
+                        setErrorMessage(`API version mismatch. Expected: ${API_VERSION}, Actual: ${data.version}`)
+                    } else {
+                        setErrorMessage(null)
+                    }
                 }
             } catch (e) {
                 setErrorMessage('Unable to connect to the server. Please try again later.')
