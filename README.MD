@@ -139,6 +139,7 @@ Contributions are welcome! Please fork this repository and submit pull requests 
 This software is licensed under the [MIT license](LICENSE). 
 
 # ToDo-List
+- [ ] Add github action for Build & Attach archive on release
 - [ ] Error reporting (frontend bug reporting system)
 - [ ] User online/offline status (show online status in chat list)
 - [ ] Global chat for all users
