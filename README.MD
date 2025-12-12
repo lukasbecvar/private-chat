@@ -165,7 +165,7 @@ This software is licensed under the [MIT license](LICENSE).
     - [ ] Chatters list
     - [ ] Messages count
     - [ ] Last message time
-- [ ] File sharing
+- [ ] File sharing (with miniIO-S3 storage)
     - [ ] Image viewer
     - [ ] Video player
     - [ ] Audo player
